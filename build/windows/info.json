@@ -1,16 +1,15 @@
 {
-  "fixed": {
-    "file_version": "0.1.0"
-  },
-  "info": {
-    "0000": {
-      "ProductVersion": "0.1.0",
-      "CompanyName": "AIUB Companion",
-      "FileDescription": "AIUB Companion is a software application designed to assist students of the American International University-Bangladesh (AIUB) in managing their academic and campus life. It provides features such as course management, event notifications, and campus resources.",
-      "LegalCopyright": "© 2026, AIUB Companion",
-      "ProductName": "AIUB Companion",
-      "Comments": "This application is developed to enhance the student experience at AIUB by providing a centralized platform for accessing important information and resources related to their academic journey and campus activities."
-    }
-  }
+	"fixed": {
+		"file_version": "0.1.0"
+	},
+	"info": {
+		"0000": {
+			"ProductVersion": "0.1.0",
+			"CompanyName": "AIUB Companion",
+			"FileDescription": "AIUB Companion",
+			"LegalCopyright": "(c) 2026, AIUB Companion",
+			"ProductName": "AIUB Companion",
+			"Comments": "This application is developed to enhance the student experience at AIUB by providing a centralized platform for accessing important information and resources related to their academic journey and campus activities."
+		}
+	}
 }
-
