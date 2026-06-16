@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/Settings",
+  "$defs": {
+    "Settings": {
+      "properties": {
+        "theme": {
+          "type": "string",
+          "enum": [
+            "light",
+            "dark",
+            "system"
+          ]
+        },
+        "log_level": {
+          "type": "string",
+          "enum": [
+            "DEBUG",
+            "INFO",
+            "WARN",
+            "ERROR"
+          ]
+        },
+        "sync": {
+          "$ref": "#/$defs/sync"
+        },
+        "launch": {
+          "$ref": "#/$defs/launch"
+        },
+        "notifications": {
+          "$ref": "#/$defs/notification"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "theme",
+        "log_level",
+        "sync",
+        "launch",
+        "notifications"
+      ]
+    },
+    "launch": {
+      "properties": {
+        "start_minimized": {
+          "type": "boolean"
+        },
+        "close_to_tray": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "start_minimized",
+        "close_to_tray"
+      ]
+    },
+    "notification": {
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "enabled"
+      ]
+    },
+    "sync": {
+      "properties": {
+        "interval_minutes": {
+          "type": "integer"
+        },
+        "notice_fetch_count": {
+          "type": "integer"
+        },
+        "on_startup": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "interval_minutes",
+        "notice_fetch_count",
+        "on_startup"
+      ]
+    }
+  }
+}

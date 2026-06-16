@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Name=My Product
+Comment=A aiub-companion application
+# The Exec line includes %u to pass the URL to the application
+Exec=/usr/local/bin/aiub-companion.exe %u
+Terminal=false
+Type=Application
+Icon=aiub-companion.exe
+Categories=Utility;
+StartupWMClass=aiub-companion.exe
+
+ 
