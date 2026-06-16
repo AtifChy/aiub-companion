@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-var ftsSpecial = regexp.MustCompile(`[^\p{L}\p{N}\s]`)
+var ftsSpecial = regexp.MustCompile(`[^\p{L}\p{M}\p{N}\s]`)
 
 func SanitizeQuery(input string) string {
 	input = strings.TrimSpace(input)
