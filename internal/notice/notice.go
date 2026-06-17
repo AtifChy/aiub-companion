@@ -34,11 +34,11 @@ type Attachment struct {
 
 // Filter represents query criteria for retrieving notices.
 type Filter struct {
-	Category string
-	Search   string
 	Urgent   *bool
 	Pinned   *bool
 	Unread   *bool
+	Category string
+	Search   string
 	Limit    int
 	Offset   int
 }
