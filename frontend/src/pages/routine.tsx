@@ -134,7 +134,7 @@ export default function RoutinePage() {
   );
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-10 mx-auto flex h-full flex-col gap-6 p-6 duration-200 lg:p-10">
+    <div className="animate-in fade-in-10 mx-auto flex h-full flex-col gap-6 p-6 duration-200 lg:p-10">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Class Routine</h1>
