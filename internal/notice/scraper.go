@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net"
 	"net/http"
 	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/microcosm-cc/bluemonday"
@@ -216,53 +216,73 @@ func (s *scraper) isAttachment(n *html.Node) bool {
 }
 
 func (s *scraper) fetchHTML(ctx context.Context, url string) (*html.Node, error) {
+	const maxAttempts = 3
+	backoff := time.Second
+
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+
+		doc, retriable, err := s.fetchWithRetriable(ctx, url)
+		if err == nil {
+			return doc, nil
+		}
+
+		if attempt == maxAttempts || !retriable {
+			return nil, fmt.Errorf("failed to fetch after %d attempts: %w", attempt, err)
+		}
+
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		case <-time.After(backoff):
+			backoff *= 2
+		}
+	}
+
+	return nil, fmt.Errorf("failed to fetch %s after %d attempts", url, maxAttempts)
+}
+
+func (s *scraper) fetchWithRetriable(ctx context.Context, url string) (*html.Node, bool, error) {
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+		return nil, false, fmt.Errorf("failed to create request: %w", err)
 	}
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36")
 
 	resp, err := s.client.Do(req)
 	if err != nil {
 		if netErr, ok := errors.AsType[net.Error](err); ok && netErr.Timeout() {
-			return nil, fmt.Errorf("timeout fetching %s: %w", url, err)
+			return nil, true, fmt.Errorf("timeout fetching %s: %w", url, err)
 		}
 		if dnsErr, ok := errors.AsType[*net.DNSError](err); ok {
 			if dnsErr.IsNotFound {
-				return nil, fmt.Errorf("no internet or host found: %w", dnsErr)
+				return nil, false, fmt.Errorf("no internet or host found: %w", dnsErr)
 			}
-			return nil, fmt.Errorf("DNS error fetching %s: %w", url, dnsErr)
+			return nil, true, fmt.Errorf("DNS error fetching %s: %w", url, dnsErr)
 		}
 		if opErr, ok := errors.AsType[*net.OpError](err); ok {
-			if sysErr, ok := errors.AsType[syscall.Errno](err); ok {
-				switch sysErr {
-				case syscall.ECONNREFUSED:
-					return nil, fmt.Errorf("connection refused: %w", opErr)
-				case syscall.ECONNRESET:
-					return nil, fmt.Errorf("connection reset: %w", opErr)
-				case syscall.ENETUNREACH:
-					return nil, fmt.Errorf("network unreachable: %w", opErr)
-				}
-			}
-			return nil, fmt.Errorf("operation error fetching %s: %w", url, opErr)
+			return nil, true, fmt.Errorf("operation error fetching %s: %w", url, opErr)
 		}
-		return nil, fmt.Errorf("failed to fetch %s: %w", url, err)
+		return nil, false, fmt.Errorf("failed to fetch %s: %w", url, err)
 	}
 	defer func() {
 		if closeErr := resp.Body.Close(); closeErr != nil {
-			application.Get().Logger.Warn("Failed to close response body", "url", url, "error", closeErr)
+			slog.Warn("Failed to close response body", "url", url, "error", closeErr)
 		}
 	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status %d for %s", resp.StatusCode, url)
+		is5xx := resp.StatusCode >= 500 && resp.StatusCode < 600
+		return nil, is5xx, fmt.Errorf("unexpected status %d for %s", resp.StatusCode, url)
 	}
 
 	doc, err := html.Parse(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse HTML: %w", err)
+		return nil, false, fmt.Errorf("failed to parse HTML: %w", err)
 	}
-	return doc, nil
+	return doc, false, nil
 }
 
 func findNodesByClass(n *html.Node, tagName, className string) []*html.Node {

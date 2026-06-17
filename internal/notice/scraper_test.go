@@ -2,10 +2,13 @@ package notice
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync/atomic"
 	"testing"
+	"time"
 
 	"golang.org/x/net/html"
 )
@@ -37,6 +40,110 @@ func parseHTML(t *testing.T, s string) *html.Node {
 }
 
 // fetchHTML tests
+
+func TestFetchHTML_RetryOn5xxFailure(t *testing.T) {
+	var attempts atomic.Int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		attempts.Add(1)
+		w.WriteHeader(http.StatusServiceUnavailable) // 503 Service Unavailable (retriable)
+	}))
+	defer srv.Close()
+
+	s := &scraper{
+		client:  srv.Client(),
+		baseURL: srv.URL,
+	}
+
+	_, err := s.fetchHTML(context.Background(), srv.URL)
+	if err == nil {
+		t.Fatal("expected error from repeated 503 responses, got nil")
+	}
+
+	expectedAttempts := int32(3) // maxAttempts configured in fetchHTML
+	actualAttempts := attempts.Load()
+	if actualAttempts != expectedAttempts {
+		t.Errorf("expected %d fetch attempts, got %d", expectedAttempts, actualAttempts)
+	}
+}
+
+func TestFetchHTML_RetryAndRecover(t *testing.T) {
+	var attempts atomic.Int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		currentAttempt := attempts.Add(1)
+		if currentAttempt == 1 {
+			w.WriteHeader(http.StatusInternalServerError) // 500 failure first
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("<html><body><p>success</p></body></html>"))
+	}))
+	defer srv.Close()
+
+	s := &scraper{
+		client:  srv.Client(),
+		baseURL: srv.URL,
+	}
+
+	doc, err := s.fetchHTML(context.Background(), srv.URL)
+	if err != nil {
+		t.Fatalf("expected recovery and success on second attempt, got error: %v", err)
+	}
+	if doc == nil {
+		t.Fatal("expected parsed document, got nil")
+	}
+
+	actualAttempts := attempts.Load()
+	if actualAttempts != 2 {
+		t.Errorf("expected recovery on attempt 2, but took %d attempts", actualAttempts)
+	}
+}
+
+func TestFetchHTML_NoRetryOn404(t *testing.T) {
+	var attempts atomic.Int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		attempts.Add(1)
+		w.WriteHeader(http.StatusNotFound) // 404 Not Found
+	}))
+	defer srv.Close()
+
+	s := &scraper{
+		client:  srv.Client(),
+		baseURL: srv.URL,
+	}
+
+	_, err := s.fetchHTML(context.Background(), srv.URL)
+	if err == nil {
+		t.Fatal("expected error for 404 response, got nil")
+	}
+
+	actualAttempts := attempts.Load()
+	if actualAttempts != 1 {
+		t.Errorf("expected exactly 1 attempt for non-retriable 404, got %d", actualAttempts)
+	}
+}
+
+func TestFetchHTML_ContextCancellation(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusServiceUnavailable) // 503 to trigger retry logic
+	}))
+	defer srv.Close()
+
+	s := &scraper{
+		client:  srv.Client(),
+		baseURL: srv.URL,
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	time.AfterFunc(1*time.Second, cancel) // Cancel after 1 second
+
+	_, err := s.fetchHTML(ctx, srv.URL)
+	if err == nil {
+		t.Fatal("expected error due to context cancellation, got nil")
+	}
+	if !errors.Is(err, context.Canceled) {
+		t.Errorf("expected error chain to contain `context.Canceled`, got %v", err)
+	}
+}
 
 func TestFetchHTML_OK(t *testing.T) {
 	s, srv := newTestScraper(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
