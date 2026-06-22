@@ -210,6 +210,14 @@
   }
 }
 
+@utility wails-drag {
+  --wails-draggable: drag;
+}
+
+@utility wails-no-drag {
+  --wails-draggable: no-drag;
+}
+
 @utility prose-custom {
   --tw-prose-body: var(--foreground);
   --tw-prose-headings: var(--foreground);

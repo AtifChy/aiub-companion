@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useDebounce } from "@/hooks/use-debounce";
 import { Course } from "@bindings/routine";
 import {
   AddToUserRoutine,
@@ -10,6 +11,7 @@ import {
   RemoveFromUserRoutine,
   SearchOfferedCourses,
 } from "@bindings/routine/service";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Dialogs } from "@wailsio/runtime";
 import {
   CalendarIcon,
@@ -21,7 +23,7 @@ import {
   Trash2Icon,
   UserIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 const DAYS: readonly string[] = [
@@ -35,58 +37,34 @@ const DAYS: readonly string[] = [
 ];
 
 export default function RoutinePage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<Course[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [routine, setRoutine] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  // load routine on mount
-  useEffect(() => {
-    fetchRoutine();
-  }, []);
+  const routineQuery = useQuery({
+    queryKey: ["routine"],
+    queryFn: () => GetUserRoutine(),
+  });
 
-  useEffect(() => {
-    if (!searchQuery.trim()) {
-      setSearchResults([]);
-      return;
-    }
+  const routine = routineQuery.data ?? [];
+  const loading = routineQuery.isLoading;
 
-    setIsSearching(true);
-    const delayDebounceFn = setTimeout(() => {
-      SearchOfferedCourses(searchQuery)
-        .then((results) => setSearchResults(results || []))
-        .catch((err) =>
-          toast.error("Failed to search courses", {
-            description: err instanceof Error ? err.message : String(err),
-          }),
-        )
-        .finally(() => setIsSearching(false));
-    }, 300);
+  const [search, setSearch] = useState("");
+  const searchDebounced = useDebounce(search, 300);
 
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery]);
+  const courseQuery = useQuery({
+    queryKey: ["courses", searchDebounced],
+    queryFn: () => SearchOfferedCourses(searchDebounced),
+    enabled: searchDebounced.trim().length > 0,
+  });
 
-  const fetchRoutine = async () => {
-    setLoading(true);
-    try {
-      const data = await GetUserRoutine();
-      setRoutine(data || []);
-    } catch (err) {
-      toast.error("Failed to fetch routine", {
-        description: err instanceof Error ? err.message : String(err),
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const searchResults = courseQuery.data ?? [];
+  const isSearching = courseQuery.isLoading;
 
   const handleAddCourse = async (classId: string) => {
     try {
       await AddToUserRoutine(classId);
+      setSearch("");
+      queryClient.invalidateQueries({ queryKey: ["routine"] });
       toast.success("Course added to routine");
-      setSearchQuery("");
-      fetchRoutine();
     } catch (err) {
       toast.error("Failed to add course", {
         description: err instanceof Error ? err.message : String(err),
@@ -98,7 +76,7 @@ export default function RoutinePage() {
     try {
       await RemoveFromUserRoutine(classId);
       toast.success("Course removed from routine");
-      fetchRoutine();
+      queryClient.invalidateQueries({ queryKey: ["routine"] });
     } catch (err) {
       toast.error("Failed to remove course", {
         description: err instanceof Error ? err.message : String(err),
@@ -153,8 +131,8 @@ export default function RoutinePage() {
         <div className="relative">
           <SearchIcon className="text-muted-foreground absolute top-1/2 left-5 size-5 -translate-1/2" />
           <Input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search Course"
             className="h-10 pl-10 text-base shadow-sm"
           />
@@ -163,7 +141,7 @@ export default function RoutinePage() {
           )}
         </div>
 
-        {searchQuery !== "" && searchResults.length > 0 && (
+        {search !== "" && searchResults.length > 0 && (
           <Card className="scrollbar-thumb-accent fade-in-10 animate-in absolute mt-2 max-h-90 w-full scrollbar-thin overflow-y-auto scroll-smooth rounded p-0 shadow-lg duration-200">
             <div className="flex flex-col">
               {searchResults.map((course) => (
@@ -206,7 +184,7 @@ export default function RoutinePage() {
           </Card>
         )}
 
-        {searchQuery !== "" && !isSearching && searchResults.length === 0 && (
+        {search !== "" && !isSearching && searchResults.length === 0 && (
           <Card className="text-muted-foreground animate-in fade-in-10 absolute mt-2 w-full rounded p-4 text-center text-sm shadow-lg duration-200">
             No courses found
           </Card>

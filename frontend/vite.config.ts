@@ -11,9 +11,6 @@ export default defineConfig({
     host: "127.0.0.1",
     port: Number(process.env.WAILS_VITE_PORT) || 9245,
     strictPort: true,
-    watch: {
-      ignored: ["**/bindings/**", "**/.bindings-tmp-*/**"],
-    },
   },
   plugins: [
     react(),
@@ -32,13 +29,26 @@ export default defineConfig({
       output: {
         codeSplitting: {
           groups: [
-            { name: "react", test: /node_modules[\\/]react/, priority: 20 },
+            {
+              name: "react",
+              test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom)[\\/]/,
+              priority: 20,
+            },
             {
               name: "ui",
-              test: /node_modules[\\/](antd|radix-ui|base-ui|shadcn|lucide-react)/,
+              test: /[\\/]node_modules[\\/](@radix-ui|lucide-react|sonner|clsx|tailwind-merge|class-variance-authority|framer-motion)[\\/]/,
               priority: 15,
             },
-            { name: "vendor", test: /node_modules/, priority: 10 },
+            {
+              name: "wails",
+              test: /[\\/]node_modules[\\/]@wailsio[\\/]/,
+              priority: 12,
+            },
+            {
+              name: "vendor",
+              test: /[\\/]node_modules[\\/]/,
+              priority: 10,
+            },
           ],
         },
       },

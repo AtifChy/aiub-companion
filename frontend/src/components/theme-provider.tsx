@@ -1,3 +1,4 @@
+import { GetSettings } from "@bindings/settings/service";
 import { createContext, useContext, useEffect, useState } from "react";
 
 export type Theme = "dark" | "light" | "system";
@@ -29,6 +30,17 @@ export function ThemeProvider({
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme,
   );
+
+  useEffect(() => {
+    GetSettings()
+      .then((config) => {
+        if (!config) return;
+        const theme = config.theme as Theme;
+        setTheme(theme);
+        localStorage.setItem(storageKey, theme);
+      })
+      .catch(console.error);
+  }, [storageKey]);
 
   useEffect(() => {
     const root = window.document.documentElement;

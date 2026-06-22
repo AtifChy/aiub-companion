@@ -11,8 +11,8 @@ import {
 import { sections } from "@/lib/routes";
 import { Command, Copyright, type LucideIcon } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import type { Info as AppInfo } from "@bindings/app";
-import { GetInfo as GetAppInfo } from "@bindings/app/service";
+import type { Info as AppInfo } from "@bindings/meta";
+import { GetInfo as GetAppInfo } from "@bindings/meta/service";
 
 export type NavItem = {
   label: string;

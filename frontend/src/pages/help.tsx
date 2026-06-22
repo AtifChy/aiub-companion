@@ -1,19 +1,19 @@
-import { useState } from "react";
-import {
-  HelpCircleIcon,
-  SearchIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-  GitBranchIcon,
-  ExternalLinkIcon,
-  InfoIcon,
-} from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Browser } from "@wailsio/runtime";
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  ExternalLinkIcon,
+  GitBranchIcon,
+  HelpCircleIcon,
+  InfoIcon,
+  SearchIcon,
+} from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 interface FAQItem {
@@ -65,7 +65,7 @@ export default function HelpPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <div className="bg-background animate-in fade-in-10 scrollbar-thumb-accent h-full scrollbar-thin space-y-8 overflow-y-scroll p-6 duration-200 lg:p-10">
+    <div className="bg-background animate-in fade-in-10 scrollbar-thumb-accent h-full scrollbar-thin scrollbar-gutter-both space-y-8 overflow-y-auto p-6 duration-200 lg:p-10">
       <Header />
 
       {/* FAQ Section */}

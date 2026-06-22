@@ -1,48 +1,63 @@
+import { AlertDialogDestructive } from "@/components/alert-dialog-destructive";
+import {
+  SettingRow,
+  SettingsCard,
+  SettingSelect,
+} from "@/components/settings/settings";
 import { useTheme, type Theme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { GetSettings, SaveSettings } from "@bindings/settings/service";
 import type { Settings } from "@bindings/settings";
-import { Loader2Icon, LucideSave } from "lucide-react";
+import { GetSettings, SaveSettings } from "@bindings/settings/service";
+import { Loader2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useMutative, type Updater } from "use-mutative";
 
-const themeItems: Record<Theme, string> = {
-  light: "Light",
-  dark: "Dark",
-  system: "System",
-};
+type Items<T extends string | number> = { value: T; label: string }[];
 
-const logLevelItems: { label: string; value: string }[] = [
-  { label: "Debug", value: "DEBUG" },
-  { label: "Info", value: "INFO" },
-  { label: "Warning", value: "WARNING" },
-  { label: "Error", value: "ERROR" },
+const themeItems: Items<Theme> = [
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
+  { value: "system", label: "System" },
+];
+
+const logLevelItems: Items<string> = [
+  { value: "DEBUG", label: "Debug" },
+  { value: "INFO", label: "Info" },
+  { value: "WARNING", label: "Warning" },
+  { value: "ERROR", label: "Error" },
+];
+
+const syncIntervalItems: Items<number> = [
+  { value: 30, label: "30 minutes" },
+  { value: 60, label: "60 minutes" },
+  { value: 120, label: "2 hours" },
+  { value: 180, label: "3 hours" },
+  { value: 360, label: "6 hours" },
+];
+
+const fetchCountItems: Items<number> = [
+  { value: 10, label: "10 notices" },
+  { value: 20, label: "20 notices" },
+  { value: 30, label: "30 notices" },
+  { value: 50, label: "50 notices" },
 ];
 
 export default function SettingsPage() {
   const { setTheme } = useTheme();
+
   const [loading, setLoading] = useState(true);
   const [showLoader, setShowLoader] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [config, setConfig] = useState<Settings | null>(null);
+
+  const [config, updateConfig] = useMutative<Settings | undefined>(undefined);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowLoader(true), 150);
 
     GetSettings()
       .then((data) => {
-        setConfig(data);
+        updateConfig(() => structuredClone(data));
         setLoading(false);
       })
       .catch((err) => {
@@ -54,54 +69,23 @@ export default function SettingsPage() {
       .finally(() => clearTimeout(timer));
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [updateConfig]);
 
-  const handleSave = async () => {
+  useEffect(() => {
     if (!config) return;
-    setSaving(true);
-    try {
-      await SaveSettings(config);
-      setTheme(config.theme as Theme);
-      toast.success("Settings saved successfully");
-    } catch (err) {
-      toast.error("Failed to save settings", {
-        description: err instanceof Error ? err.message : String(err),
-      });
-    } finally {
-      setSaving(false);
-    }
-  };
 
-  function updateConfig<K extends keyof Settings>(
-    key: K,
-    value: Settings[K],
-  ): void;
-  function updateConfig<
-    K extends {
-      [P in keyof Settings]: Settings[P] extends object ? P : never;
-    }[keyof Settings],
-    NK extends keyof Settings[K],
-  >(section: K, key: NK, value: Settings[K][NK]): void;
-
-  function updateConfig(
-    key: unknown,
-    valueOrKey: unknown,
-    nestedValue?: unknown,
-  ) {
-    setConfig((prev) => {
-      if (!prev) return prev;
-      if (nestedValue !== undefined) {
-        return {
-          ...prev,
-          [key as string]: {
-            ...prev[key as string],
-            [valueOrKey as string]: nestedValue,
-          },
-        };
+    const timer = setTimeout(async () => {
+      try {
+        await SaveSettings(config);
+        setTheme(config.theme as Theme);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        toast.error("Failed to save settings", { description: message });
       }
-      return { ...prev, [key as string]: valueOrKey };
-    });
-  }
+    }, 200);
+
+    return () => clearTimeout(timer);
+  }, [config, setTheme]);
 
   if (loading) {
     if (!showLoader) return null;
@@ -120,9 +104,19 @@ export default function SettingsPage() {
     );
   }
 
+  return <SettingsView config={config} updateConfig={updateConfig} />;
+}
+
+function SettingsView({
+  config,
+  updateConfig,
+}: {
+  config: Settings;
+  updateConfig: Updater<Settings | undefined>;
+}) {
   return (
     <div className="animate-in fade-in-10 flex h-full flex-col duration-200">
-      <div className="scrollbar-thumb-accent min-h-0 flex-1 scrollbar-thin space-y-8 overflow-y-auto p-6 lg:p-10">
+      <div className="scrollbar-thumb-accent min-h-0 flex-1 scrollbar-thin scrollbar-gutter-both space-y-8 overflow-y-auto p-6 lg:p-10">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
           <p className="text-muted-foreground mt-2 text-sm">
@@ -132,221 +126,164 @@ export default function SettingsPage() {
 
         <div className="grid gap-6">
           {/*Appearance*/}
-          <Card className="shadow-xs">
-            <CardHeader>
-              <CardTitle>Appearance</CardTitle>
-            </CardHeader>
-            <Separator />
-            <CardContent>
-              <div className="flex items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <Label>Theme</Label>
-                  <p className="text-muted-foreground">
-                    Select your prefered color theme
-                  </p>
-                </div>
-                <Select
-                  items={themeItems}
-                  value={config.theme}
-                  onValueChange={(v) => v !== null && updateConfig("theme", v)}
-                >
-                  <SelectTrigger className="w-30">
-                    <SelectValue placeholder="Select theme" />
-                  </SelectTrigger>
-                  <SelectContent className="p-1">
-                    {Object.entries(themeItems).map((item) => (
-                      <SelectItem key={item[0]} value={item[0]}>
-                        {item[1]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
+          <SettingsCard title="Appearance">
+            <SettingRow
+              label="Theme"
+              description="Select your prefered color theme"
+            >
+              <SettingSelect
+                items={themeItems}
+                value={config.theme}
+                onValueChange={(v) => {
+                  updateConfig((draft) => {
+                    if (draft) draft.theme = v;
+                  });
+                }}
+              />
+            </SettingRow>
+          </SettingsCard>
 
           {/*Sync & Data*/}
-          <Card className="shadow-xs">
-            <CardHeader>
-              <CardTitle>Sync & Data</CardTitle>
-            </CardHeader>
-            <Separator />
-            <CardContent className="flex flex-col gap-4">
-              <div className="flex items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <Label>Sync Interval</Label>
-                  <p className="text-muted-foreground text-sm">
-                    How often to automatically check for new notices
-                  </p>
-                </div>
-                <Select
-                  value={config.sync.interval_minutes}
-                  onValueChange={(v) =>
-                    v !== null && updateConfig("sync", "interval_minutes", v)
-                  }
-                >
-                  <SelectTrigger className="w-30">
-                    <SelectValue placeholder="Select interval" />
-                  </SelectTrigger>
-                  <SelectContent className="w-50 p-1">
-                    {[15, 30, 60, 180].map((interval) => (
-                      <SelectItem key={interval} value={interval}>
-                        Every {interval} minutes
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+          <SettingsCard title="Sync & Data">
+            <SettingRow
+              label="Sync Interval"
+              description="How often to automatically check for new notices"
+            >
+              <SettingSelect
+                items={syncIntervalItems}
+                value={config.sync.interval_minutes}
+                onValueChange={(v) => {
+                  updateConfig((draft) => {
+                    if (draft) draft.sync.interval_minutes = v;
+                  });
+                }}
+              />
+            </SettingRow>
 
-              <div className="flex items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <Label>Notice Per Sync</Label>
-                  <p className="text-muted-foreground text-sm">
-                    The number of recent notices to fetch per sync cycle
-                  </p>
-                </div>
-                <Select
-                  value={config.sync.notice_fetch_count}
-                  onValueChange={(v) =>
-                    v !== null && updateConfig("sync", "notice_fetch_count", v)
-                  }
-                >
-                  <SelectTrigger className="w-30">
-                    <SelectValue placeholder="Select count" />
-                  </SelectTrigger>
-                  <SelectContent className="w-50 p-1">
-                    {[10, 20, 30, 50].map((count) => (
-                      <SelectItem key={count} value={count}>
-                        {count} notices
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <SettingRow
+              label="Notice Per Sync"
+              description="The number of recent notices to fetch per sync cycle"
+            >
+              <SettingSelect
+                items={fetchCountItems}
+                value={config.sync.fetch_count}
+                onValueChange={(v) => {
+                  updateConfig((draft) => {
+                    if (draft) draft.sync.fetch_count = v;
+                  });
+                }}
+              />
+            </SettingRow>
 
-              <div className="flex items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <Label>Sync on Startup</Label>
-                  <p className="text-muted-foreground text-sm">
-                    Automatically sync notices when app starts
-                  </p>
-                </div>
-                <Switch
-                  checked={config.sync.on_startup}
-                  onCheckedChange={(v) => updateConfig("sync", "on_startup", v)}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
+            <SettingRow
+              label="Sync on Startup"
+              description="Automatically sync notices when app starts"
+            >
+              <Switch
+                checked={config.sync.on_startup}
+                onCheckedChange={(v) =>
+                  updateConfig((draft) => {
+                    if (draft) draft.sync.on_startup = v;
+                  })
+                }
+                className="cursor-pointer"
+              />
+            </SettingRow>
+          </SettingsCard>
           {/*Launch & Systray*/}
-          <Card className="shadow-xs">
-            <CardHeader>
-              <CardTitle>Launch & Systray</CardTitle>
-            </CardHeader>
-            <Separator />
-            <CardContent className="flex flex-col gap-4">
-              <div className="flex items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <Label>Start Minimized</Label>
-                  <p className="text-muted-foreground text-sm">
-                    Launch the application directly to the system tray
-                  </p>
-                </div>
-                <Switch
-                  checked={config.launch.start_minimized}
-                  onCheckedChange={(v) =>
-                    updateConfig("launch", "start_minimized", v)
-                  }
-                />
-              </div>
+          <SettingsCard title="Launch & Systray">
+            <SettingRow
+              label="Start Minimized"
+              description="Launch the application directly to the system tray"
+            >
+              <Switch
+                checked={config.launch.start_minimized}
+                onCheckedChange={(v) =>
+                  updateConfig((draft) => {
+                    if (draft) draft.launch.start_minimized = v;
+                  })
+                }
+                className="cursor-pointer"
+              />
+            </SettingRow>
 
-              <div className="flex items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <Label>Close to Tray</Label>
-                  <p className="text-muted-foreground text-sm">
-                    Keep the application running in the background when window
-                    closed
-                  </p>
-                </div>
-                <Switch
-                  checked={config.launch.close_to_tray}
-                  onCheckedChange={(v) =>
-                    updateConfig("launch", "close_to_tray", v)
-                  }
-                />
-              </div>
-            </CardContent>
-          </Card>
+            <SettingRow
+              label="Close to Tray"
+              description="Keep the application running in the background when window closed"
+            >
+              <Switch
+                checked={config.launch.close_to_tray}
+                onCheckedChange={(v) =>
+                  updateConfig((draft) => {
+                    if (draft) draft.launch.close_to_tray = v;
+                  })
+                }
+                className="cursor-pointer"
+              />
+            </SettingRow>
+          </SettingsCard>
 
           {/*Notifications*/}
-          <Card className="shadow-xs">
-            <CardHeader>
-              <CardTitle>Notifications</CardTitle>
-            </CardHeader>
-            <Separator />
-            <CardContent className="flex flex-col gap-4">
-              <div className="flex items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <Label>Enable</Label>
-                  <p className="text-muted-foreground text-sm">
-                    Show desktop alert for new notices
-                  </p>
-                </div>
-                <Switch
-                  checked={config.notifications.enabled}
-                  onCheckedChange={(v) =>
-                    updateConfig("notifications", "enabled", v)
-                  }
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <SettingsCard title="Notifications">
+            <SettingRow
+              label="Enable"
+              description="Show desktop alert for new notices"
+            >
+              <Switch
+                checked={config.notifications.enabled}
+                onCheckedChange={(v) =>
+                  updateConfig((draft) => {
+                    if (draft) draft.notifications.enabled = v;
+                  })
+                }
+                className="cursor-pointer"
+              />
+            </SettingRow>
+          </SettingsCard>
 
           {/*Advanced*/}
-          <Card className="shadow-xs">
-            <CardHeader>
-              <CardTitle>Advanced</CardTitle>
-            </CardHeader>
-            <Separator />
-            <CardContent>
-              <div className="flex items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <Label>Log Level</Label>
-                  <p className="text-muted-foreground">
-                    Ammount of information logged by the application
-                  </p>
-                </div>
-                <Select
-                  items={logLevelItems}
-                  value={config.log_level}
-                  onValueChange={(v) =>
-                    v !== null && updateConfig("log_level", v)
-                  }
-                >
-                  <SelectTrigger className="w-30">
-                    <SelectValue placeholder="Select theme" />
-                  </SelectTrigger>
-                  <SelectContent className="p-1">
-                    {logLevelItems.map((level) => (
-                      <SelectItem key={level.value} value={level.value}>
-                        {level.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+          <SettingsCard title="Advanced">
+            <SettingRow
+              label="Log Level"
+              description="Ammount of information logged by the application"
+            >
+              <SettingSelect
+                items={logLevelItems}
+                value={config.log_level}
+                onValueChange={(v) => {
+                  updateConfig((draft) => {
+                    if (draft) draft.log_level = v;
+                  });
+                }}
+              />
+            </SettingRow>
 
-      <div className="border-t p-4">
-        <div className="flex justify-end">
-          <Button onClick={handleSave} disabled={saving} size="lg">
-            {saving ? <Loader2Icon className="animate-spin" /> : <LucideSave />}
-            {saving ? "Saving..." : "Save Changes"}
-          </Button>
+            <SettingRow
+              label="Open Log File"
+              description="Open the log file in default text editor"
+            >
+              <Button
+                variant="outline"
+                onClick={() => toast.error("Not implemented yet")}
+              >
+                Open Logs
+              </Button>
+            </SettingRow>
+          </SettingsCard>
+
+          {/* Danger Zone */}
+          <SettingsCard title="Danger Zone" variant="destructive">
+            <SettingRow
+              label="Reset All Settings"
+              description="Reset all settings to their default values. This action cannot be undone."
+            >
+              <AlertDialogDestructive
+                label="Reset Settings"
+                description="Are you sure you want to reset all settings to their default values? This action cannot be undone."
+                onClick={() => toast.error("Not implemented yet")}
+              />
+            </SettingRow>
+          </SettingsCard>
         </div>
       </div>
     </div>

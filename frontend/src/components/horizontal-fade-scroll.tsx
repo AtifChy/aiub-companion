@@ -43,7 +43,7 @@ export function HorizontalFadeScroll({
     resizeObserver.observe(container);
 
     return () => resizeObserver.disconnect();
-  }, [children]);
+  }, [checkOverflow]);
 
   const handleWheel = useCallback((e: React.WheelEvent) => {
     const container = scrollRef.current;
@@ -59,7 +59,7 @@ export function HorizontalFadeScroll({
       data-overflow-right={scrollState.right}
       data-overflow-both={scrollState.left && scrollState.right}
       className={cn(
-        "relative w-full overflow-hidden",
+        "relative w-full overflow-hidden select-none",
         "data-[overflow-both=true]:mask-[linear-gradient(to_right,transparent_0%,black_40px,black_calc(100%-40px),transparent_100%)]",
         "data-[overflow-left=true]:data-[overflow-both=false]:mask-[linear-gradient(to_right,transparent_0%,black_40px,black_100%)]",
         "data-[overflow-right=true]:data-[overflow-both=false]:mask-[linear-gradient(to_right,black_0%,black_calc(100%-40px),transparent_100%)]",
