@@ -7,16 +7,16 @@ import (
 	"os"
 	"time"
 
-	"github.com/wailsapp/wails/v3/pkg/application"
-	"github.com/wailsapp/wails/v3/pkg/events"
-	"github.com/wailsapp/wails/v3/pkg/services/notifications"
-
-	appinfo "aiub-companion/internal/app"
 	"aiub-companion/internal/database"
 	"aiub-companion/internal/log"
+	"aiub-companion/internal/meta"
 	"aiub-companion/internal/notice"
 	"aiub-companion/internal/routine"
 	"aiub-companion/internal/settings"
+	"aiub-companion/internal/ui"
+
+	"github.com/wailsapp/wails/v3/pkg/application"
+	"github.com/wailsapp/wails/v3/pkg/services/notifications"
 )
 
 //go:embed all:frontend/dist
@@ -26,8 +26,6 @@ var assets embed.FS
 var version = "dev"
 
 const EventNoticesSynced = "notices:synced"
-
-var mainWindow *application.WebviewWindow
 
 func init() {
 	// Register a custom event whose associated data type is string.
@@ -49,18 +47,28 @@ func main() {
 	}()
 
 	// Set application version from build variable
-	appinfo.SetVersion(version)
+	meta.SetVersion(version)
 
-	cfg, err := settings.Load()
-	if err != nil {
-		slog.Warn("Failed to load settings, using defaults", "error", err)
+	// Initialize settings service
+	settingsService := settings.NewService()
+
+	syncInterval := make(chan time.Duration, 1)
+	applyLogLevel := func(levelStr string) {
+		if level, err := settings.ParseLogLevel(levelStr); err != nil {
+			slog.Warn("Invalid log level in settings", "error", err)
+		} else {
+			logger.SetLevel(level)
+		}
 	}
 
-	if level, err := settings.ParseLogLevel(cfg.LogLevel); err != nil {
-		slog.Warn("Invalid log level in settings", "error", err)
-	} else {
-		logger.SetLevel(level)
-	}
+	settingsService.OnChange(func(new *settings.Settings) {
+		syncInterval <- time.Duration(new.Sync.IntervalMinutes) * time.Minute
+		applyLogLevel(new.LogLevel)
+	})
+
+	// Apply initial settings
+	cfg := settingsService.GetSettings()
+	applyLogLevel(cfg.LogLevel)
 
 	dbInstance, err := database.InitDB()
 	if err != nil {
@@ -83,21 +91,15 @@ func main() {
 	// Initialize Services
 	noticeService := notice.NewService(noticeRepo, noticeClient)
 	routineService := routine.NewService(routineRepo)
-	appService := appinfo.NewService()
-
-	syncInterval := make(chan time.Duration, 1)
-	settingsService := settings.NewService(logger.Level, func(d time.Duration) {
-		syncInterval <- d
-	})
+	appService := meta.NewService()
 
 	// Wails native services
 	notifier := notifications.New()
 
 	// Create a new Wails application by providing the necessary options.
-	var app *application.App
-	app = application.New(application.Options{
-		Name:        appinfo.ID,
-		Description: appinfo.Description,
+	app := application.New(application.Options{
+		Name:        meta.ID,
+		Description: meta.Description,
 		Services: []application.Service{
 			application.NewService(noticeService),
 			application.NewService(routineService),
@@ -118,11 +120,7 @@ func main() {
 			ApplicationShouldTerminateAfterLastWindowClosed: false,
 		},
 		SingleInstance: &application.SingleInstanceOptions{
-			UniqueID: appinfo.ID,
-			OnSecondInstanceLaunch: func(data application.SecondInstanceData) {
-				slog.Info("Second instance launched", "args", data.Args, "dir", data.WorkingDir, "data", data.AdditionalData)
-				showMainWindow(app)
-			},
+			UniqueID: meta.ID,
 			AdditionalData: map[string]string{
 				"launchTime": time.Now().Format(time.RFC1123),
 			},
@@ -130,12 +128,18 @@ func main() {
 		Logger: logger.Logger,
 	})
 
-	// Setup the system tray icon and menu.
-	setupSystemTray(app)
+	// Setup UI Manager
+	manager := ui.NewManager(app, settingsService)
+	manager.SetupTray()
+
+	app.Config().SingleInstance.OnSecondInstanceLaunch = func(data application.SecondInstanceData) {
+		slog.Info("Second instance launched", "args", data.Args, "dir", data.WorkingDir, "data", data.AdditionalData)
+		manager.ShowMainWindow()
+	}
 
 	// Show the main window on startup
 	if !cfg.Launch.StartMinimized {
-		showMainWindow(app)
+		manager.ShowMainWindow()
 	}
 
 	// Sync notices on startup and every 30 minutes.
@@ -149,64 +153,19 @@ func main() {
 	}
 }
 
-func showMainWindow(app *application.App) {
-	if mainWindow == nil {
-		// Create if doesn't exist
-		mainWindow = app.Window.NewWithOptions(application.WebviewWindowOptions{
-			Title:  appinfo.DisplayName,
-			Width:  1024,
-			Height: 768,
-			Mac: application.MacWindow{
-				InvisibleTitleBarHeight: 50,
-				Backdrop:                application.MacBackdropTranslucent,
-				TitleBar:                application.MacTitleBarHiddenInset,
-			},
-			BackgroundColour: application.NewRGBA(0, 0, 0, 255),
-			URL:              "/",
-		})
-		mainWindow.OnWindowEvent(events.Common.WindowClosing, func(event *application.WindowEvent) {
-			mainWindow = nil
-		})
-	}
-
-	// Show and focus the main window.
-	mainWindow.Show()
-	mainWindow.Focus()
-}
-
-func setupSystemTray(app *application.App) {
-	systray := app.SystemTray.New()
-	systray.SetIcon(app.Config().Icon)
-	systray.SetTooltip(appinfo.DisplayName)
-	systray.SetLabel(appinfo.DisplayName)
-	systray.OnDoubleClick(func() {
-		showMainWindow(app)
-	})
-
-	// Create the system tray menu.
-	menu := app.NewMenu()
-	menu.Add("Show").OnClick(func(ctx *application.Context) {
-		showMainWindow(app)
-	})
-	menu.Add("Quit").OnClick(func(ctx *application.Context) {
-		app.Quit()
-	})
-	systray.SetMenu(menu)
-}
-
 func startBackgroundSync(
 	app *application.App,
 	noticeService *notice.Service,
 	notifier *notifications.NotificationService,
-	cfg *settings.Settings,
+	config *settings.Settings,
 	syncInterval chan time.Duration,
 ) {
-	interval := time.Duration(cfg.Sync.IntervalMinutes) * time.Minute
+	interval := time.Duration(config.Sync.IntervalMinutes) * time.Minute
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 
 	doSync := func() {
-		newCount, err := noticeService.SyncNotices(app.Context(), cfg.Sync.NoticeFetchCount)
+		newCount, err := noticeService.SyncNotices(app.Context(), config.Sync.FetchCount)
 		if err != nil {
 			slog.Error("Error syncing notices", "error", err)
 			return
@@ -219,7 +178,7 @@ func startBackgroundSync(
 		title := fmt.Sprintf("%d new notice(s)", newCount)
 		err = notifier.SendNotification(notifications.NotificationOptions{
 			ID:    fmt.Sprintf("sync-%d", time.Now().Local().UnixMilli()),
-			Title: appinfo.DisplayName,
+			Title: meta.DisplayName,
 			Body:  title + " available",
 		})
 		if err != nil {
@@ -231,7 +190,7 @@ func startBackgroundSync(
 	}
 
 	// Run the sync after 5 seconds on startup
-	if cfg.Sync.OnStartup {
+	if config.Sync.OnStartup {
 		slog.Info("Syncing notices on startup")
 		time.AfterFunc(5*time.Second, doSync)
 	}

@@ -11,7 +11,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"aiub-companion/internal/app"
+	"aiub-companion/internal/meta"
 )
 
 type Settings struct {
@@ -22,13 +22,16 @@ type Settings struct {
 	LogLevel string `json:"log_level" jsonschema:"enum=DEBUG,enum=INFO,enum=WARN,enum=ERROR"`
 
 	// Sync
-	Sync sync `json:"sync"`
+	Sync synchronization `json:"sync"`
 
 	// Launch
 	Launch launch `json:"launch"`
 
 	// Notifications
 	Notifications notification `json:"notifications"`
+
+	// Window state
+	Window WindowState `json:"window"`
 }
 
 type notification struct {
@@ -40,13 +43,22 @@ type launch struct {
 	CloseToTray    bool `json:"close_to_tray"`
 }
 
-type sync struct {
-	IntervalMinutes  int  `json:"interval_minutes"`
-	NoticeFetchCount int  `json:"notice_fetch_count"`
-	OnStartup        bool `json:"on_startup"`
+type synchronization struct {
+	IntervalMinutes int  `json:"interval_minutes"`
+	FetchCount      int  `json:"fetch_count"`
+	OnStartup       bool `json:"on_startup"`
 }
 
-func Default() *Settings {
+type WindowState struct {
+	Enabled   bool `json:"enabled"`
+	Width     int  `json:"width"`
+	Height    int  `json:"height"`
+	X         int  `json:"x"`
+	Y         int  `json:"y"`
+	Maximized bool `json:"maximized"`
+}
+
+func defaultSettings() *Settings {
 	return &Settings{
 		Notifications: notification{
 			Enabled: true,
@@ -55,26 +67,31 @@ func Default() *Settings {
 			StartMinimized: false,
 			CloseToTray:    true,
 		},
-		Sync: sync{
-			IntervalMinutes:  30,
-			NoticeFetchCount: 20,
-			OnStartup:        false,
+		Sync: synchronization{
+			IntervalMinutes: 30,
+			FetchCount:      20,
+			OnStartup:       false,
 		},
 		Theme:    "system",
 		LogLevel: "INFO",
+		Window: WindowState{
+			Enabled:   false,
+			Width:     1024,
+			Height:    768,
+			X:         -1,
+			Y:         -1,
+			Maximized: false,
+		},
 	}
 }
 
-func settingsPath() (string, error) {
-	configDir, err := os.UserConfigDir()
-	if err != nil {
-		return "", fmt.Errorf("failed to get user config dir: %w", err)
-	}
-	return filepath.Join(configDir, app.Name, "settings.json"), nil
+func ParseLogLevel(s string) (slog.Level, error) {
+	var level slog.Level
+	return level, level.UnmarshalText([]byte(s))
 }
 
-func Load() (*Settings, error) {
-	s := Default()
+func load() (*Settings, error) {
+	s := defaultSettings()
 
 	path, err := settingsPath()
 	if err != nil {
@@ -106,7 +123,7 @@ func Load() (*Settings, error) {
 	return s, nil
 }
 
-func Save(s *Settings) error {
+func save(s *Settings) error {
 	path, err := settingsPath()
 	if err != nil {
 		return fmt.Errorf("failed to get settings path: %w", err)
@@ -146,7 +163,10 @@ func Save(s *Settings) error {
 	return nil
 }
 
-func ParseLogLevel(s string) (slog.Level, error) {
-	var level slog.Level
-	return level, level.UnmarshalText([]byte(s))
+func settingsPath() (string, error) {
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return "", fmt.Errorf("failed to get user config dir: %w", err)
+	}
+	return filepath.Join(configDir, meta.Name, "settings.json"), nil
 }

@@ -1,4 +1,4 @@
-package app
+package meta
 
 type Info struct {
 	Name    string `json:"name"`

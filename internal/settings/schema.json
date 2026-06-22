@@ -22,13 +22,16 @@
           ]
         },
         "sync": {
-          "$ref": "#/$defs/sync"
+          "$ref": "#/$defs/synchronization"
         },
         "launch": {
           "$ref": "#/$defs/launch"
         },
         "notifications": {
           "$ref": "#/$defs/notification"
+        },
+        "window": {
+          "$ref": "#/$defs/WindowState"
         }
       },
       "additionalProperties": false,
@@ -38,7 +41,40 @@
         "log_level",
         "sync",
         "launch",
-        "notifications"
+        "notifications",
+        "window"
+      ]
+    },
+    "WindowState": {
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "width": {
+          "type": "integer"
+        },
+        "height": {
+          "type": "integer"
+        },
+        "x": {
+          "type": "integer"
+        },
+        "y": {
+          "type": "integer"
+        },
+        "maximized": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "enabled",
+        "width",
+        "height",
+        "x",
+        "y",
+        "maximized"
       ]
     },
     "launch": {
@@ -69,12 +105,12 @@
         "enabled"
       ]
     },
-    "sync": {
+    "synchronization": {
       "properties": {
         "interval_minutes": {
           "type": "integer"
         },
-        "notice_fetch_count": {
+        "fetch_count": {
           "type": "integer"
         },
         "on_startup": {
@@ -85,7 +121,7 @@
       "type": "object",
       "required": [
         "interval_minutes",
-        "notice_fetch_count",
+        "fetch_count",
         "on_startup"
       ]
     }

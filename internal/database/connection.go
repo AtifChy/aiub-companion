@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"aiub-companion/internal/app"
+	"aiub-companion/internal/meta"
 
 	_ "modernc.org/sqlite"
 )
@@ -28,12 +28,12 @@ func InitDB() (*DBInstance, error) {
 		return nil, fmt.Errorf("failed to get user config dir: %w", err)
 	}
 
-	appDir := filepath.Join(configDir, app.Name)
+	appDir := filepath.Join(configDir, meta.Name)
 	if err := os.MkdirAll(appDir, 0o755); err != nil {
 		return nil, fmt.Errorf("failed to create app dir: %w", err)
 	}
 
-	dbPath := filepath.Join(appDir, app.Name+".db")
+	dbPath := filepath.Join(appDir, meta.Name+".db")
 
 	// Open the database connection
 	conn, err := sql.Open("sqlite", dbPath)

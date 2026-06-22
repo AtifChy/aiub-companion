@@ -1,5 +1,5 @@
-// Package app defines the application metadata and version information.
-package app
+// Package meta defines the application metadata and version information.
+package meta
 
 const (
 	ID          = "io.github.atifchy.aiub-companion"

@@ -6,10 +6,10 @@ require (
 	github.com/lmittmann/tint v1.1.3
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
-	github.com/wailsapp/wails/v3 v3.0.0-alpha2.103
+	github.com/wailsapp/wails/v3 v3.0.0-alpha2.105
 	github.com/xuri/excelize/v2 v2.10.1
 	golang.org/x/net v0.56.0
-	modernc.org/sqlite v1.52.0
+	modernc.org/sqlite v1.53.0
 )
 
 require (
