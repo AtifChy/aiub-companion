@@ -14,22 +14,22 @@ import { useMutative, type Updater } from "use-mutative";
 
 interface SettingsContextType {
   config: Settings;
-  updateConfig: Updater<Settings | undefined>;
+  setConfig: Updater<Settings | undefined>;
 }
 
 const SettingsContext = createContext<SettingsContextType | null>(null);
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
-  const [config, updateConfig] = useMutative<Settings | undefined>(undefined);
+  const [config, setConfig] = useMutative<Settings | undefined>(undefined);
   const hydratedRef = useRef(false);
 
   useEffect(() => {
     SettingsService.GetSettings()
       .then((config) => {
-        updateConfig(() => config && rawReturn(structuredClone(config)));
+        setConfig(() => config && rawReturn(structuredClone(config)));
       })
       .catch((err) => logger.error("Failed to load settings: ", err));
-  }, [updateConfig]);
+  }, [setConfig]);
 
   useEffect(() => {
     if (!config) return;
@@ -59,7 +59,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <SettingsContext.Provider value={{ config, updateConfig }}>
+    <SettingsContext.Provider value={{ config, setConfig }}>
       {children}
     </SettingsContext.Provider>
   );

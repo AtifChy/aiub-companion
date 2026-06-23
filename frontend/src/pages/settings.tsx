@@ -37,7 +37,7 @@ const fetchCountItems: Items<number> = [10, 20, 30, 50].map((v) => ({
 }));
 
 export default function SettingsPage() {
-  const { config, updateConfig } = useSettings();
+  const { config, setConfig } = useSettings();
 
   if (!config) {
     return (
@@ -47,7 +47,7 @@ export default function SettingsPage() {
     );
   }
 
-  return <SettingsView config={config} updateConfig={updateConfig} />;
+  return <SettingsView config={config} updateConfig={setConfig} />;
 }
 
 function SettingsView({
