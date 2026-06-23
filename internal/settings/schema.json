@@ -83,6 +83,9 @@
         },
         "restore_window": {
           "type": "boolean"
+        },
+        "sidebar_open": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false,
@@ -90,7 +93,8 @@
       "required": [
         "start_minimized",
         "close_to_tray",
-        "restore_window"
+        "restore_window",
+        "sidebar_open"
       ]
     },
     "notification": {

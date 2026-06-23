@@ -198,6 +198,21 @@ function SettingsView({
                 className="cursor-pointer"
               />
             </SettingRow>
+
+            <SettingRow
+              label="Sidebar Open"
+              description="Keep the sidebar open on app start"
+            >
+              <Switch
+                checked={config.launch.sidebar_open}
+                onCheckedChange={(v) =>
+                  updateConfig((draft) => {
+                    if (draft) draft.launch.sidebar_open = v;
+                  })
+                }
+                className="cursor-pointer"
+              />
+            </SettingRow>
           </SettingsCard>
 
           {/*Advanced*/}

@@ -42,6 +42,7 @@ type launch struct {
 	StartMinimized bool `json:"start_minimized"`
 	CloseToTray    bool `json:"close_to_tray"`
 	RestoreWindow  bool `json:"restore_window"`
+	SidebarOpen    bool `json:"sidebar_open"`
 }
 
 type synchronization struct {
@@ -67,6 +68,7 @@ func defaultSettings() *Settings {
 			StartMinimized: false,
 			CloseToTray:    true,
 			RestoreWindow:  false,
+			SidebarOpen:    true,
 		},
 		Sync: synchronization{
 			IntervalMinutes: 30,

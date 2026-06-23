@@ -1,5 +1,5 @@
 import Layout from "@/Layout";
-import { SettingsProvider } from "@/components/settings-provider";
+import { SettingsProvider, useSettings } from "@/components/settings-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,33 +16,38 @@ const queryClient = new QueryClient({
   },
 });
 
-function App() {
+export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <SettingsProvider>
-        <ThemeProvider>
-          <SidebarProvider defaultOpen={false}>
-            <TooltipProvider>
-              <HashRouter>
-                <Routes>
-                  <Route element={<Layout />}>
-                    <Route index element={<Navigate to={routes[0].path} />} />
-                    {routes.map((route) => (
-                      <Route
-                        key={route.path}
-                        path={route.path}
-                        element={<route.component />}
-                      />
-                    ))}
-                  </Route>
-                </Routes>
-              </HashRouter>
-            </TooltipProvider>
-          </SidebarProvider>
-        </ThemeProvider>
+        <ShellProviders>
+          <HashRouter>
+            <Routes>
+              <Route element={<Layout />}>
+                <Route index element={<Navigate to={routes[0].path} />} />
+                {routes.map((route) => (
+                  <Route
+                    key={route.path}
+                    path={route.path}
+                    element={<route.component />}
+                  />
+                ))}
+              </Route>
+            </Routes>
+          </HashRouter>
+        </ShellProviders>
       </SettingsProvider>
     </QueryClientProvider>
   );
 }
 
-export default App;
+function ShellProviders({ children }: { children: React.ReactNode }) {
+  const { config } = useSettings();
+  return (
+    <ThemeProvider>
+      <SidebarProvider defaultOpen={config.launch.sidebar_open}>
+        <TooltipProvider>{children}</TooltipProvider>
+      </SidebarProvider>
+    </ThemeProvider>
+  );
+}
