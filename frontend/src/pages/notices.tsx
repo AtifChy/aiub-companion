@@ -20,18 +20,15 @@ import {
 } from "@/components/ui/resizable";
 import { Separator } from "@/components/ui/separator";
 import { Toggle } from "@/components/ui/toggle";
-import { useDebounce } from "@/hooks/use-debounce";
-import { cn } from "@/lib/utils";
-import { Notice } from "@bindings/notice";
 import {
-  GetNoticeDetails,
-  GetNotices,
-  SyncNotices,
-  ToggleNoticePinned,
-  ToggleNoticeRead,
-} from "@bindings/notice/service";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Browser, Events } from "@wailsio/runtime";
+  useNotices,
+  useSync,
+  type Category,
+  type NoticeFilters,
+} from "@/hooks/use-notices";
+import { cn } from "@/lib/utils";
+import type { Notice } from "@bindings/notice";
+import { Browser } from "@wailsio/runtime";
 import {
   CircleCheckBigIcon,
   CircleIcon,
@@ -54,9 +51,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-const PAGE_SIZE = 30;
-
-const CATEGORIES: readonly string[] = [
+const CATEGORIES: Category[] = [
   "all",
   "general",
   "admission",
@@ -68,9 +63,7 @@ const CATEGORIES: readonly string[] = [
   "holiday",
 ];
 
-type Category = Exclude<(typeof CATEGORIES)[number], "all">;
-
-const categoryStyles: Record<Category, string> = {
+const categoryStyles: Record<Exclude<Category, "all">, string> = {
   admission: "border-blue-500/20 bg-blue-500/10 text-blue-500",
   exam: "border-red-500/20 bg-red-500/10 text-red-500",
   registration: "border-violet-500/20 bg-violet-500/10 text-violet-500",
@@ -81,57 +74,44 @@ const categoryStyles: Record<Category, string> = {
   general: "border-zinc-500/20 bg-zinc-500/10 text-zinc-500",
 };
 
+const INITIAL_FILTERS: NoticeFilters = {
+  search: "",
+  category: "all",
+  urgent: false,
+  pinned: false,
+  unread: false,
+};
+
 export default function NoticesPage() {
-  const queryClient = useQueryClient();
-
-  const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState<Category | "all">("all");
-  const [filter, setFilter] = useState({
-    urgent: false,
-    pinned: false,
-    unread: false,
-  });
-
-  const [syncing, setSyncing] = useState(false);
+  const [filters, setFilters] = useState<NoticeFilters>(INITIAL_FILTERS);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const debouncedSearch = useDebounce(search, 300);
   const searchRef = useRef<HTMLInputElement>(null);
 
-  const noticesQuery = useQuery({
-    queryKey: ["notices", activeCategory, debouncedSearch, filter],
-    queryFn: () =>
-      GetNotices({
-        Category: activeCategory === "all" ? "" : activeCategory,
-        Search: debouncedSearch,
-        Urgent: filter.urgent || null,
-        Pinned: filter.pinned || null,
-        Unread: filter.unread || null,
-        Limit: PAGE_SIZE,
-        Offset: 0,
-      }),
-  });
+  const { listQuery, detailQuery, toggleRead, togglePin } = useNotices(
+    filters,
+    selectedId,
+  );
+  const { syncing, sync } = useSync();
 
-  const notices = noticesQuery.data ?? [];
-  const loadingList = noticesQuery.isLoading;
-  const fetchError = noticesQuery.error;
+  const notices = listQuery.data ?? [];
+  const unreadCount = notices.filter((notice) => !notice.isRead).length;
 
-  const noticeDetailsQuery = useQuery({
-    queryKey: ["noticeDetails", selectedId],
-    queryFn: () => GetNoticeDetails(selectedId!),
-    enabled: !!selectedId,
-  });
+  const detail = detailQuery.data ?? null;
 
-  const detail = noticeDetailsQuery.data ?? null;
-  const loadingDetail = noticeDetailsQuery.isLoading && !detail;
+  const handleSelect = async (notice: Notice) => {
+    if (notice.id === selectedId) return;
+    setSelectedId(notice.id);
+    if (!notice.isRead) {
+      await toggleRead(notice.id, true);
+    }
+  };
 
-  const unreadCount = notices.filter((n) => !n.isRead).length;
-
-  // search on "/" key
+  // Focus search input on "/" press
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "/" && document.activeElement !== searchRef.current) {
-        e.preventDefault();
+    const handler = (event: KeyboardEvent) => {
+      if (event.key === "/" && document.activeElement !== searchRef.current) {
+        event.preventDefault();
         searchRef.current?.focus();
       }
     };
@@ -139,319 +119,320 @@ export default function NoticesPage() {
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
-  // listen for notices synced event
-  useEffect(() => {
-    const cleanup = Events.On("notices:synced", async (count) => {
-      toast.success(`${count.data} new notice` + (count.data !== 1 ? "s" : ""));
-      queryClient.invalidateQueries({ queryKey: ["notices"] });
-    });
-    return cleanup;
-  }, [queryClient]);
-
-  // select notice
-  const handleSelect = async (notice: Notice) => {
-    if (notice.id === selectedId) return;
-
-    setSelectedId(notice.id);
-
-    if (notice.isRead) return;
-
-    try {
-      await ToggleNoticeRead(notice.id, true);
-      queryClient.invalidateQueries({ queryKey: ["notices"] });
-    } catch (err) {
-      toast.error("Failed to mark notice as read: " + err);
-    }
-  };
-
-  // toggle read
-  const handleToggleRead = async () => {
-    if (!detail) return;
-    const next = !detail.isRead;
-    try {
-      await ToggleNoticeRead(detail.id, next);
-      queryClient.invalidateQueries({ queryKey: ["notices"] });
-    } catch (err) {
-      toast.error("Failed to toggle read: " + err);
-    }
-  };
-
-  // toggle pin
-  const handleTogglePin = async (
-    id: string,
-    current: boolean,
-    e?: React.MouseEvent,
-  ) => {
-    e?.stopPropagation();
-    const next = !current;
-    try {
-      await ToggleNoticePinned(id, next);
-      queryClient.invalidateQueries({ queryKey: ["notices"] });
-    } catch (err) {
-      toast.error("Failed to toggle pin: " + err);
-    }
-  };
-
-  // sync notices
-  const handleSync = async () => {
-    setSyncing(true);
-    try {
-      const count = await SyncNotices(PAGE_SIZE);
-      if (count > 0) {
-        toast.success(`Synced ${count} notice${count !== 1 ? "s" : ""}.`, {
-          position: "top-center",
-        });
-      } else {
-        toast.info("No new notices to sync.");
-      }
-      await queryClient.invalidateQueries({ queryKey: ["notices"] });
-    } catch (err) {
-      toast.error("Failed to sync notices: " + err);
-    } finally {
-      setSyncing(false);
-    }
-  };
-
   return (
-    <ResizablePanelGroup
-      orientation="horizontal"
-      className="flex h-full overflow-hidden"
-    >
+    <ResizablePanelGroup orientation="horizontal" className="flex h-full">
       <ResizablePanel defaultSize="35%" className="bg-card flex flex-col">
-        {/*list toolbar*/}
-        <div className="border-b px-3 py-2.5">
-          {/*search*/}
-          <div className="relative">
-            <SearchIcon className="text-muted-foreground absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2" />
-            <Input
-              ref={searchRef}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search notices…"
-              autoComplete="off"
-              className="pr-7 pl-8 text-xs select-none"
-            />
-            {search ? (
-              <Button
-                variant="ghost"
-                onClick={() => setSearch("")}
-                className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 h-auto -translate-y-1/2 p-0.5"
-              >
-                <XIcon strokeWidth="2.5" className="size-3.5" />
-              </Button>
-            ) : (
-              <div className="text-secondary-foreground/40 border-secondary/10 bg-secondary/20 absolute top-1/2 right-2 -translate-y-1/2 rounded-sm border p-1">
-                <SlashIcon strokeWidth="4" className="size-2.5" />
-              </div>
-            )}
-          </div>
+        <NoticeListToolbar
+          filters={filters}
+          onFilterChange={setFilters}
+          onFilterClear={() =>
+            setFilters({
+              ...filters,
+              urgent: false,
+              pinned: false,
+              unread: false,
+            })
+          }
+          syncing={syncing}
+          onSync={sync}
+          noticeCount={notices.length}
+          unreadCount={unreadCount}
+          loading={listQuery.isLoading}
+          searchRef={searchRef}
+        />
 
-          {/*category tabs*/}
-          <HorizontalFadeScroll className="mt-2 flex scrollbar-none gap-1 overflow-x-auto scroll-smooth px-1 outline-none">
-            {CATEGORIES.map((cat) => (
-              <Badge
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                variant={activeCategory === cat ? "default" : "outline"}
-                className={cn(
-                  "cursor-pointer font-semibold capitalize",
-                  activeCategory !== cat &&
-                    "text-muted-foreground hover:text-foreground hover:border-foreground/20",
-                )}
-              >
-                {cat}
-              </Badge>
-            ))}
-          </HorizontalFadeScroll>
-        </div>
-
-        {/*list header*/}
-        <div className="text-muted-foreground flex items-center justify-between border-b px-2 py-1.5 text-[0.7rem]">
-          <span>
-            {loadingList ? (
-              "Loading…"
-            ) : (
-              <div className="flex h-0 items-center">
-                <span className="text-foreground font-semibold">
-                  {notices.length} notices
-                </span>
-                {unreadCount >= 0 && (
-                  <>
-                    <DotIcon />
-                    <span className="text-primary font-semibold">
-                      {unreadCount} unread
-                    </span>
-                  </>
-                )}
-              </div>
-            )}
-          </span>
-          <div className="flex gap-1.5">
-            <DropdownMenu>
-              <AppTooltip content="Filter">
-                <DropdownMenuTrigger
-                  render={
-                    <Button variant="ghost" className="h-auto p-0.5">
-                      {!filter.urgent && !filter.pinned && !filter.unread ? (
-                        <FilterIcon className="fill-foreground/20 size-3.5" />
-                      ) : (
-                        <FilterXIcon className="fill-primary/20 text-primary size-3.5" />
-                      )}
-                    </Button>
-                  }
-                />
-              </AppTooltip>
-              <DropdownMenuContent>
-                <DropdownMenuGroup>
-                  <DropdownMenuLabel>Filter</DropdownMenuLabel>
-                  <DropdownMenuCheckboxItem
-                    checked={filter.urgent}
-                    onCheckedChange={(v) =>
-                      setFilter((prev) => ({ ...prev, urgent: v }))
-                    }
-                  >
-                    Urgent
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={filter.pinned}
-                    onCheckedChange={(v) =>
-                      setFilter((prev) => ({ ...prev, pinned: v }))
-                    }
-                  >
-                    Pinned
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={filter.unread}
-                    onCheckedChange={(v) =>
-                      setFilter((prev) => ({ ...prev, unread: v }))
-                    }
-                  >
-                    Unread
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    disabled={
-                      !filter.urgent && !filter.pinned && !filter.unread
-                    }
-                    onClick={() =>
-                      setFilter({ urgent: false, pinned: false, unread: false })
-                    }
-                  >
-                    Clear
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <AppTooltip content="Sync notices">
-              <Button
-                variant="ghost"
-                onClick={handleSync}
-                disabled={syncing}
-                className="h-auto p-0.5"
-              >
-                <RefreshCwIcon
-                  className={cn("size-3.5", syncing ? "animate-spin" : "")}
-                />
-              </Button>
-            </AppTooltip>
-          </div>
-        </div>
-
-        {/*notice list*/}
-        <div className="scrollbar-thumb-accent flex-1 scrollbar-thin overflow-y-auto">
-          {loadingList ? (
-            <div className="flex h-32 items-center justify-center">
-              <Loader2Icon className="text-muted-foreground size-5 animate-spin" />
-            </div>
-          ) : fetchError ? (
-            <div className="text-muted-foreground flex flex-col items-center gap-1 px-4 py-16 text-center">
-              <InboxIcon className="size-8 opacity-20" />
-              <p className="text-destructive text-xs font-semibold">
-                Failed to load notices
-              </p>
-              <p className="text-[0.65rem] break-all">{fetchError.message}</p>
-              <Button
-                variant="ghost"
-                size="xs"
-                onClick={() =>
-                  queryClient.invalidateQueries({ queryKey: ["notices"] })
-                }
-                className="text-primary underline-offset-2 hover:underline"
-              >
-                Retry
-              </Button>
-            </div>
-          ) : notices.length === 0 ? (
-            <div className="text-muted-foreground flex flex-col items-center gap-2 px-4 py-16 text-center">
-              <InboxIcon className="size-9 opacity-20" />
-              <p className="text-xs">No notices found</p>
-              {(search || activeCategory !== "all") && (
-                <Button
-                  variant="ghost"
-                  size="xs"
-                  onClick={() => {
-                    setSearch("");
-                    setActiveCategory("all");
-                  }}
-                  className="text-primary underline-offset-2 hover:underline"
-                >
-                  Clear filters
-                </Button>
-              )}
-            </div>
-          ) : (
-            notices.map((notice) => (
-              <NoticeListItem
-                key={notice.id}
-                notice={notice}
-                isActive={selectedId === notice.id}
-                onClick={() => handleSelect(notice)}
-                onTogglePin={(e) =>
-                  handleTogglePin(notice.id, notice.isPinned, e)
-                }
-              />
-            ))
-          )}
-        </div>
+        <NoticeList
+          notices={notices}
+          loading={listQuery.isLoading}
+          error={listQuery.error}
+          selectedId={selectedId}
+          onSelect={handleSelect}
+          onTogglePin={togglePin}
+          onRetry={listQuery.refetch}
+          onClearFilters={() => setFilters(INITIAL_FILTERS)}
+          hasActiveFilters={filters.urgent || filters.pinned || filters.unread}
+        />
       </ResizablePanel>
 
       <ResizableHandle withHandle />
 
-      {/*detail panel*/}
       <ResizablePanel defaultSize="65%" minSize="30%" className="min-w-0">
-        <DetailPanel
+        <DetailView
           notice={detail}
-          loading={loadingDetail}
-          onTogglePin={() =>
-            detail && handleTogglePin(detail.id, detail.isPinned)
-          }
-          onToggleRead={handleToggleRead}
+          loading={detailQuery.isLoading}
+          onTogglePin={() => detail && togglePin(detail.id, !detail.isPinned)}
+          onToggleRead={() => detail && toggleRead(detail.id, !detail.isRead)}
         />
       </ResizablePanel>
     </ResizablePanelGroup>
   );
 }
 
+interface NoticeListToolbarProps {
+  filters: NoticeFilters;
+  onFilterChange: (value: NoticeFilters) => void;
+  onFilterClear: () => void;
+
+  syncing: boolean;
+  onSync: () => void;
+
+  noticeCount: number;
+  unreadCount: number;
+  loading: boolean;
+
+  searchRef: React.RefObject<HTMLInputElement | null>;
+}
+
+function NoticeListToolbar({
+  filters,
+  onFilterChange,
+  onFilterClear,
+  syncing,
+  onSync,
+  noticeCount,
+  unreadCount,
+  loading,
+  searchRef,
+}: NoticeListToolbarProps) {
+  const hasActiveFilters = filters.urgent || filters.pinned || filters.unread;
+
+  return (
+    <>
+      {/*search + categories*/}
+      <div className="border-b px-3 py-2.5">
+        <div className="relative">
+          <SearchIcon className="text-muted-foreground absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2" />
+          <Input
+            ref={searchRef}
+            value={filters.search}
+            onChange={(e) =>
+              onFilterChange({ ...filters, search: e.target.value })
+            }
+            placeholder="Search notices…"
+            autoComplete="off"
+            className="pr-7 pl-8 text-xs select-none"
+          />
+          {filters.search ? (
+            <Button
+              variant="ghost"
+              onClick={() => onFilterChange({ ...filters, search: "" })}
+              className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 h-auto -translate-y-1/2 p-0.5"
+            >
+              <XIcon strokeWidth="2.5" className="size-3.5" />
+            </Button>
+          ) : (
+            <div className="text-secondary-foreground/40 border-secondary/10 bg-secondary/20 absolute top-1/2 right-2 -translate-y-1/2 rounded-sm border p-1">
+              <SlashIcon strokeWidth="4" className="size-2.5" />
+            </div>
+          )}
+        </div>
+
+        <HorizontalFadeScroll className="mt-2 flex scrollbar-none gap-1 overflow-x-auto scroll-smooth px-1 outline-none">
+          {CATEGORIES.map((cat) => (
+            <Badge
+              key={cat}
+              onClick={() => onFilterChange({ ...filters, category: cat })}
+              variant={filters.category === cat ? "default" : "outline"}
+              className={cn(
+                "cursor-pointer font-semibold capitalize",
+                filters.category !== cat &&
+                  "text-muted-foreground hover:text-foreground hover:border-foreground/20",
+              )}
+            >
+              {cat}
+            </Badge>
+          ))}
+        </HorizontalFadeScroll>
+      </div>
+
+      {/*list header*/}
+      <div className="text-muted-foreground flex items-center justify-between border-b px-2 py-1.5 text-[0.7rem]">
+        <span>
+          {loading ? (
+            "Loading…"
+          ) : (
+            <div className="flex h-0 items-center">
+              <span className="text-foreground font-semibold">
+                {noticeCount} notices
+              </span>
+              {unreadCount > 0 && (
+                <>
+                  <DotIcon />
+                  <span className="text-primary font-semibold">
+                    {unreadCount} unread
+                  </span>
+                </>
+              )}
+            </div>
+          )}
+        </span>
+
+        <div className="flex gap-1.5">
+          <DropdownMenu>
+            <AppTooltip content="Filter">
+              <DropdownMenuTrigger
+                render={
+                  <Button variant="ghost" className="h-auto p-0.5">
+                    {hasActiveFilters ? (
+                      <FilterXIcon className="fill-primary/20 text-primary size-3.5" />
+                    ) : (
+                      <FilterIcon className="fill-foreground/20 size-3.5" />
+                    )}
+                  </Button>
+                }
+              />
+            </AppTooltip>
+            <DropdownMenuContent>
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>Filter</DropdownMenuLabel>
+                {(["urgent", "pinned", "unread"] as const).map((key) => (
+                  <DropdownMenuCheckboxItem
+                    key={key}
+                    checked={filters[key]}
+                    onCheckedChange={(v) =>
+                      onFilterChange({ ...filters, [key]: v })
+                    }
+                  >
+                    {key.charAt(0).toUpperCase() + key.slice(1)}
+                  </DropdownMenuCheckboxItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  disabled={!hasActiveFilters}
+                  onClick={onFilterClear}
+                >
+                  Clear
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <AppTooltip content="Sync notices">
+            <Button
+              variant="ghost"
+              onClick={onSync}
+              disabled={syncing}
+              className="h-auto p-0.5"
+            >
+              <RefreshCwIcon
+                className={cn("size-3.5", syncing && "animate-spin")}
+              />
+            </Button>
+          </AppTooltip>
+        </div>
+      </div>
+    </>
+  );
+}
+
+interface NoticeListProps {
+  notices: Notice[];
+  loading: boolean;
+  error: Error | null;
+  selectedId: string | null;
+  onSelect: (notice: Notice) => void;
+  onTogglePin: (id: string, next: boolean) => void;
+  onRetry: () => void;
+  onClearFilters: () => void;
+  hasActiveFilters: boolean;
+}
+
+function NoticeList({
+  notices,
+  loading,
+  error,
+  selectedId,
+  onSelect,
+  onTogglePin,
+  onRetry,
+  onClearFilters,
+  hasActiveFilters,
+}: NoticeListProps) {
+  if (loading) {
+    return (
+      <div>
+        <Loader2Icon className="text-muted-foreground size-5 animate-spin" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-muted-foreground flex flex-col items-center gap-1 px-4 py-16 text-center">
+        <InboxIcon className="size-8 opacity-20" />
+        <p className="text-destructive text-xs font-semibold">
+          Failed to load notices
+        </p>
+        <p className="text-[0.65rem] break-all">{error.message}</p>
+        <Button
+          variant="ghost"
+          size="xs"
+          onClick={onRetry}
+          className="text-primary underline-offset-2 hover:underline"
+        >
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
+  if (notices.length === 0) {
+    return (
+      <div className="text-muted-foreground flex flex-col items-center gap-2 px-4 py-16 text-center">
+        <InboxIcon className="size-9 opacity-20" />
+        <p className="text-xs">No notices found</p>
+        {hasActiveFilters && (
+          <Button
+            variant="ghost"
+            size="xs"
+            onClick={onClearFilters}
+            className="text-primary underline-offset-2 hover:underline"
+          >
+            Clear filters
+          </Button>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="scrollbar-thumb-accent flex-1 scrollbar-thin overflow-y-auto">
+      {notices.map((notice) => (
+        <NoticeListItem
+          key={notice.id}
+          notice={notice}
+          selected={selectedId === notice.id}
+          onSelect={() => onSelect(notice)}
+          onTogglePin={(e) => {
+            e.stopPropagation();
+            onTogglePin(notice.id, !notice.isPinned);
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 interface NoticeListItemProps {
   notice: Notice;
-  isActive: boolean;
-  onClick: () => void;
+  selected: boolean;
+  onSelect: () => void;
   onTogglePin: (e: React.MouseEvent) => void;
 }
 
 function NoticeListItem({
   notice,
-  isActive,
-  onClick,
+  selected,
+  onSelect,
   onTogglePin,
 }: NoticeListItemProps) {
   return (
-    <button
-      onClick={onClick}
+    <div
+      onClick={onSelect}
       className={cn(
         "group animate-in fade-in slide-in-from-bottom-5 w-full cursor-pointer border-b p-3 text-left transition-colors duration-300",
         "focus-visible:border-ring focus-visible:ring-ring/50 outline-none focus-visible:rounded focus-visible:border-b-transparent focus-visible:border-l-transparent focus-visible:ring-3 focus-visible:ring-inset",
-        isActive
+        selected
           ? "bg-primary/10 border-l-primary border-l-2"
           : "hover:bg-muted/50 border-l-2 border-l-transparent",
       )}
@@ -472,9 +453,7 @@ function NoticeListItem({
           {notice.isUrgent && (
             <Badge
               variant="destructive"
-              className={cn(
-                "border-destructive/20 h-4 border px-1.5 py-0 text-[0.6rem] font-semibold tracking-wider uppercase",
-              )}
+              className="border-destructive/20 h-4 border px-1.5 py-0 text-[0.6rem] font-semibold tracking-wider uppercase"
             >
               urgent
             </Badge>
@@ -497,14 +476,11 @@ function NoticeListItem({
           </Button>
         </div>
 
-        <div className="flex items-center gap-1">
-          <span className="text-muted-foreground text-[0.65rem]">
-            {formatDate(notice.postedDate)}
-          </span>
-        </div>
+        <span className="text-muted-foreground text-[0.65rem]">
+          {formatDate(notice.postedDate)}
+        </span>
       </div>
 
-      {/*title*/}
       <p
         className={cn(
           "line-clamp-1 text-sm leading-snug",
@@ -516,30 +492,42 @@ function NoticeListItem({
         {notice.fullTitle || notice.title}
       </p>
 
-      {/*summary*/}
       {notice.summary && (
         <p className="text-muted-foreground line-clamp-2 text-[0.7rem]">
           {notice.summary}
         </p>
       )}
-    </button>
+    </div>
   );
 }
 
-interface DetailPanelProps {
+interface DetailViewProps {
   notice: Notice | null;
   loading: boolean;
   onTogglePin: () => void;
   onToggleRead: () => void;
 }
 
-function DetailPanel({
+function DetailView({
   notice,
   loading,
   onTogglePin,
   onToggleRead,
-}: DetailPanelProps) {
-  if (loading && !notice?.isCached) {
+}: DetailViewProps) {
+  const [showLoader, setShowLoader] = useState(false);
+
+  useEffect(() => {
+    if (!loading) {
+      // eslint-disable-next-line
+      setShowLoader(false);
+      return;
+    }
+    const timer = setTimeout(() => setShowLoader(true), 300);
+    return () => clearTimeout(timer);
+  }, [loading]);
+
+  if (loading) {
+    if (!showLoader) return null;
     return (
       <div className="flex h-full items-center justify-center">
         <Loader2Icon className="text-muted-foreground size-10 animate-spin" />
@@ -558,14 +546,12 @@ function DetailPanel({
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      {/*detail header*/}
       <div className="bg-card border-b px-6 py-4">
-        {/*badges*/}
         <div className="flex flex-wrap items-center gap-2">
           <Badge
             className={cn(
               "px-2 text-[0.65rem] font-bold tracking-wider uppercase",
-              categoryStyles[notice.category] ?? categoryStyles["default"],
+              categoryStyles[notice.category],
             )}
           >
             {notice.category}
@@ -573,10 +559,7 @@ function DetailPanel({
           {notice.isUrgent && (
             <Badge
               variant="destructive"
-              className={cn(
-                "border-destructive/20 px-2 text-[0.65rem] font-bold tracking-wider uppercase",
-                categoryStyles["urgent"],
-              )}
+              className="border-destructive/20 px-2 text-[0.65rem] font-bold tracking-wider uppercase"
             >
               urgent
             </Badge>
@@ -589,12 +572,10 @@ function DetailPanel({
           )}
         </div>
 
-        {/*title*/}
         <h1 className="my-3 line-clamp-1 font-serif text-xl leading-snug font-bold">
           {notice.fullTitle || notice.title}
         </h1>
 
-        {/*meta + actions*/}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <span className="text-muted-foreground text-xs">
             {formatDate(notice.postedDate)}
@@ -639,11 +620,11 @@ function DetailPanel({
               <Button
                 variant="ghost"
                 className="hover:text-primary"
-                onClick={() => {
+                onClick={() =>
                   Browser.OpenURL("https://aiub.edu/" + notice.id).catch(
                     (err) => toast.error("Failed to open URL: " + err),
-                  );
-                }}
+                  )
+                }
               >
                 <ExternalLinkIcon className="size-3.5" />
               </Button>
@@ -652,9 +633,7 @@ function DetailPanel({
         </div>
       </div>
 
-      {/*scrollable body*/}
       <div className="scrollbar-thumb-accent scrollbar-thin overflow-y-auto px-6 py-5">
-        {/*content*/}
         {notice.content ? (
           <div
             className="prose prose-sm prose-custom dark:prose-invert prose-li:text-left mx-auto text-center"
@@ -666,7 +645,6 @@ function DetailPanel({
           </p>
         )}
 
-        {/*attachments*/}
         {notice.attachments?.length > 0 && (
           <div className="mt-4">
             <Separator className="mb-4" />
@@ -676,56 +654,54 @@ function DetailPanel({
             </h3>
             <div className="flex flex-col gap-1.5">
               {notice.attachments.map((att) => (
-                <div
-                  key={att.id}
-                  className="bg-muted/40 border-border hover:bg-muted flex justify-between rounded border px-3 py-2.5"
-                >
-                  <div className="flex min-w-0 items-center gap-2">
-                    <FileTextIcon className="text-primary size-3.5" />
-                    <span className="truncate text-xs font-medium">
-                      {att.label || "Attachment"}
-                    </span>
-                  </div>
-                  <div className="ml-3 flex shrink-0 items-center">
-                    {att.localPath ? (
-                      <AppTooltip content="Open local file">
-                        <Button
-                          variant="ghost"
-                          className="hover:text-muted-foreground h-auto p-0.5"
-                          onClick={() => {
-                            if (att.url) {
-                              Browser.OpenURL(att.url).catch((err) =>
-                                toast.error("Failed to open URL: " + err),
-                              );
-                            }
-                          }}
-                        >
-                          <ExternalLinkIcon className="size-3.5" />
-                        </Button>
-                      </AppTooltip>
-                    ) : (
-                      <AppTooltip content="Download">
-                        <Button
-                          variant="ghost"
-                          className="hover:text-muted-foreground h-auto p-0.5"
-                          onClick={() => {
-                            if (att.url) {
-                              Browser.OpenURL(att.url).catch((err) =>
-                                toast.error("Failed to open URL: " + err),
-                              );
-                            }
-                          }}
-                        >
-                          <DownloadIcon className="size-3.5" />
-                        </Button>
-                      </AppTooltip>
-                    )}
-                  </div>
-                </div>
+                <AttachmentItem key={att.id} attachment={att} />
               ))}
             </div>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+interface AttachmentItemProps {
+  attachment: Notice["attachments"][number];
+}
+
+function AttachmentItem({ attachment }: AttachmentItemProps) {
+  const openUrl = () => {
+    if (!attachment.url) return;
+    Browser.OpenURL(attachment.url).catch((err) => {
+      toast.error("Failed to open attachment URL", {
+        description: (err as Error).message,
+      });
+    });
+  };
+
+  return (
+    <div className="bg-muted/40 border-border hover:bg-muted flex justify-between rounded border px-3 py-2.5">
+      <div className="flex min-w-0 items-center gap-2">
+        <FileTextIcon className="text-primary size-3.5" />
+        <span className="truncate text-xs font-medium">
+          {attachment.label || "Attachment"}
+        </span>
+      </div>
+      <div className="ml-3 flex shrink-0 items-center">
+        <AppTooltip
+          content={attachment.localPath ? "Open local file" : "Download"}
+        >
+          <Button
+            variant="ghost"
+            className="hover:text-muted-foreground h-auto p-0.5"
+            onClick={openUrl}
+          >
+            {attachment.localPath ? (
+              <ExternalLinkIcon className="size-3.5" />
+            ) : (
+              <DownloadIcon className="size-3.5" />
+            )}
+          </Button>
+        </AppTooltip>
       </div>
     </div>
   );

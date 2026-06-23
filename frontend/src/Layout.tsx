@@ -51,7 +51,7 @@ export default function Layout() {
   return (
     <div className="flex h-screen w-full">
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className="overflow-hidden">
         <Header section={section} label={label} />
         <main className="min-h-0 flex-1 overflow-hidden">
           <Suspense fallback={<Fallback />}>
@@ -98,7 +98,7 @@ function Header({ section, label }: { section: string; label: string }) {
   return (
     <header
       onDoubleClick={toggleMaximize}
-      className="bg-background wails-drag sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b p-2 transition-[width,height] ease-linear"
+      className="bg-background wails-drag sticky top-0 z-50 flex h-11 shrink-0 items-center gap-2 border-b p-2 transition-[width,height] ease-linear"
     >
       <SidebarTrigger />
       <Separator
