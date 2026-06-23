@@ -350,7 +350,7 @@ function NoticeList({
 }: NoticeListProps) {
   if (loading) {
     return (
-      <div>
+      <div className="flex h-32 items-center justify-center">
         <Loader2Icon className="text-muted-foreground size-5 animate-spin" />
       </div>
     );

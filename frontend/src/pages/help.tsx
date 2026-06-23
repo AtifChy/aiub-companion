@@ -129,10 +129,10 @@ function FAQList({ searchQuery }: { searchQuery: string }) {
       {filteredFaqs.length > 0 ? (
         filteredFaqs.map((faq, idx) => (
           <FAQItem
+            key={idx}
             faq={faq}
-            index={idx}
-            expandedIndex={expandedIndex}
-            toggleExpand={toggleExpand}
+            expanded={expandedIndex === idx}
+            onExpand={() => toggleExpand(idx)}
           />
         ))
       ) : (
@@ -145,34 +145,31 @@ function FAQList({ searchQuery }: { searchQuery: string }) {
 }
 
 function FAQItem({
-  index: idx,
   faq,
-  expandedIndex,
-  toggleExpand,
+  expanded,
+  onExpand,
 }: {
-  index: number;
   faq: FAQItem;
-  expandedIndex: number | null;
-  toggleExpand: (index: number) => void;
+  expanded: boolean;
+  onExpand: () => void;
 }) {
-  const isExpanded = expandedIndex === idx;
   return (
-    <div key={idx} className="hover:bg-muted/30 transition-colors">
+    <div className="hover:bg-muted/30 transition-colors">
       <button
-        onClick={() => toggleExpand(idx)}
+        onClick={onExpand}
         className="flex w-full items-center justify-between p-4 text-left font-medium outline-none"
       >
         <div className="flex items-center gap-3">
           {getCategoryBadge(faq.category)}
           <span className="text-sm sm:text-base">{faq.question}</span>
         </div>
-        {isExpanded ? (
+        {expanded ? (
           <ChevronUpIcon className="text-muted-foreground size-4 shrink-0" />
         ) : (
           <ChevronDownIcon className="text-muted-foreground size-4 shrink-0" />
         )}
       </button>
-      {isExpanded && (
+      {expanded && (
         <div className="text-muted-foreground animate-in fade-in slide-in-from-top-1 px-4 pb-4 text-sm leading-relaxed duration-200">
           {faq.answer}
         </div>
