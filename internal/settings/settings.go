@@ -41,6 +41,7 @@ type notification struct {
 type launch struct {
 	StartMinimized bool `json:"start_minimized"`
 	CloseToTray    bool `json:"close_to_tray"`
+	RestoreWindow  bool `json:"restore_window"`
 }
 
 type synchronization struct {
@@ -50,7 +51,6 @@ type synchronization struct {
 }
 
 type WindowState struct {
-	Enabled   bool `json:"enabled"`
 	Width     int  `json:"width"`
 	Height    int  `json:"height"`
 	X         int  `json:"x"`
@@ -66,6 +66,7 @@ func defaultSettings() *Settings {
 		Launch: launch{
 			StartMinimized: false,
 			CloseToTray:    true,
+			RestoreWindow:  false,
 		},
 		Sync: synchronization{
 			IntervalMinutes: 30,
@@ -75,7 +76,6 @@ func defaultSettings() *Settings {
 		Theme:    "system",
 		LogLevel: "INFO",
 		Window: WindowState{
-			Enabled:   false,
 			Width:     1024,
 			Height:    768,
 			X:         -1,

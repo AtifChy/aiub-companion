@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import type { Settings } from "@bindings/settings";
 import { GetSettings, SaveSettings } from "@bindings/settings/service";
 import { Loader2Icon } from "lucide-react";
+import { rawReturn } from "mutative";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useMutative, type Updater } from "use-mutative";
@@ -53,11 +54,11 @@ export default function SettingsPage() {
   const [config, updateConfig] = useMutative<Settings | undefined>(undefined);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowLoader(true), 150);
+    const timer = setTimeout(() => setShowLoader(true), 300);
 
     GetSettings()
       .then((data) => {
-        updateConfig(() => structuredClone(data));
+        updateConfig(() => rawReturn(JSON.parse(JSON.stringify(data))));
         setLoading(false);
       })
       .catch((err) => {
@@ -190,6 +191,7 @@ function SettingsView({
               />
             </SettingRow>
           </SettingsCard>
+
           {/*Launch & Systray*/}
           <SettingsCard title="Launch & Systray">
             <SettingRow
@@ -234,6 +236,23 @@ function SettingsView({
                 onCheckedChange={(v) =>
                   updateConfig((draft) => {
                     if (draft) draft.notifications.enabled = v;
+                  })
+                }
+                className="cursor-pointer"
+              />
+            </SettingRow>
+          </SettingsCard>
+
+          <SettingsCard title="Window">
+            <SettingRow
+              label="Restore Window"
+              description="Restore window size and position on app start"
+            >
+              <Switch
+                checked={config.launch.restore_window}
+                onCheckedChange={(v) =>
+                  updateConfig((draft) => {
+                    if (draft) draft.launch.restore_window = v;
                   })
                 }
                 className="cursor-pointer"

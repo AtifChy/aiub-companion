@@ -47,9 +47,6 @@
     },
     "WindowState": {
       "properties": {
-        "enabled": {
-          "type": "boolean"
-        },
         "width": {
           "type": "integer"
         },
@@ -69,7 +66,6 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "enabled",
         "width",
         "height",
         "x",
@@ -84,13 +80,17 @@
         },
         "close_to_tray": {
           "type": "boolean"
+        },
+        "restore_window": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false,
       "type": "object",
       "required": [
         "start_minimized",
-        "close_to_tray"
+        "close_to_tray",
+        "restore_window"
       ]
     },
     "notification": {

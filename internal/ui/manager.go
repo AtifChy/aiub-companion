@@ -111,7 +111,7 @@ func (m *Manager) setupEventHandlers() {
 }
 
 func (m *Manager) loadState() {
-	if m.window == nil {
+	if m.window == nil || !m.settings.GetSettings().Launch.RestoreWindow {
 		return
 	}
 	m.window.SetSize(m.state.Width, m.state.Height)
