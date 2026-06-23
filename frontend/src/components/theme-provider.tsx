@@ -1,80 +1,56 @@
-import { GetSettings } from "@bindings/settings/service";
-import { createContext, useContext, useEffect, useState } from "react";
+import { useSettings } from "@/components/settings-provider";
+import { createContext, useContext, useEffect } from "react";
 
 export type Theme = "dark" | "light" | "system";
+
+const ThemeProviderContext = createContext<Theme>("system");
 
 type ThemeProviderProps = {
   children: React.ReactNode;
   defaultTheme?: Theme;
-  storageKey?: string;
 };
-
-type ThemeProviderState = {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-};
-
-const initialState: ThemeProviderState = {
-  theme: "system",
-  setTheme: () => null,
-};
-
-const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
   defaultTheme = "system",
-  storageKey = "vite-ui-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme,
-  );
-
-  useEffect(() => {
-    GetSettings()
-      .then((config) => {
-        if (!config) return;
-        const theme = config.theme as Theme;
-        setTheme(theme);
-        localStorage.setItem(storageKey, theme);
-      })
-      .catch(console.error);
-  }, [storageKey]);
+  const { config } = useSettings();
+  const theme = (config.theme as Theme) || defaultTheme;
 
   useEffect(() => {
     const root = window.document.documentElement;
 
-    root.classList.remove("light", "dark");
+    const setTheme = (theme: Exclude<Theme, "system">) => {
+      root.classList.remove("light", "dark");
+      root.classList.add(theme);
+    };
 
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-      root.classList.add(systemTheme);
-      return;
+      const applySystemTheme = () => {
+        setTheme(mediaQuery.matches ? "dark" : "light");
+      };
+      applySystemTheme();
+
+      mediaQuery.addEventListener("change", applySystemTheme);
+      return () => mediaQuery.removeEventListener("change", applySystemTheme);
     }
 
-    root.classList.add(theme);
+    setTheme(theme);
+
+    return undefined;
   }, [theme]);
 
-  const value = {
-    theme,
-    setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme);
-      setTheme(theme);
-    },
-  };
-
   return (
-    <ThemeProviderContext.Provider {...props} value={value}>
+    <ThemeProviderContext.Provider {...props} value={theme}>
       {children}
     </ThemeProviderContext.Provider>
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useTheme = () => {
   const context = useContext(ThemeProviderContext);
 

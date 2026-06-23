@@ -1,20 +1,16 @@
 import { AlertDialogDestructive } from "@/components/alert-dialog-destructive";
+import { useSettings } from "@/components/settings-provider";
 import {
   SettingRow,
   SettingsCard,
   SettingSelect,
 } from "@/components/settings/settings";
-import { useTheme, type Theme } from "@/components/theme-provider";
+import { type Theme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { useDelayedLoading } from "@/hooks/use-delayed-loading";
 import type { Settings } from "@bindings/settings";
-import { GetSettings, SaveSettings } from "@bindings/settings/service";
-import { Loader2Icon } from "lucide-react";
-import { rawReturn } from "mutative";
-import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useMutative, type Updater } from "use-mutative";
+import { type Updater } from "use-mutative";
 
 type Items<T extends string | number> = { value: T; label: string }[];
 
@@ -41,51 +37,7 @@ const fetchCountItems: Items<number> = [10, 20, 30, 50].map((v) => ({
 }));
 
 export default function SettingsPage() {
-  const { setTheme } = useTheme();
-
-  const [loading, setLoading] = useState(true);
-  const showLoader = useDelayedLoading(loading);
-
-  const [config, updateConfig] = useMutative<Settings | undefined>(undefined);
-
-  useEffect(() => {
-    GetSettings()
-      .then((data) => {
-        updateConfig(() => rawReturn(JSON.parse(JSON.stringify(data))));
-        setLoading(false);
-      })
-      .catch((err) => {
-        toast.error("Failed to load settings", {
-          description: err instanceof Error ? err.message : String(err),
-        });
-        setLoading(false);
-      });
-  }, [updateConfig]);
-
-  useEffect(() => {
-    if (!config) return;
-
-    const timer = setTimeout(async () => {
-      try {
-        await SaveSettings(config);
-        setTheme(config.theme as Theme);
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        toast.error("Failed to save settings", { description: message });
-      }
-    }, 200);
-
-    return () => clearTimeout(timer);
-  }, [config, setTheme]);
-
-  if (loading) {
-    if (!showLoader) return null;
-    return (
-      <div className="flex h-full items-center justify-center">
-        <Loader2Icon className="text-muted-foreground size-8 animate-spin" />
-      </div>
-    );
-  }
+  const { config, updateConfig } = useSettings();
 
   if (!config) {
     return (

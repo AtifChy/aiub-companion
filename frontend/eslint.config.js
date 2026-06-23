@@ -12,7 +12,6 @@ export default defineConfig([
     "bindings/**",
     "vite.config.ts",
     "src/components/ui/**/*{.ts,.tsx}",
-    "src/components/theme-provider.tsx",
     "src/hooks/use-mobile.ts",
   ]),
   {
