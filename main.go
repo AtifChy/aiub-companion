@@ -91,7 +91,8 @@ func main() {
 	// Initialize Services
 	noticeService := notice.NewService(noticeRepo, noticeClient)
 	routineService := routine.NewService(routineRepo)
-	appService := meta.NewService()
+	loggerService := log.NewService()
+	metaService := meta.NewService()
 
 	// Wails native services
 	notifier := notifications.New()
@@ -104,7 +105,8 @@ func main() {
 			application.NewService(noticeService),
 			application.NewService(routineService),
 			application.NewService(settingsService),
-			application.NewService(appService),
+			application.NewService(loggerService),
+			application.NewService(metaService),
 			application.NewService(notifier),
 		},
 		Assets: application.AssetOptions{
