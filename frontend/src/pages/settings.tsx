@@ -17,33 +17,27 @@ import { useMutative, type Updater } from "use-mutative";
 
 type Items<T extends string | number> = { value: T; label: string }[];
 
-const themeItems: Items<Theme> = [
-  { value: "light", label: "Light" },
-  { value: "dark", label: "Dark" },
-  { value: "system", label: "System" },
-];
+const themeItems: Items<Theme> = ["light", "dark", "system"].map((v) => ({
+  value: v as Theme,
+  label: v.charAt(0).toUpperCase() + v.slice(1),
+}));
 
-const logLevelItems: Items<string> = [
-  { value: "DEBUG", label: "Debug" },
-  { value: "INFO", label: "Info" },
-  { value: "WARNING", label: "Warning" },
-  { value: "ERROR", label: "Error" },
-];
+const logLevelItems: Items<string> = ["DEBUG", "INFO", "WARNING", "ERROR"].map(
+  (v) => ({
+    value: v,
+    label: v.charAt(0) + v.slice(1).toLowerCase(),
+  }),
+);
 
-const syncIntervalItems: Items<number> = [
-  { value: 30, label: "30 minutes" },
-  { value: 60, label: "60 minutes" },
-  { value: 120, label: "2 hours" },
-  { value: 180, label: "3 hours" },
-  { value: 360, label: "6 hours" },
-];
+const syncIntervalItems: Items<number> = [30, 60, 120, 180, 360].map((v) => ({
+  value: v,
+  label: v >= 60 ? `${v / 60} hour${v === 60 ? "" : "s"}` : `${v} minutes`,
+}));
 
-const fetchCountItems: Items<number> = [
-  { value: 10, label: "10 notices" },
-  { value: 20, label: "20 notices" },
-  { value: 30, label: "30 notices" },
-  { value: 50, label: "50 notices" },
-];
+const fetchCountItems: Items<number> = [10, 20, 30, 50].map((v) => ({
+  value: v,
+  label: `${v} notices`,
+}));
 
 export default function SettingsPage() {
   const { setTheme } = useTheme();
@@ -144,6 +138,24 @@ function SettingsView({
             </SettingRow>
           </SettingsCard>
 
+          {/*Notifications*/}
+          <SettingsCard title="Notifications">
+            <SettingRow
+              label="Enable"
+              description="Show desktop alert for new notices"
+            >
+              <Switch
+                checked={config.notifications.enabled}
+                onCheckedChange={(v) =>
+                  updateConfig((draft) => {
+                    if (draft) draft.notifications.enabled = v;
+                  })
+                }
+                className="cursor-pointer"
+              />
+            </SettingRow>
+          </SettingsCard>
+
           {/*Sync & Data*/}
           <SettingsCard title="Sync & Data">
             <SettingRow
@@ -223,27 +235,7 @@ function SettingsView({
                 className="cursor-pointer"
               />
             </SettingRow>
-          </SettingsCard>
 
-          {/*Notifications*/}
-          <SettingsCard title="Notifications">
-            <SettingRow
-              label="Enable"
-              description="Show desktop alert for new notices"
-            >
-              <Switch
-                checked={config.notifications.enabled}
-                onCheckedChange={(v) =>
-                  updateConfig((draft) => {
-                    if (draft) draft.notifications.enabled = v;
-                  })
-                }
-                className="cursor-pointer"
-              />
-            </SettingRow>
-          </SettingsCard>
-
-          <SettingsCard title="Window">
             <SettingRow
               label="Restore Window"
               description="Restore window size and position on app start"
