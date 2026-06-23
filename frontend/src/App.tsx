@@ -21,20 +21,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <SettingsProvider>
         <ShellProviders>
-          <HashRouter>
-            <Routes>
-              <Route element={<Layout />}>
-                <Route index element={<Navigate to={routes[0].path} />} />
-                {routes.map((route) => (
-                  <Route
-                    key={route.path}
-                    path={route.path}
-                    element={<route.component />}
-                  />
-                ))}
-              </Route>
-            </Routes>
-          </HashRouter>
+          <AppRouter />
         </ShellProviders>
       </SettingsProvider>
     </QueryClientProvider>
@@ -49,5 +36,24 @@ function ShellProviders({ children }: { children: React.ReactNode }) {
         <TooltipProvider>{children}</TooltipProvider>
       </SidebarProvider>
     </ThemeProvider>
+  );
+}
+
+function AppRouter() {
+  return (
+    <HashRouter>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route index element={<Navigate to={routes[0].path} />} />
+          {routes.map((route) => (
+            <Route
+              key={route.path}
+              path={route.path}
+              element={<route.component />}
+            />
+          ))}
+        </Route>
+      </Routes>
+    </HashRouter>
   );
 }
