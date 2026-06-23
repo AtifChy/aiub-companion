@@ -1,21 +1,21 @@
-import { Debug, Error, Info, Warn } from "@bindings/log/service";
+import { Service as LogService } from "@bindings/log";
 
 export const logger = {
   debug: (message: string, ...args: unknown[]) => {
     console.debug(message, ...args);
-    void Debug(format(message, args));
+    void LogService.Debug(format(message, args));
   },
   info: (message: string, ...args: unknown[]) => {
     console.info(message, ...args);
-    void Info(format(message, args));
+    void LogService.Info(format(message, args));
   },
   warn: (message: string, ...args: unknown[]) => {
     console.warn(message, ...args);
-    void Warn(format(message, args));
+    void LogService.Warn(format(message, args));
   },
   error: (message: string, ...args: unknown[]) => {
     console.error(message, ...args);
-    void Error(format(message, args));
+    void LogService.Error(format(message, args));
   },
 };
 

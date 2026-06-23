@@ -9,10 +9,9 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { sections } from "@/lib/routes";
+import { Service as MetaService, type Info } from "@bindings/meta";
 import { Command, Copyright, type LucideIcon } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import type { Info as AppInfo } from "@bindings/meta";
-import { GetInfo as GetAppInfo } from "@bindings/meta/service";
 
 export type NavItem = {
   label: string;
@@ -22,10 +21,10 @@ export type NavItem = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [appInfo, setAppInfo] = useState<AppInfo | null>(null);
+  const [appInfo, setAppInfo] = useState<Info | null>(null);
 
   useEffect(() => {
-    GetAppInfo()
+    MetaService.GetInfo()
       .then(setAppInfo)
       .catch((err) => console.error("Failed to get app info: ", err));
   }, []);

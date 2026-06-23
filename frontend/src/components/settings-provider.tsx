@@ -1,5 +1,5 @@
-import type { Settings } from "@bindings/settings";
-import { GetSettings, SaveSettings } from "@bindings/settings/service";
+import { logger } from "@/lib/logger";
+import { Service as SettingsService, type Settings } from "@bindings/settings";
 import { Loader2Icon } from "lucide-react";
 import { rawReturn } from "mutative";
 import {
@@ -24,15 +24,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const hydratedRef = useRef(false);
 
   useEffect(() => {
-    GetSettings()
-      .then((config) =>
-        updateConfig(() => rawReturn(JSON.parse(JSON.stringify(config)))),
-      )
-      .catch((err) =>
-        toast.error("Failed to load settings", {
-          description: (err as Error).message,
-        }),
-      );
+    SettingsService.GetSettings()
+      .then((config) => {
+        updateConfig(() => config && rawReturn(structuredClone(config)));
+      })
+      .catch((err) => logger.error("Failed to load settings: ", err));
   }, [updateConfig]);
 
   useEffect(() => {
@@ -43,11 +39,12 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     }
     const timer = setTimeout(
       () =>
-        SaveSettings(config).catch((err) =>
+        SettingsService.SaveSettings(config).catch((err) => {
+          logger.error("Failed to save settings: ", err);
           toast.error("Failed to save settings", {
             description: (err as Error).message,
-          }),
-        ),
+          });
+        }),
       200,
     );
     return () => clearTimeout(timer);

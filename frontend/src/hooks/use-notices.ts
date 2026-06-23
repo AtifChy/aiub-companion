@@ -1,12 +1,6 @@
-import type { Notice } from "@bindings/notice";
-import {
-  GetNoticeDetails,
-  GetNotices,
-  SyncNotices,
-  ToggleNoticePinned,
-  ToggleNoticeRead,
-} from "@bindings/notice/service";
-import { GetSettings } from "@bindings/settings/service";
+import { useSettings } from "@/components/settings-provider";
+import { logger } from "@/lib/logger";
+import { Service as NoticeService, type Notice } from "@bindings/notice";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Events } from "@wailsio/runtime";
 import { useCallback, useEffect, useState } from "react";
@@ -39,7 +33,7 @@ export function useNotices(filter: NoticeFilters, selectedId: string | null) {
   const listQuery = useQuery({
     queryKey: ["notices", { ...filter, search: debouncedSearch }],
     queryFn: () =>
-      GetNotices({
+      NoticeService.GetNotices({
         Category: filter.category === "all" ? "" : filter.category,
         Search: debouncedSearch,
         Urgent: filter.urgent || null,
@@ -50,7 +44,7 @@ export function useNotices(filter: NoticeFilters, selectedId: string | null) {
 
   const detailQuery = useQuery({
     queryKey: ["noticeDetails", selectedId],
-    queryFn: () => GetNoticeDetails(selectedId!),
+    queryFn: () => NoticeService.GetNoticeDetails(selectedId!),
     enabled: !!selectedId,
   });
 
@@ -83,9 +77,10 @@ export function useNotices(filter: NoticeFilters, selectedId: string | null) {
       (old) => (old ? { ...old, isRead: next } : old),
     );
     try {
-      await ToggleNoticeRead(id, next);
+      await NoticeService.ToggleNoticeRead(id, next);
     } catch (err) {
       await invalidate(id);
+      logger.error("Failed to toggle read status: ", err);
       toast.error("Failed to toggle read status", {
         description: (err as Error).message,
       });
@@ -103,9 +98,10 @@ export function useNotices(filter: NoticeFilters, selectedId: string | null) {
       (old) => (old ? { ...old, isPinned: next } : old),
     );
     try {
-      await ToggleNoticePinned(id, next);
+      await NoticeService.ToggleNoticePinned(id, next);
     } catch (err) {
       await invalidate(id);
+      logger.error("Failed to toggle pin status: ", err);
       toast.error("Failed to toggle pin status", {
         description: (err as Error).message,
       });
@@ -122,13 +118,13 @@ export function useNotices(filter: NoticeFilters, selectedId: string | null) {
 
 export function useSync() {
   const queryClient = useQueryClient();
+  const { config } = useSettings();
   const [syncing, setSyncing] = useState(false);
 
   const sync = async () => {
     setSyncing(true);
     try {
-      const config = await GetSettings();
-      const count = await SyncNotices(config?.sync.fetch_count ?? 20);
+      const count = await NoticeService.SyncNotices(config.sync.fetch_count);
       if (count > 0) {
         toast.success(`${count} new notice${count !== 1 ? "s" : ""} synced`);
       } else {

@@ -3,14 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/use-debounce";
-import { Course } from "@bindings/routine";
-import {
-  AddToUserRoutine,
-  GetUserRoutine,
-  ImportOfferedCourses,
-  RemoveFromUserRoutine,
-  SearchOfferedCourses,
-} from "@bindings/routine/service";
+import { logger } from "@/lib/logger";
+import { Course, Service as RoutineService } from "@bindings/routine";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Dialogs } from "@wailsio/runtime";
 import {
@@ -41,7 +35,7 @@ export default function RoutinePage() {
 
   const routineQuery = useQuery({
     queryKey: ["routine"],
-    queryFn: () => GetUserRoutine(),
+    queryFn: () => RoutineService.GetUserRoutine(),
   });
 
   const routine = routineQuery.data ?? [];
@@ -52,7 +46,7 @@ export default function RoutinePage() {
 
   const courseQuery = useQuery({
     queryKey: ["courses", searchDebounced],
-    queryFn: () => SearchOfferedCourses(searchDebounced),
+    queryFn: () => RoutineService.SearchOfferedCourses(searchDebounced),
     enabled: searchDebounced.trim().length > 0,
   });
 
@@ -61,25 +55,27 @@ export default function RoutinePage() {
 
   const handleAddCourse = async (classId: string) => {
     try {
-      await AddToUserRoutine(classId);
+      await RoutineService.AddToUserRoutine(classId);
       setSearch("");
       queryClient.invalidateQueries({ queryKey: ["routine"] });
       toast.success("Course added to routine");
     } catch (err) {
+      logger.error("Failed to add course", err);
       toast.error("Failed to add course", {
-        description: err instanceof Error ? err.message : String(err),
+        description: (err as Error).message,
       });
     }
   };
 
   const handleRemoveCourse = async (classId: string) => {
     try {
-      await RemoveFromUserRoutine(classId);
+      await RoutineService.RemoveFromUserRoutine(classId);
       toast.success("Course removed from routine");
       queryClient.invalidateQueries({ queryKey: ["routine"] });
     } catch (err) {
+      logger.error("Failed to remove course", err);
       toast.error("Failed to remove course", {
-        description: err instanceof Error ? err.message : String(err),
+        description: (err as Error).message,
       });
     }
   };
@@ -94,11 +90,12 @@ export default function RoutinePage() {
         ],
       });
       if (!path) return;
-      await ImportOfferedCourses(path);
+      await RoutineService.ImportOfferedCourses(path);
       toast.success("Courses imported successfully");
     } catch (err) {
+      logger.error("Failed to import courses", err);
       toast.error("Failed to import courses", {
-        description: err instanceof Error ? err.message : String(err),
+        description: (err as Error).message,
       });
     }
   };
