@@ -48,8 +48,6 @@ func (r *sqliteRepository) GetNotices(ctx context.Context, f Filter) ([]Notice, 
 		Urgent:   database.BoolOrNull(f.Urgent),
 		Pinned:   database.BoolOrNull(f.Pinned),
 		Unread:   database.BoolOrNull(f.Unread),
-		Limit:    int64(f.Limit),
-		Offset:   int64(f.Offset),
 	})
 	if err != nil {
 		return nil, err

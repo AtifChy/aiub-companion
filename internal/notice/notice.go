@@ -39,6 +39,4 @@ type Filter struct {
 	Unread   *bool
 	Category string
 	Search   string
-	Limit    int
-	Offset   int
 }

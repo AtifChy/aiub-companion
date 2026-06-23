@@ -1,3 +1,4 @@
+import type { Notice } from "@bindings/notice";
 import {
   GetNoticeDetails,
   GetNotices,
@@ -5,14 +6,12 @@ import {
   ToggleNoticePinned,
   ToggleNoticeRead,
 } from "@bindings/notice/service";
+import { GetSettings } from "@bindings/settings/service";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Events } from "@wailsio/runtime";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useDebounce } from "./use-debounce";
-import type { Notice } from "@bindings/notice";
-
-const PAGE_SIZE = 30;
 
 export type Category =
   | "all"
@@ -46,8 +45,6 @@ export function useNotices(filter: NoticeFilters, selectedId: string | null) {
         Urgent: filter.urgent || null,
         Pinned: filter.pinned || null,
         Unread: filter.unread || null,
-        Limit: PAGE_SIZE,
-        Offset: 0,
       }),
   });
 
@@ -130,7 +127,8 @@ export function useSync() {
   const sync = async () => {
     setSyncing(true);
     try {
-      const count = await SyncNotices(PAGE_SIZE);
+      const config = await GetSettings();
+      const count = await SyncNotices(config?.sync.fetch_count ?? 20);
       if (count > 0) {
         toast.success(`${count} new notice${count !== 1 ? "s" : ""} synced`);
       } else {

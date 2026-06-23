@@ -213,10 +213,6 @@ WHERE
 ORDER BY
   n.posted_date DESC,
   n.source_order DESC
-LIMIT
-  ?7
-OFFSET
-  ?6
 `
 
 type SearchNoticesWithStateParams struct {
@@ -225,8 +221,6 @@ type SearchNoticesWithStateParams struct {
 	Urgent   sql.NullBool
 	Pinned   sql.NullBool
 	Unread   sql.NullBool
-	Offset   int64
-	Limit    int64
 }
 
 type SearchNoticesWithStateRow struct {
@@ -253,8 +247,6 @@ func (q *Queries) SearchNoticesWithState(ctx context.Context, arg SearchNoticesW
 		arg.Urgent,
 		arg.Pinned,
 		arg.Unread,
-		arg.Offset,
-		arg.Limit,
 	)
 	if err != nil {
 		return nil, err

@@ -44,11 +44,7 @@ WHERE
   )
 ORDER BY
   n.posted_date DESC,
-  n.source_order DESC
-LIMIT
-  @limit
-OFFSET
-  @offset;
+  n.source_order DESC;
 
 -- name: GetLatestNoticeInfo :one
 SELECT
