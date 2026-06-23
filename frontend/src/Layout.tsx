@@ -68,7 +68,7 @@ function Header({ section, label }: { section: string; label: string }) {
   const [maximized, setMaximized] = useState(false);
 
   useEffect(() => {
-    const handleResize = async () => {
+    const handleResize = () => {
       Window.IsMaximised()
         .then(setMaximized)
         .catch((err) => {
@@ -81,9 +81,7 @@ function Header({ section, label }: { section: string; label: string }) {
     handleResize();
     window.addEventListener("resize", handleResize);
 
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const toggleMaximize = async () => {
