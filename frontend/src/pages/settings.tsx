@@ -7,6 +7,7 @@ import {
 import { useTheme, type Theme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { useDelayedLoading } from "@/hooks/use-delayed-loading";
 import type { Settings } from "@bindings/settings";
 import { GetSettings, SaveSettings } from "@bindings/settings/service";
 import { Loader2Icon } from "lucide-react";
@@ -43,13 +44,11 @@ export default function SettingsPage() {
   const { setTheme } = useTheme();
 
   const [loading, setLoading] = useState(true);
-  const [showLoader, setShowLoader] = useState(false);
+  const showLoader = useDelayedLoading(loading);
 
   const [config, updateConfig] = useMutative<Settings | undefined>(undefined);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowLoader(true), 300);
-
     GetSettings()
       .then((data) => {
         updateConfig(() => rawReturn(JSON.parse(JSON.stringify(data))));
@@ -60,10 +59,7 @@ export default function SettingsPage() {
           description: err instanceof Error ? err.message : String(err),
         });
         setLoading(false);
-      })
-      .finally(() => clearTimeout(timer));
-
-    return () => clearTimeout(timer);
+      });
   }, [updateConfig]);
 
   useEffect(() => {

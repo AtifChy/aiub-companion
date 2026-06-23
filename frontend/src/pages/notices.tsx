@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/resizable";
 import { Separator } from "@/components/ui/separator";
 import { Toggle } from "@/components/ui/toggle";
+import { useDelayedLoading } from "@/hooks/use-delayed-loading";
 import {
   useNotices,
   useSync,
@@ -514,17 +515,7 @@ function DetailView({
   onTogglePin,
   onToggleRead,
 }: DetailViewProps) {
-  const [showLoader, setShowLoader] = useState(false);
-
-  useEffect(() => {
-    if (!loading) {
-      // eslint-disable-next-line
-      setShowLoader(false);
-      return;
-    }
-    const timer = setTimeout(() => setShowLoader(true), 300);
-    return () => clearTimeout(timer);
-  }, [loading]);
+  const showLoader = useDelayedLoading(loading);
 
   if (loading) {
     if (!showLoader) return null;
