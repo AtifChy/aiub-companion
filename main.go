@@ -95,11 +95,11 @@ func main() {
 	metaService := meta.NewService()
 
 	// Wails native services
-	notifier := notifications.New()
+	notificationService := notifications.New()
 
 	// Create a new Wails application by providing the necessary options.
 	app := application.New(application.Options{
-		Name:        meta.ID,
+		Name:        meta.DisplayName,
 		Description: meta.Description,
 		Services: []application.Service{
 			application.NewService(noticeService),
@@ -107,7 +107,7 @@ func main() {
 			application.NewService(settingsService),
 			application.NewService(loggerService),
 			application.NewService(metaService),
-			application.NewService(notifier),
+			application.NewService(notificationService),
 		},
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),
@@ -145,7 +145,7 @@ func main() {
 	}
 
 	// Sync notices on startup and every 30 minutes.
-	go startBackgroundSync(app, noticeService, notifier, cfg, syncInterval)
+	go startBackgroundSync(app, noticeService, notificationService, cfg, syncInterval)
 
 	// Run the application. This blocks until the application has been exited.
 	err = app.Run()
