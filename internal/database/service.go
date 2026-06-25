@@ -4,14 +4,10 @@ package database
 import (
 	"context"
 	"database/sql"
-	"embed"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 	_ "modernc.org/sqlite"
 )
-
-//go:embed sql/schemas/*.sql
-var schemasFS embed.FS
 
 // Service holds the database connection and queries
 type Service struct {
@@ -22,27 +18,27 @@ func NewService() *Service {
 	return &Service{}
 }
 
-func (db *Service) ServiceStartup(ctx context.Context, options application.ServiceOptions) error {
+func (s *Service) ServiceStartup(ctx context.Context, options application.ServiceOptions) error {
 	instance, err := open()
 	if err != nil {
 		return err
 	}
-	db.db = instance.db
+	s.db = instance.db
 	return nil
 }
 
-func (db *Service) ServiceShutdown() error {
-	return db.Close()
+func (s *Service) ServiceShutdown() error {
+	return s.Close()
 }
 
-func (db *Service) DB() *sql.DB {
-	return db.db
+func (s *Service) DB() *sql.DB {
+	return s.db
 }
 
 // Close closes the database connection
-func (db *Service) Close() error {
-	if db.db != nil {
-		return db.db.Close()
+func (s *Service) Close() error {
+	if s.db != nil {
+		return s.db.Close()
 	}
 	return nil
 }

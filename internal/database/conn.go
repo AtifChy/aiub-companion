@@ -2,12 +2,16 @@ package database
 
 import (
 	"database/sql"
+	"embed"
 	"fmt"
 	"os"
 	"path/filepath"
 
 	"aiub-companion/internal/meta"
 )
+
+//go:embed sql/schemas/*.sql
+var schemasFS embed.FS
 
 // open initializes the database connection and creates the schema if it doesn't exist
 func open() (*Service, error) {
