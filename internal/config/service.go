@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"sync"
 	"sync/atomic"
@@ -18,6 +19,7 @@ func init() {
 
 type Service struct {
 	config  atomic.Pointer[Config]
+	path    string
 	writeMu sync.Mutex
 }
 
@@ -26,7 +28,13 @@ func NewService() *Service {
 }
 
 func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptions) error {
-	config, err := load()
+	path, err := configPath()
+	if err != nil {
+		return fmt.Errorf("failed to determine config path: %w", err)
+	}
+	s.path = path
+
+	config, err := load(s.path)
 	if err != nil {
 		slog.Error("Failed to load config on startup, using defaults", "error", err)
 	}
@@ -52,7 +60,7 @@ func (s *Service) SaveConfig(config *Config) error {
 	application.Get().Event.Emit(event.EventConfigChanged, next)
 
 	// Persist to disk
-	return save(&next)
+	return save(s.path, &next)
 }
 
 func (s *Service) ResetConfig() error {
@@ -60,7 +68,7 @@ func (s *Service) ResetConfig() error {
 	defer s.writeMu.Unlock()
 	defaults := defaultConfig()
 	s.config.Store(defaults)
-	return save(defaults)
+	return save(s.path, defaults)
 }
 
 //wails:ignore
@@ -75,5 +83,5 @@ func (s *Service) UpdateWindowState(state *WindowState) error {
 	}
 
 	s.config.Store(&next)
-	return save(&next)
+	return save(s.path, &next)
 }

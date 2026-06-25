@@ -90,13 +90,8 @@ func ParseLogLevel(s string) (slog.Level, error) {
 	return level, level.UnmarshalText([]byte(s))
 }
 
-func load() (*Config, error) {
+func load(path string) (*Config, error) {
 	cfg := defaultConfig()
-
-	path, err := configPath()
-	if err != nil {
-		return cfg, fmt.Errorf("failed to get config path: %w", err)
-	}
 
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -123,12 +118,7 @@ func load() (*Config, error) {
 	return cfg, nil
 }
 
-func save(cfg *Config) error {
-	path, err := configPath()
-	if err != nil {
-		return fmt.Errorf("failed to get config path: %w", err)
-	}
-
+func save(path string, cfg *Config) error {
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return fmt.Errorf("failed to create config directory: %w", err)
 	}
