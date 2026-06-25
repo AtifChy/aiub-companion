@@ -9,7 +9,7 @@ func TestValidateSchema(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Valid settings",
+			name: "Valid config",
 			json: `{
 				"theme": "dark",
 				"log_level": "DEBUG",

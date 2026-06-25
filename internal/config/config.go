@@ -95,7 +95,7 @@ func load() (*Config, error) {
 
 	path, err := configPath()
 	if err != nil {
-		return cfg, fmt.Errorf("failed to get settings path: %w", err)
+		return cfg, fmt.Errorf("failed to get config path: %w", err)
 	}
 
 	data, err := os.ReadFile(path)
@@ -103,7 +103,7 @@ func load() (*Config, error) {
 		if errors.Is(err, os.ErrNotExist) {
 			return cfg, nil
 		}
-		return cfg, fmt.Errorf("failed to read settings file: %w", err)
+		return cfg, fmt.Errorf("failed to read config file: %w", err)
 	}
 
 	if err := validate(data); err != nil {
@@ -117,7 +117,7 @@ func load() (*Config, error) {
 		if typeErr, ok := errors.AsType[*json.UnmarshalTypeError](err); ok {
 			return cfg, fmt.Errorf("invalid JSON type for field %q (expected %s): %w", typeErr.Field, typeErr.Type, err)
 		}
-		return cfg, fmt.Errorf("failed to unmarshal settings: %w", err)
+		return cfg, fmt.Errorf("failed to unmarshal config: %w", err)
 	}
 
 	return cfg, nil
@@ -126,19 +126,19 @@ func load() (*Config, error) {
 func save(cfg *Config) error {
 	path, err := configPath()
 	if err != nil {
-		return fmt.Errorf("failed to get settings path: %w", err)
+		return fmt.Errorf("failed to get config path: %w", err)
 	}
 
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-		return fmt.Errorf("failed to create settings directory: %w", err)
+		return fmt.Errorf("failed to create config directory: %w", err)
 	}
 
 	data, err := json.MarshalIndent(cfg, "", "  ")
 	if err != nil {
-		return fmt.Errorf("failed to marshal settings: %w", err)
+		return fmt.Errorf("failed to marshal config: %w", err)
 	}
 
-	tmp, err := os.CreateTemp(filepath.Dir(path), "settings-*.json")
+	tmp, err := os.CreateTemp(filepath.Dir(path), "config-*.json")
 	if err != nil {
 		return fmt.Errorf("failed to create temp file: %w", err)
 	}

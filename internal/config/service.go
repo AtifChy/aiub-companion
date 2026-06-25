@@ -28,7 +28,7 @@ func NewService() *Service {
 func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptions) error {
 	config, err := load()
 	if err != nil {
-		slog.Error("Failed to load settings on startup, using defaults", "error", err)
+		slog.Error("Failed to load config on startup, using defaults", "error", err)
 	}
 	s.config.Store(config)
 	return nil

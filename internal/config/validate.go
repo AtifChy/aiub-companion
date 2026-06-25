@@ -13,7 +13,7 @@ import (
 var schemaJSON []byte
 
 // schemaURI is a unique URI for the schema resource.
-const schemaURI = "urn:aiub-companion:settings"
+const schemaURI = "urn:aiub-companion:config"
 
 // compiledSchema is the compiled JSON schema used for validation.
 var compiledSchema *jsonschema.Schema
@@ -45,7 +45,7 @@ func validate(data []byte) error {
 	if err := compiledSchema.Validate(v); err != nil {
 		if validationErr, ok := errors.AsType[*jsonschema.ValidationError](err); ok {
 			b, _ := json.MarshalIndent(validationErr.BasicOutput(), "", "  ")
-			return fmt.Errorf("invalid settings:\n%s", string(b))
+			return fmt.Errorf("invalid config:\n%s", string(b))
 		}
 		return fmt.Errorf("validation error: %w", err)
 	}

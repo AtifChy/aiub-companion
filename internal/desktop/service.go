@@ -12,15 +12,15 @@ import (
 )
 
 type Service struct {
-	app      *application.App
-	window   *application.WebviewWindow
-	settings *config.Service
-	state    config.WindowState
+	app    *application.App
+	window *application.WebviewWindow
+	config *config.Service
+	state  config.WindowState
 }
 
-func NewService(settings *config.Service) *Service {
+func NewService(config *config.Service) *Service {
 	return &Service{
-		settings: settings,
+		config: config,
 	}
 }
 
@@ -33,7 +33,7 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 	}
 
 	s.app.Event.OnApplicationEvent(events.Common.ApplicationStarted, func(event *application.ApplicationEvent) {
-		cfg := s.settings.GetConfig()
+		cfg := s.config.GetConfig()
 		s.state = cfg.Window
 
 		s.setupTray()
@@ -94,7 +94,7 @@ func (s *Service) createMainWindow() {
 func (s *Service) setupEventHandlers() {
 	// State change events
 	s.window.OnWindowEvent(events.Common.WindowMinimise, func(event *application.WindowEvent) {
-		if err := s.settings.UpdateWindowState(&s.state); err != nil {
+		if err := s.config.UpdateWindowState(&s.state); err != nil {
 			slog.Error("Failed to save window state on minimize", "error", err)
 		}
 	})
@@ -119,10 +119,10 @@ func (s *Service) setupEventHandlers() {
 
 	// Save state on close
 	s.window.OnWindowEvent(events.Common.WindowClosing, func(event *application.WindowEvent) {
-		if err := s.settings.UpdateWindowState(&s.state); err != nil {
+		if err := s.config.UpdateWindowState(&s.state); err != nil {
 			slog.Error("Failed to save window state on close", "error", err)
 		}
-		if s.settings.GetConfig().Launch.CloseToTray {
+		if s.config.GetConfig().Launch.CloseToTray {
 			s.window = nil
 		} else {
 			event.Cancel()
@@ -133,7 +133,7 @@ func (s *Service) setupEventHandlers() {
 }
 
 func (s *Service) loadState() {
-	if s.window == nil || !s.settings.GetConfig().Launch.RestoreWindow {
+	if s.window == nil || !s.config.GetConfig().Launch.RestoreWindow {
 		return
 	}
 	s.window.SetSize(s.state.Width, s.state.Height)

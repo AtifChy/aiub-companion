@@ -23,17 +23,17 @@ func init() {
 
 type Service struct {
 	notice       *notice.Service
-	settings     *config.Service
+	config       *config.Service
 	notification *notifications.NotificationService
 
 	intervalCh chan time.Duration
 	cancel     context.CancelFunc
 }
 
-func NewService(notice *notice.Service, settings *config.Service, notification *notifications.NotificationService) *Service {
+func NewService(notice *notice.Service, config *config.Service, notification *notifications.NotificationService) *Service {
 	return &Service{
 		notice:       notice,
-		settings:     settings,
+		config:       config,
 		notification: notification,
 		intervalCh:   make(chan time.Duration, 1),
 	}
@@ -44,8 +44,8 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 	s.cancel = cancel
 
 	application.Get().Event.On(config.EventConfigChanged, func(event *application.CustomEvent) {
-		if settings, ok := event.Data.(config.Config); ok {
-			s.intervalCh <- time.Duration(settings.Sync.IntervalMinutes) * time.Minute
+		if cfg, ok := event.Data.(config.Config); ok {
+			s.intervalCh <- time.Duration(cfg.Sync.IntervalMinutes) * time.Minute
 		}
 	})
 
@@ -54,7 +54,7 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 }
 
 func (s *Service) run(ctx context.Context) {
-	cfg := s.settings.GetConfig()
+	cfg := s.config.GetConfig()
 	interval := time.Duration(cfg.Sync.IntervalMinutes) * time.Minute
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()

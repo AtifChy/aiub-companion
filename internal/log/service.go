@@ -23,7 +23,7 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServerOption
 			if level, err := config.ParseLogLevel(cfg.LogLevel); err == nil {
 				s.logger.SetLevel(level)
 			} else {
-				s.logger.L().Warn("invalid log level in settings", "error", err)
+				s.logger.L().Warn("invalid log level in config", "error", err)
 			}
 		}
 	})
