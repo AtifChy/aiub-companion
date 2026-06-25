@@ -21,11 +21,12 @@ const SettingsContext = createContext<SettingsContextType | null>(null);
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [config, setConfig] = useMutative<Settings | undefined>(undefined);
-  const hydratedRef = useRef(false);
+  const skipNextSave = useRef(false);
 
   useEffect(() => {
     SettingsService.GetSettings()
       .then((config) => {
+        skipNextSave.current = true;
         setConfig(() => config && rawReturn(structuredClone(config)));
       })
       .catch((err) => logger.error("Failed to load settings: ", err));
@@ -33,18 +34,22 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!config) return;
-    if (!hydratedRef.current) {
-      hydratedRef.current = true;
+
+    if (skipNextSave.current) {
+      skipNextSave.current = false;
       return;
     }
+
     const timer = setTimeout(
       () =>
-        SettingsService.SaveSettings(config).catch((err) => {
-          logger.error("Failed to save settings: ", err);
-          toast.error("Failed to save settings", {
-            description: (err as Error).message,
-          });
-        }),
+        SettingsService.SaveSettings(config)
+          .then(() => logger.info("Settings saved successfully"))
+          .catch((err) => {
+            logger.error("Failed to save settings: ", err);
+            toast.error("Failed to save settings", {
+              description: (err as Error).message,
+            });
+          }),
       200,
     );
     return () => clearTimeout(timer);
