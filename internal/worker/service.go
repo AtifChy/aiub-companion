@@ -7,9 +7,9 @@ import (
 	"log/slog"
 	"time"
 
+	"aiub-companion/internal/config"
 	"aiub-companion/internal/meta"
 	"aiub-companion/internal/notice"
-	"aiub-companion/internal/settings"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/services/notifications"
@@ -24,14 +24,14 @@ func init() {
 
 type Service struct {
 	notice       *notice.Service
-	settings     *settings.Service
+	settings     *config.Service
 	notification *notifications.NotificationService
 
 	intervalCh chan time.Duration
 	cancel     context.CancelFunc
 }
 
-func NewService(notice *notice.Service, settings *settings.Service, notification *notifications.NotificationService) *Service {
+func NewService(notice *notice.Service, settings *config.Service, notification *notifications.NotificationService) *Service {
 	return &Service{
 		notice:       notice,
 		settings:     settings,
@@ -44,8 +44,8 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 	ctx, cancel := context.WithCancel(ctx)
 	s.cancel = cancel
 
-	application.Get().Event.On(settings.EventSettingsChanged, func(event *application.CustomEvent) {
-		if settings, ok := event.Data.(settings.Settings); ok {
+	application.Get().Event.On(config.EventSettingsChanged, func(event *application.CustomEvent) {
+		if settings, ok := event.Data.(config.Settings); ok {
 			s.intervalCh <- time.Duration(settings.Sync.IntervalMinutes) * time.Minute
 		}
 	})

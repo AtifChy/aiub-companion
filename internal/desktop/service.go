@@ -5,8 +5,8 @@ import (
 	"context"
 	"log/slog"
 
+	"aiub-companion/internal/config"
 	"aiub-companion/internal/meta"
-	"aiub-companion/internal/settings"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
@@ -15,11 +15,11 @@ import (
 type Service struct {
 	app      *application.App
 	window   *application.WebviewWindow
-	settings *settings.Service
-	state    settings.WindowState
+	settings *config.Service
+	state    config.WindowState
 }
 
-func NewService(settings *settings.Service) *Service {
+func NewService(settings *config.Service) *Service {
 	return &Service{
 		settings: settings,
 	}

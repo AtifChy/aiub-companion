@@ -3,16 +3,17 @@
 package main
 
 import (
-	"aiub-companion/internal/settings"
 	"encoding/json"
 	"log"
 	"os"
+
+	"aiub-companion/internal/config"
 
 	"github.com/invopop/jsonschema"
 )
 
 func main() {
-	schema := jsonschema.Reflect(&settings.Settings{})
+	schema := jsonschema.Reflect(&config.Settings{})
 
 	data, err := json.MarshalIndent(schema, "", "  ")
 	if err != nil {

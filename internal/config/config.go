@@ -1,7 +1,7 @@
 //go:generate go run gen.go
 
-// Package settings holds the application settings.
-package settings
+// Package config holds the application configuration.
+package config
 
 import (
 	"encoding/json"

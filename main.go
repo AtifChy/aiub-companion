@@ -6,13 +6,13 @@ import (
 	"os"
 	"time"
 
+	"aiub-companion/internal/config"
 	"aiub-companion/internal/database"
 	"aiub-companion/internal/desktop"
 	"aiub-companion/internal/log"
 	"aiub-companion/internal/meta"
 	"aiub-companion/internal/notice"
 	"aiub-companion/internal/routine"
-	"aiub-companion/internal/settings"
 	"aiub-companion/internal/worker"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
@@ -42,7 +42,7 @@ func main() {
 	notificationService := notifications.New()
 
 	databaseService := database.NewService()
-	settingsService := settings.NewService()
+	settingsService := config.NewService()
 
 	noticeService := notice.NewService(databaseService)
 	routineService := routine.NewService(databaseService)
