@@ -95,7 +95,7 @@ function Header({ section, label }: { section: string; label: string }) {
 
   return (
     <header
-      onDoubleClick={void toggleMaximize}
+      onDoubleClick={() => void toggleMaximize()}
       className="wails-drag sticky top-0 z-50 flex h-11 shrink-0 items-center gap-2 border-b p-2 transition-[width,height] ease-linear"
     >
       <SidebarTrigger />
