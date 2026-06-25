@@ -8,8 +8,8 @@ const (
 	Description = "Desktop companion app for AIUB notices and tools"
 )
 
-var Version string
-
-func SetVersion(v string) {
-	Version = v
-}
+var (
+	Version   string = "dev"
+	Commit    string
+	BuildTime string
+)

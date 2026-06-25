@@ -26,7 +26,11 @@ var assets embed.FS
 var appIcon []byte
 
 // build time variables
-var version = "dev"
+var (
+	version   = "dev"
+	commit    string
+	buildTime string
+)
 
 func main() {
 	// Setup structured logging with slog and our custom log package.
@@ -39,9 +43,6 @@ func main() {
 	defer func() {
 		_ = logger.Close()
 	}()
-
-	// Set application version from build variable
-	meta.SetVersion(version)
 
 	// Initialize Services
 	metaService := meta.NewService()
