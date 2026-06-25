@@ -1,10 +1,20 @@
 package settings
 
 import (
+	"context"
 	"log/slog"
 	"sync"
 	"sync/atomic"
+
+	"github.com/wailsapp/wails/v3/pkg/application"
 )
+
+const EventSettingsChanged = "settings:changed"
+
+func init() {
+	// Register a custom event whose associated data type is *Settings.
+	application.RegisterEvent[Settings](EventSettingsChanged)
+}
 
 type Service struct {
 	writeMu   sync.Mutex
@@ -13,13 +23,16 @@ type Service struct {
 }
 
 func NewService() *Service {
+	return &Service{}
+}
+
+func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptions) error {
 	config, err := load()
 	if err != nil {
-		slog.Error("Failed to load settings, using defaults", "error", err)
+		slog.Error("Failed to load settings on startup, using defaults", "error", err)
 	}
-	s := &Service{}
 	s.config.Store(config)
-	return s
+	return nil
 }
 
 func (s *Service) GetSettings() *Settings {
@@ -36,10 +49,8 @@ func (s *Service) SaveSettings(config *Settings) error {
 
 	s.config.Store(&next)
 
-	// Trigger side effects
-	for _, listener := range s.listeners {
-		listener(&next)
-	}
+	// Emit event to notify listeners of the change
+	application.Get().Event.Emit(EventSettingsChanged, next)
 
 	// Persist to disk
 	return save(&next)
@@ -51,13 +62,6 @@ func (s *Service) ResetSettings() error {
 	defaults := defaultSettings()
 	s.config.Store(defaults)
 	return save(defaults)
-}
-
-//wails:ignore
-func (s *Service) OnChange(listener func(*Settings)) {
-	s.writeMu.Lock()
-	defer s.writeMu.Unlock()
-	s.listeners = append(s.listeners, listener)
 }
 
 //wails:ignore
