@@ -1,39 +1,20 @@
-// Package database provides functions to initialize and manage the database connection for the AIUB Companion application.
 package database
 
 import (
 	"database/sql"
-	"embed"
 	"fmt"
 	"os"
 	"path/filepath"
 
 	"aiub-companion/internal/meta"
-
-	_ "modernc.org/sqlite"
 )
 
-//go:embed sql/schemas/*.sql
-var schemasFS embed.FS
-
-// DBInstance holds the database connection and queries
-type DBInstance struct {
-	SQLDB *sql.DB
-}
-
-// InitDB initializes the database connection and creates the schema if it doesn't exist
-func InitDB() (*DBInstance, error) {
-	configDir, err := os.UserConfigDir()
+// open initializes the database connection and creates the schema if it doesn't exist
+func open() (*Service, error) {
+	dbPath, err := dbPath()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get user config dir: %w", err)
+		return nil, fmt.Errorf("failed to get database path: %w", err)
 	}
-
-	appDir := filepath.Join(configDir, meta.Name)
-	if err := os.MkdirAll(appDir, 0o755); err != nil {
-		return nil, fmt.Errorf("failed to create app dir: %w", err)
-	}
-
-	dbPath := filepath.Join(appDir, meta.Name+".db")
 
 	// Open the database connection
 	conn, err := sql.Open("sqlite", dbPath)
@@ -60,7 +41,21 @@ func InitDB() (*DBInstance, error) {
 		return nil, fmt.Errorf("failed to run schemas: %w", err)
 	}
 
-	return &DBInstance{SQLDB: conn}, nil
+	return &Service{db: conn}, nil
+}
+
+// dbPath returns the path to the database file, creating the necessary directories if they don't exist
+func dbPath() (string, error) {
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return "", fmt.Errorf("failed to get user config dir: %w", err)
+	}
+
+	appDir := filepath.Join(configDir, meta.Name)
+	if err := os.MkdirAll(appDir, 0o755); err != nil {
+		return "", fmt.Errorf("failed to create app dir: %w", err)
+	}
+	return filepath.Join(appDir, meta.Name+".db"), nil
 }
 
 // runSchemas reads and executes all SQL schema files from the embedded filesystem
@@ -80,13 +75,5 @@ func runSchemas(conn *sql.DB) error {
 		}
 	}
 
-	return nil
-}
-
-// Close closes the database connection
-func (db *DBInstance) Close() error {
-	if db.SQLDB != nil {
-		return db.SQLDB.Close()
-	}
 	return nil
 }
