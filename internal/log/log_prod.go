@@ -1,6 +1,6 @@
 //go:build production
 
-// Package log provides logging functionality for the AIUB Companion metalication.
+// Package log provides logging functionality for the application.
 package log
 
 import (
@@ -9,8 +9,8 @@ import (
 	"path"
 	"path/filepath"
 
+	"aiub-companion/internal/config"
 	"aiub-companion/internal/log/logger"
-	"aiub-companion/internal/meta"
 )
 
 func SetupLogger() (*logger.Logger, error) {
@@ -19,12 +19,12 @@ func SetupLogger() (*logger.Logger, error) {
 		return nil, err
 	}
 
-	logDir = path.Join(logDir, meta.Name, "logs")
+	logDir = path.Join(logDir, config.AppName, "logs")
 	if err := os.MkdirAll(logDir, 0o755); err != nil {
 		return nil, fmt.Errorf("failed to create log directory: %w", err)
 	}
 
-	filename := filepath.Join(logDir, meta.Name+".log")
+	filename := filepath.Join(logDir, config.AppName+".log")
 
 	log, err := logger.NewLogger(filename)
 	if err != nil {
