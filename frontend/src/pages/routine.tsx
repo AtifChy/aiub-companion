@@ -57,7 +57,7 @@ export default function RoutinePage() {
     try {
       await RoutineService.AddToUserRoutine(classId);
       setSearch("");
-      queryClient.invalidateQueries({ queryKey: ["routine"] });
+      void queryClient.invalidateQueries({ queryKey: ["routine"] });
       toast.success("Course added to routine");
     } catch (err) {
       logger.error("Failed to add course", err);
@@ -71,7 +71,7 @@ export default function RoutinePage() {
     try {
       await RoutineService.RemoveFromUserRoutine(classId);
       toast.success("Course removed from routine");
-      queryClient.invalidateQueries({ queryKey: ["routine"] });
+      void queryClient.invalidateQueries({ queryKey: ["routine"] });
     } catch (err) {
       logger.error("Failed to remove course", err);
       toast.error("Failed to remove course", {
@@ -118,7 +118,7 @@ export default function RoutinePage() {
           </p>
         </div>
 
-        <Button variant="outline" onClick={handleImportCourses}>
+        <Button variant="outline" onClick={void handleImportCourses}>
           <FileSpreadsheetIcon className="size-4" />
           Import Offered Courses
         </Button>
@@ -145,7 +145,7 @@ export default function RoutinePage() {
                 <div
                   key={course.classID}
                   className="hover:bg-accent/50 flex cursor-pointer items-center justify-between border-b px-4 py-3 transition-colors last:border-0"
-                  onClick={() => handleAddCourse(course.classID)}
+                  onClick={() => void handleAddCourse(course.classID)}
                 >
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2 font-medium">
@@ -268,7 +268,7 @@ export default function RoutinePage() {
                         variant="destructive"
                         size="icon"
                         className="absolute top-3 right-3 opacity-0 transition-opacity group-hover:opacity-100"
-                        onClick={() => handleRemoveCourse(course.classID)}
+                        onClick={() => void handleRemoveCourse(course.classID)}
                       >
                         <Trash2Icon className="size-4" />
                       </Button>

@@ -95,8 +95,8 @@ function Header({ section, label }: { section: string; label: string }) {
 
   return (
     <header
-      onDoubleClick={toggleMaximize}
-      className="bg-background wails-drag sticky top-0 z-50 flex h-11 shrink-0 items-center gap-2 border-b p-2 transition-[width,height] ease-linear"
+      onDoubleClick={void toggleMaximize}
+      className="wails-drag sticky top-0 z-50 flex h-11 shrink-0 items-center gap-2 border-b p-2 transition-[width,height] ease-linear"
     >
       <SidebarTrigger />
       <Separator
@@ -116,9 +116,9 @@ function Header({ section, label }: { section: string; label: string }) {
       </Breadcrumb>
       <WindowControls
         maximized={maximized}
-        onMinimize={Window.Minimise}
-        onMaximize={toggleMaximize}
-        onClose={Window.Close}
+        onMinimize={() => void Window.Minimise()}
+        onMaximize={() => void toggleMaximize()}
+        onClose={() => void Window.Close()}
       />
     </header>
   );

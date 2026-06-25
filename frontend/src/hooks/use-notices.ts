@@ -1,11 +1,11 @@
 import { useSettings } from "@/components/settings-provider";
+import { useDebounce } from "@/hooks/use-debounce";
 import { logger } from "@/lib/logger";
 import { Service as NoticeService, type Notice } from "@bindings/notice";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Events } from "@wailsio/runtime";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useDebounce } from "./use-debounce";
 
 export type Category =
   | "all"
@@ -58,7 +58,7 @@ export function useNotices(filter: NoticeFilters, selectedId: string | null) {
   );
 
   useEffect(() => {
-    return Events.On("notices:synced", async (count) => {
+    return Events.On("notices:synced", (count) => {
       void invalidate();
       toast.success(
         `${count.data} new notice${count.data !== 1 ? "s" : ""} synced`,
@@ -132,6 +132,7 @@ export function useSync() {
       }
       await queryClient.invalidateQueries({ queryKey: ["notices"] });
     } catch (err) {
+      logger.error("Failed to sync notices", err);
       toast.error("Failed to sync notices", {
         description: (err as Error).message,
       });

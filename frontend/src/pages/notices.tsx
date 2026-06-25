@@ -27,6 +27,7 @@ import {
   type Category,
   type NoticeFilters,
 } from "@/hooks/use-notices";
+import { logger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
 import type { Notice } from "@bindings/notice";
 import { Browser } from "@wailsio/runtime";
@@ -64,7 +65,8 @@ const CATEGORIES: Category[] = [
   "holiday",
 ];
 
-const categoryStyles: Record<Exclude<Category, "all">, string> = {
+type AltCategory = Exclude<Category, "all">;
+const categoryStyles: Record<AltCategory, string> = {
   admission: "border-blue-500/20 bg-blue-500/10 text-blue-500",
   exam: "border-red-500/20 bg-red-500/10 text-red-500",
   registration: "border-violet-500/20 bg-violet-500/10 text-violet-500",
@@ -100,11 +102,11 @@ export default function NoticesPage() {
 
   const detail = detailQuery.data ?? null;
 
-  const handleSelect = async (notice: Notice) => {
+  const handleSelect = (notice: Notice) => {
     if (notice.id === selectedId) return;
     setSelectedId(notice.id);
     if (!notice.isRead) {
-      await toggleRead(notice.id, true);
+      void toggleRead(notice.id, true);
     }
   };
 
@@ -135,7 +137,7 @@ export default function NoticesPage() {
             })
           }
           syncing={syncing}
-          onSync={sync}
+          onSync={() => void sync()}
           noticeCount={notices.length}
           unreadCount={unreadCount}
           loading={listQuery.isLoading}
@@ -148,8 +150,8 @@ export default function NoticesPage() {
           error={listQuery.error}
           selectedId={selectedId}
           onSelect={handleSelect}
-          onTogglePin={togglePin}
-          onRetry={listQuery.refetch}
+          onTogglePin={(id, next) => void togglePin(id, next)}
+          onRetry={() => void listQuery.refetch()}
           onClearFilters={() => setFilters(INITIAL_FILTERS)}
           hasActiveFilters={filters.urgent || filters.pinned || filters.unread}
         />
@@ -161,8 +163,12 @@ export default function NoticesPage() {
         <DetailView
           notice={detail}
           loading={detailQuery.isLoading}
-          onTogglePin={() => detail && togglePin(detail.id, !detail.isPinned)}
-          onToggleRead={() => detail && toggleRead(detail.id, !detail.isRead)}
+          onTogglePin={() =>
+            detail && void togglePin(detail.id, !detail.isPinned)
+          }
+          onToggleRead={() =>
+            detail && void toggleRead(detail.id, !detail.isRead)
+          }
         />
       </ResizablePanel>
     </ResizablePanelGroup>
@@ -446,7 +452,7 @@ function NoticeListItem({
           <Badge
             className={cn(
               "h-4 px-1.5 py-0 text-[0.6rem] font-semibold tracking-wider uppercase",
-              categoryStyles[notice.category],
+              categoryStyles[notice.category as AltCategory],
             )}
           >
             {notice.category}
@@ -542,7 +548,7 @@ function DetailView({
           <Badge
             className={cn(
               "px-2 text-[0.65rem] font-bold tracking-wider uppercase",
-              categoryStyles[notice.category],
+              categoryStyles[notice.category as AltCategory],
             )}
           >
             {notice.category}
@@ -612,8 +618,13 @@ function DetailView({
                 variant="ghost"
                 className="hover:text-primary"
                 onClick={() =>
-                  Browser.OpenURL("https://aiub.edu/" + notice.id).catch(
-                    (err) => toast.error("Failed to open URL: " + err),
+                  void Browser.OpenURL("https://aiub.edu/" + notice.id).catch(
+                    (err) => {
+                      logger.error("Failed to open URL", err);
+                      toast.error("Failed to open URL", {
+                        description: (err as Error).message,
+                      });
+                    },
                   )
                 }
               >
