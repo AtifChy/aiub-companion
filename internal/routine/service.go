@@ -8,15 +8,22 @@ import (
 
 	"aiub-companion/internal/database"
 
+	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/xuri/excelize/v2"
 )
 
 type Service struct {
+	db   *database.Service
 	repo Repository
 }
 
-func NewService(repo Repository) *Service {
-	return &Service{repo: repo}
+func NewService(db *database.Service) *Service {
+	return &Service{db: db}
+}
+
+func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptions) error {
+	s.repo = NewRepository(s.db.DB())
+	return nil
 }
 
 func (s *Service) ImportOfferedCourses(ctx context.Context, filePath string) error {

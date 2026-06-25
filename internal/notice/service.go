@@ -6,18 +6,24 @@ import (
 	"slices"
 
 	"aiub-companion/internal/database"
+
+	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
 type Service struct {
+	db     *database.Service
 	repo   Repository
 	client Client
 }
 
-func NewService(repo Repository, client Client) *Service {
-	return &Service{
-		repo:   repo,
-		client: client,
-	}
+func NewService(db *database.Service) *Service {
+	return &Service{db: db}
+}
+
+func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptions) error {
+	s.repo = NewRepository(s.db.DB())
+	s.client = NewClient()
+	return nil
 }
 
 func (s *Service) SyncNotices(ctx context.Context, count int) (int64, error) {
