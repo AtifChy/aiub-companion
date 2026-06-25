@@ -118,7 +118,7 @@ export default function RoutinePage() {
           </p>
         </div>
 
-        <Button variant="outline" onClick={void handleImportCourses}>
+        <Button variant="outline" onClick={() => void handleImportCourses()}>
           <FileSpreadsheetIcon className="size-4" />
           Import Offered Courses
         </Button>
@@ -216,7 +216,8 @@ export default function RoutinePage() {
                     {day}
                   </h2>
                   <p className="text-muted-foreground text-sm font-medium">
-                    {dayCources.length} Class{dayCources.length === 1 && "es"}
+                    {dayCources.length} Class
+                    {dayCources.length !== 1 ? "es" : ""}
                   </p>
                 </div>
 

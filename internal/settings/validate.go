@@ -12,6 +12,10 @@ import (
 //go:embed schema.json
 var schemaJSON []byte
 
+// schemaURI is a unique URI for the schema resource.
+const schemaURI = "urn:aiub-companion:settings"
+
+// compiledSchema is the compiled JSON schema used for validation.
 var compiledSchema *jsonschema.Schema
 
 func init() {
@@ -19,9 +23,6 @@ func init() {
 	if err := json.Unmarshal(schemaJSON, &schema); err != nil {
 		panic(fmt.Errorf("failed to unmarshal schema: %w", err))
 	}
-
-	// Use a unique URI for the schema resource. This URI is only used internally by the jsonschema compiler.
-	const schemaURI = "urn:aiub-companion:settings"
 
 	c := jsonschema.NewCompiler()
 	if err := c.AddResource(schemaURI, schema); err != nil {

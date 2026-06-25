@@ -17,9 +17,8 @@ func init() {
 }
 
 type Service struct {
-	writeMu   sync.Mutex
-	config    atomic.Pointer[Settings]
-	listeners []func(*Settings)
+	writeMu sync.Mutex
+	config  atomic.Pointer[Settings]
 }
 
 func NewService() *Service {
