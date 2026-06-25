@@ -29,7 +29,7 @@ tasks:
           EXTRA_TAGS: "{{.EXTRA_TAGS}}"
           OBFUSCATED: "{{.OBFUSCATED}}"
           GARBLE_ARGS: "{{.GARBLE_ARGS}}"
-          LDFLAGS: "-X main.version={{.VERSION}}"
+          LDFLAGS: "-X {{.MODULE}}/internal/config.Version={{.VERSION}} -X {{.MODULE}}/internal/config.BuildTime={{.BUILD_TIME}}"
     vars:
       DEFAULT_OUTPUT: "{{.BIN_DIR}}/{{.APP_NAME}}"
       OUTPUT: "{{ .OUTPUT | default .DEFAULT_OUTPUT }}"
@@ -37,9 +37,11 @@ tasks:
       TARGET_ARCH: "{{.ARCH | default ARCH}}"
       # Check if a C compiler is available (gcc or clang) — cross-platform via wails3 tool
       HAS_CC:
-        sh: "wails3 tool has-cc"
+        sh: wails3 tool has "gcc|clang"
       VERSION:
         sh: git describe --tags --dirty --always
+      BUILD_TIME:
+        sh: date -u +"%Y-%m-%dT%H:%M:%SZ"
 
   build:native:
     summary: Builds the application natively on Linux
