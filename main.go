@@ -25,13 +25,6 @@ var assets embed.FS
 //go:embed build/appicon.png
 var appIcon []byte
 
-// build time variables
-var (
-	version   = "dev"
-	commit    string
-	buildTime string
-)
-
 func main() {
 	// Setup structured logging with slog and our custom log package.
 	logger, err := log.SetupLogger()
