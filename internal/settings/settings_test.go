@@ -15,15 +15,24 @@ func TestValidateSchema(t *testing.T) {
 				"log_level": "DEBUG",
 				"sync": {
 					"interval_minutes": 15,
-					"notice_fetch_count": 10,
+					"fetch_count": 10,
 					"on_startup": true
 				},
 				"launch": {
 					"start_minimized": true,
-					"close_to_tray": false
+					"close_to_tray": false,
+					"restore_window": false,
+					"sidebar_open": true
 				},
 				"notifications": {
 					"enabled": true
+				},
+				"window": {
+					"width": 1024,
+					"height": 768,
+					"x": -1,
+					"y": -1,
+					"maximized": false
 				}
 			}`,
 			wantErr: false,
@@ -31,14 +40,24 @@ func TestValidateSchema(t *testing.T) {
 		{
 			name: "Invalid theme value",
 			json: `{
-				"theme": "invalid-theme-value"
+				"theme": "invalid-theme-value",
+				"log_level": "DEBUG",
+				"sync": { "interval_minutes": 15, "fetch_count": 10, "on_startup": true },
+				"launch": { "start_minimized": true, "close_to_tray": false, "restore_window": false, "sidebar_open": true },
+				"notifications": { "enabled": true },
+				"window": { "width": 1024, "height": 768, "x": -1, "y": -1, "maximized": false }
 			}`,
 			wantErr: true,
 		},
 		{
 			name: "Invalid log level",
 			json: `{
-				"log_level": "TRACE"
+				"theme": "dark",
+				"log_level": "TRACE",
+				"sync": { "interval_minutes": 15, "fetch_count": 10, "on_startup": true },
+				"launch": { "start_minimized": true, "close_to_tray": false, "restore_window": false, "sidebar_open": true },
+				"notifications": { "enabled": true },
+				"window": { "width": 1024, "height": 768, "x": -1, "y": -1, "maximized": false }
 			}`,
 			wantErr: true,
 		},
