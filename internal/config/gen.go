@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	schema := jsonschema.Reflect(&config.Settings{})
+	schema := jsonschema.Reflect(&config.Config{})
 
 	data, err := json.MarshalIndent(schema, "", "  ")
 	if err != nil {

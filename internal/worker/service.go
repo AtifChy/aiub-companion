@@ -44,8 +44,8 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 	ctx, cancel := context.WithCancel(ctx)
 	s.cancel = cancel
 
-	application.Get().Event.On(config.EventSettingsChanged, func(event *application.CustomEvent) {
-		if settings, ok := event.Data.(config.Settings); ok {
+	application.Get().Event.On(config.EventConfigChanged, func(event *application.CustomEvent) {
+		if settings, ok := event.Data.(config.Config); ok {
 			s.intervalCh <- time.Duration(settings.Sync.IntervalMinutes) * time.Minute
 		}
 	})
@@ -55,7 +55,7 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 }
 
 func (s *Service) run(ctx context.Context) {
-	cfg := s.settings.GetSettings()
+	cfg := s.settings.GetConfig()
 	interval := time.Duration(cfg.Sync.IntervalMinutes) * time.Minute
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()

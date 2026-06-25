@@ -14,7 +14,7 @@ import (
 	"aiub-companion/internal/meta"
 )
 
-type Settings struct {
+type Config struct {
 	// Appearance
 	Theme string `json:"theme" jsonschema:"enum=light,enum=dark,enum=system"`
 
@@ -59,8 +59,8 @@ type WindowState struct {
 	Maximized bool `json:"maximized"`
 }
 
-func defaultSettings() *Settings {
-	return &Settings{
+func defaultConfig() *Config {
+	return &Config{
 		Notifications: notification{
 			Enabled: true,
 		},
@@ -92,41 +92,41 @@ func ParseLogLevel(s string) (slog.Level, error) {
 	return level, level.UnmarshalText([]byte(s))
 }
 
-func load() (*Settings, error) {
-	s := defaultSettings()
+func load() (*Config, error) {
+	cfg := defaultConfig()
 
-	path, err := settingsPath()
+	path, err := configPath()
 	if err != nil {
-		return s, fmt.Errorf("failed to get settings path: %w", err)
+		return cfg, fmt.Errorf("failed to get settings path: %w", err)
 	}
 
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return s, nil
+			return cfg, nil
 		}
-		return s, fmt.Errorf("failed to read settings file: %w", err)
+		return cfg, fmt.Errorf("failed to read settings file: %w", err)
 	}
 
 	if err := validate(data); err != nil {
-		return s, err
+		return cfg, err
 	}
 
-	if err := json.Unmarshal(data, s); err != nil {
+	if err := json.Unmarshal(data, cfg); err != nil {
 		if syntaxErr, ok := errors.AsType[*json.SyntaxError](err); ok {
-			return s, fmt.Errorf("invalid JSON syntax at offset %d: %w", syntaxErr.Offset, err)
+			return cfg, fmt.Errorf("invalid JSON syntax at offset %d: %w", syntaxErr.Offset, err)
 		}
 		if typeErr, ok := errors.AsType[*json.UnmarshalTypeError](err); ok {
-			return s, fmt.Errorf("invalid JSON type for field %q (expected %s): %w", typeErr.Field, typeErr.Type, err)
+			return cfg, fmt.Errorf("invalid JSON type for field %q (expected %s): %w", typeErr.Field, typeErr.Type, err)
 		}
-		return s, fmt.Errorf("failed to unmarshal settings: %w", err)
+		return cfg, fmt.Errorf("failed to unmarshal settings: %w", err)
 	}
 
-	return s, nil
+	return cfg, nil
 }
 
-func save(s *Settings) error {
-	path, err := settingsPath()
+func save(cfg *Config) error {
+	path, err := configPath()
 	if err != nil {
 		return fmt.Errorf("failed to get settings path: %w", err)
 	}
@@ -135,7 +135,7 @@ func save(s *Settings) error {
 		return fmt.Errorf("failed to create settings directory: %w", err)
 	}
 
-	data, err := json.MarshalIndent(s, "", "  ")
+	data, err := json.MarshalIndent(cfg, "", "  ")
 	if err != nil {
 		return fmt.Errorf("failed to marshal settings: %w", err)
 	}
@@ -165,10 +165,10 @@ func save(s *Settings) error {
 	return nil
 }
 
-func settingsPath() (string, error) {
+func configPath() (string, error) {
 	configDir, err := os.UserConfigDir()
 	if err != nil {
 		return "", fmt.Errorf("failed to get user config dir: %w", err)
 	}
-	return filepath.Join(configDir, meta.Name, "settings.json"), nil
+	return filepath.Join(configDir, meta.Name, "config.json"), nil
 }

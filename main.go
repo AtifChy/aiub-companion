@@ -42,13 +42,13 @@ func main() {
 	notificationService := notifications.New()
 
 	databaseService := database.NewService()
-	settingsService := config.NewService()
+	configService := config.NewService()
 
 	noticeService := notice.NewService(databaseService)
 	routineService := routine.NewService(databaseService)
 
-	desktopService := desktop.NewService(settingsService)
-	workerService := worker.NewService(noticeService, settingsService, notificationService)
+	desktopService := desktop.NewService(configService)
+	workerService := worker.NewService(noticeService, configService, notificationService)
 
 	loggerService := log.NewService(logger)
 
@@ -61,7 +61,7 @@ func main() {
 			// Core
 			application.NewService(loggerService),
 			application.NewService(databaseService),
-			application.NewService(settingsService),
+			application.NewService(configService),
 
 			// Independent
 			application.NewService(metaService),

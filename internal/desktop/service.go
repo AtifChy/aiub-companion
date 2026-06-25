@@ -34,7 +34,7 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 	}
 
 	s.app.Event.OnApplicationEvent(events.Common.ApplicationStarted, func(event *application.ApplicationEvent) {
-		cfg := s.settings.GetSettings()
+		cfg := s.settings.GetConfig()
 		s.state = cfg.Window
 
 		s.setupTray()
@@ -123,7 +123,7 @@ func (s *Service) setupEventHandlers() {
 		if err := s.settings.UpdateWindowState(&s.state); err != nil {
 			slog.Error("Failed to save window state on close", "error", err)
 		}
-		if s.settings.GetSettings().Launch.CloseToTray {
+		if s.settings.GetConfig().Launch.CloseToTray {
 			s.window = nil
 		} else {
 			event.Cancel()
@@ -134,7 +134,7 @@ func (s *Service) setupEventHandlers() {
 }
 
 func (s *Service) loadState() {
-	if s.window == nil || !s.settings.GetSettings().Launch.RestoreWindow {
+	if s.window == nil || !s.settings.GetConfig().Launch.RestoreWindow {
 		return
 	}
 	s.window.SetSize(s.state.Width, s.state.Height)

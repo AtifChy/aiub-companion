@@ -1,5 +1,5 @@
 import { logger } from "@/lib/logger";
-import { Service as SettingsService, type Settings } from "@bindings/settings";
+import { Service as ConfigService, type Config } from "@bindings/config";
 import { Loader2Icon } from "lucide-react";
 import { rawReturn } from "mutative";
 import {
@@ -13,18 +13,18 @@ import { toast } from "sonner";
 import { useMutative, type Updater } from "use-mutative";
 
 interface SettingsContextType {
-  config: Settings;
-  setConfig: Updater<Settings | undefined>;
+  config: Config;
+  setConfig: Updater<Config | undefined>;
 }
 
 const SettingsContext = createContext<SettingsContextType | null>(null);
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
-  const [config, setConfig] = useMutative<Settings | undefined>(undefined);
+  const [config, setConfig] = useMutative<Config | undefined>(undefined);
   const skipNextSave = useRef(false);
 
   useEffect(() => {
-    SettingsService.GetSettings()
+    ConfigService.GetConfig()
       .then((config) => {
         skipNextSave.current = true;
         setConfig(() => config && rawReturn(structuredClone(config)));
@@ -42,7 +42,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
     const timer = setTimeout(
       () =>
-        SettingsService.SaveSettings(config)
+        ConfigService.SaveConfig(config)
           .then(() => logger.info("Settings saved successfully"))
           .catch((err) => {
             logger.error("Failed to save settings: ", err);

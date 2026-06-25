@@ -9,16 +9,16 @@ import (
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
-const EventSettingsChanged = "settings:changed"
+const EventConfigChanged = "config:changed"
 
 func init() {
-	// Register a custom event whose associated data type is *Settings.
-	application.RegisterEvent[Settings](EventSettingsChanged)
+	// Register a custom event whose associated data type is Config.
+	application.RegisterEvent[Config](EventConfigChanged)
 }
 
 type Service struct {
+	config  atomic.Pointer[Config]
 	writeMu sync.Mutex
-	config  atomic.Pointer[Settings]
 }
 
 func NewService() *Service {
@@ -34,11 +34,11 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 	return nil
 }
 
-func (s *Service) GetSettings() *Settings {
+func (s *Service) GetConfig() *Config {
 	return s.config.Load()
 }
 
-func (s *Service) SaveSettings(config *Settings) error {
+func (s *Service) SaveConfig(config *Config) error {
 	s.writeMu.Lock()
 	defer s.writeMu.Unlock()
 
@@ -49,16 +49,16 @@ func (s *Service) SaveSettings(config *Settings) error {
 	s.config.Store(&next)
 
 	// Emit event to notify listeners of the change
-	application.Get().Event.Emit(EventSettingsChanged, next)
+	application.Get().Event.Emit(EventConfigChanged, next)
 
 	// Persist to disk
 	return save(&next)
 }
 
-func (s *Service) ResetSettings() error {
+func (s *Service) ResetConfig() error {
 	s.writeMu.Lock()
 	defer s.writeMu.Unlock()
-	defaults := defaultSettings()
+	defaults := defaultConfig()
 	s.config.Store(defaults)
 	return save(defaults)
 }

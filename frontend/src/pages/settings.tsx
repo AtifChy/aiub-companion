@@ -8,7 +8,7 @@ import {
 import { type Theme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import type { Settings } from "@bindings/settings";
+import type { Config } from "@bindings/config";
 import { toast } from "sonner";
 import { type Updater } from "use-mutative";
 
@@ -54,8 +54,8 @@ function SettingsView({
   config,
   updateConfig,
 }: {
-  config: Settings;
-  updateConfig: Updater<Settings | undefined>;
+  config: Config;
+  updateConfig: Updater<Config | undefined>;
 }) {
   return (
     <div className="animate-in fade-in-10 flex h-full flex-col duration-200">
