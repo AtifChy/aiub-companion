@@ -1,0 +1,22 @@
+name: changelog
+
+on: push
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Generate Changelog
+        run: echo "# Good things have arrived" > ${{ github.workspace }}/CHANGELOG.txt
+
+      - name: Release
+        uses: softprops/action-gh-release@v3
+        if: github.ref_type == 'tag'
+        with:
+          body_path: ${{ github.workspace }}/CHANGELOG.txt
