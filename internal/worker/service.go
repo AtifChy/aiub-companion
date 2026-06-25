@@ -8,17 +8,16 @@ import (
 	"time"
 
 	"aiub-companion/internal/config"
+	"aiub-companion/internal/event"
 	"aiub-companion/internal/notice"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/services/notifications"
 )
 
-const EventNoticesSynced = "notices:synced"
-
 func init() {
 	// Register a custom event whose associated data type is string.
-	application.RegisterEvent[int](EventNoticesSynced)
+	application.RegisterEvent[int](event.EventNoticesSynced)
 }
 
 type Service struct {
@@ -43,8 +42,8 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 	ctx, cancel := context.WithCancel(ctx)
 	s.cancel = cancel
 
-	application.Get().Event.On(config.EventConfigChanged, func(event *application.CustomEvent) {
-		if cfg, ok := event.Data.(config.Config); ok {
+	application.Get().Event.On(event.EventConfigChanged, func(ev *application.CustomEvent) {
+		if cfg, ok := ev.Data.(config.Config); ok {
 			s.intervalCh <- time.Duration(cfg.Sync.IntervalMinutes) * time.Minute
 		}
 	})
@@ -81,7 +80,7 @@ func (s *Service) run(ctx context.Context) {
 		}
 
 		app := application.Get()
-		app.Event.Emit(EventNoticesSynced, count)
+		app.Event.Emit(event.EventNoticesSynced, count)
 		slog.Info("Synced notices", "count", count)
 	}
 

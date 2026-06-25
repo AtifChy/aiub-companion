@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"aiub-companion/internal/config"
+	"aiub-companion/internal/event"
 	"aiub-companion/internal/log/logger"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
@@ -18,8 +19,8 @@ func NewService(logger *logger.Logger) *Service {
 }
 
 func (s *Service) ServiceStartup(ctx context.Context, _ application.ServerOptions) error {
-	application.Get().Event.On(config.EventConfigChanged, func(event *application.CustomEvent) {
-		if cfg, ok := event.Data.(config.Config); ok {
+	application.Get().Event.On(event.EventConfigChanged, func(ev *application.CustomEvent) {
+		if cfg, ok := ev.Data.(config.Config); ok {
 			if level, err := config.ParseLogLevel(cfg.LogLevel); err == nil {
 				s.logger.SetLevel(level)
 			} else {

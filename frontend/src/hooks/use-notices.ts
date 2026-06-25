@@ -1,5 +1,6 @@
 import { useSettings } from "@/components/settings-provider";
 import { useDebounce } from "@/hooks/use-debounce";
+import { EventNoticesSynced } from "@/lib/event";
 import { logger } from "@/lib/logger";
 import { Service as NoticeService, type Notice } from "@bindings/notice";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -58,7 +59,7 @@ export function useNotices(filter: NoticeFilters, selectedId: string | null) {
   );
 
   useEffect(() => {
-    return Events.On("notices:synced", (count) => {
+    return Events.On(EventNoticesSynced, (count) => {
       void invalidate();
       toast.success(
         `${count.data} new notice${count.data !== 1 ? "s" : ""} synced`,

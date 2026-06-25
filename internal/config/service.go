@@ -6,14 +6,14 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"aiub-companion/internal/event"
+
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
-const EventConfigChanged = "config:changed"
-
 func init() {
 	// Register a custom event whose associated data type is Config.
-	application.RegisterEvent[Config](EventConfigChanged)
+	application.RegisterEvent[Config](event.EventConfigChanged)
 }
 
 type Service struct {
@@ -49,7 +49,7 @@ func (s *Service) SaveConfig(config *Config) error {
 	s.config.Store(&next)
 
 	// Emit event to notify listeners of the change
-	application.Get().Event.Emit(EventConfigChanged, next)
+	application.Get().Event.Emit(event.EventConfigChanged, next)
 
 	// Persist to disk
 	return save(&next)
