@@ -1,25 +1,48 @@
 package log
 
-import "log/slog"
+import (
+	"context"
 
-type Service struct{}
+	"aiub-companion/internal/log/logger"
+	"aiub-companion/internal/settings"
 
-func NewService() *Service {
-	return &Service{}
+	"github.com/wailsapp/wails/v3/pkg/application"
+)
+
+type Service struct {
+	logger *logger.Logger
+}
+
+func NewService(logger *logger.Logger) *Service {
+	return &Service{logger: logger}
+}
+
+func (s *Service) ServiceStartup(ctx context.Context, _ application.ServerOptions) error {
+	application.Get().Event.On(settings.EventSettingsChanged, func(event *application.CustomEvent) {
+		if config, ok := event.Data.(settings.Settings); ok {
+			if level, err := settings.ParseLogLevel(config.LogLevel); err == nil {
+				s.logger.SetLevel(level)
+			} else {
+				s.logger.L().Warn("invalid log level in settings", "error", err)
+			}
+		}
+	})
+
+	return nil
 }
 
 func (s *Service) Debug(message string) {
-	slog.Debug("[frontend] " + message)
+	s.logger.L().Debug("[frontend] " + message)
 }
 
 func (s *Service) Info(message string) {
-	slog.Info("[frontend] " + message)
+	s.logger.L().Info("[frontend] " + message)
 }
 
 func (s *Service) Warn(message string) {
-	slog.Warn("[frontend] " + message)
+	s.logger.L().Warn("[frontend] " + message)
 }
 
 func (s *Service) Error(message string) {
-	slog.Error("[frontend] " + message)
+	s.logger.L().Error("[frontend] " + message)
 }

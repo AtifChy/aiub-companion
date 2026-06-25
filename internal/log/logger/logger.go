@@ -35,6 +35,10 @@ func NewLogger(filepath string) (*Logger, error) {
 	}, nil
 }
 
+func (l *Logger) L() *slog.Logger {
+	return l.Logger
+}
+
 func (l *Logger) SetLevel(level slog.Level) {
 	l.Level.Set(level)
 }
