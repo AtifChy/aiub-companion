@@ -6,7 +6,6 @@ import (
 	"log/slog"
 
 	"aiub-companion/internal/config"
-	"aiub-companion/internal/meta"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
@@ -60,8 +59,8 @@ func (s *Service) showMainWindow() {
 func (s *Service) setupTray() {
 	systray := s.app.SystemTray.New()
 	systray.SetIcon(s.app.Config().Icon)
-	systray.SetLabel(meta.DisplayName)
-	systray.SetTooltip(meta.DisplayName)
+	systray.SetLabel(config.DisplayName)
+	systray.SetTooltip(config.DisplayName)
 
 	systray.OnDoubleClick(func() {
 		s.showMainWindow()
@@ -80,7 +79,7 @@ func (s *Service) setupTray() {
 func (s *Service) createMainWindow() {
 	s.window = s.app.Window.NewWithOptions(application.WebviewWindowOptions{
 		Name:             "main-window",
-		Title:            meta.DisplayName,
+		Title:            config.DisplayName,
 		Frameless:        true,
 		BackgroundColour: application.NewRGBA(0, 0, 0, 255),
 		URL:              "/",

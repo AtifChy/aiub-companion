@@ -10,7 +10,6 @@ import (
 	"aiub-companion/internal/database"
 	"aiub-companion/internal/desktop"
 	"aiub-companion/internal/log"
-	"aiub-companion/internal/meta"
 	"aiub-companion/internal/notice"
 	"aiub-companion/internal/routine"
 	"aiub-companion/internal/worker"
@@ -38,7 +37,6 @@ func main() {
 	}()
 
 	// Initialize Services
-	metaService := meta.NewService()
 	notificationService := notifications.New()
 
 	databaseService := database.NewService()
@@ -54,8 +52,8 @@ func main() {
 
 	// Create a new Wails application by providing the necessary options.
 	app := application.New(application.Options{
-		Name:        meta.DisplayName,
-		Description: meta.Description,
+		Name:        config.DisplayName,
+		Description: config.Description,
 		Icon:        appIcon,
 		Services: []application.Service{
 			// Core
@@ -64,7 +62,6 @@ func main() {
 			application.NewService(configService),
 
 			// Independent
-			application.NewService(metaService),
 			application.NewService(notificationService),
 
 			// Domain logic
@@ -88,7 +85,7 @@ func main() {
 			ApplicationShouldTerminateAfterLastWindowClosed: false,
 		},
 		SingleInstance: &application.SingleInstanceOptions{
-			UniqueID: meta.ID,
+			UniqueID: config.ID,
 			AdditionalData: map[string]string{
 				"launchTime": time.Now().Format(time.RFC1123),
 			},

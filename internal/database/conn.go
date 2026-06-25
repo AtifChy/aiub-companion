@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"aiub-companion/internal/meta"
+	"aiub-companion/internal/config"
 )
 
 //go:embed sql/schemas/*.sql
@@ -55,11 +55,11 @@ func dbPath() (string, error) {
 		return "", fmt.Errorf("failed to get user config dir: %w", err)
 	}
 
-	appDir := filepath.Join(configDir, meta.Name)
+	appDir := filepath.Join(configDir, config.AppName)
 	if err := os.MkdirAll(appDir, 0o755); err != nil {
 		return "", fmt.Errorf("failed to create app dir: %w", err)
 	}
-	return filepath.Join(appDir, meta.Name+".db"), nil
+	return filepath.Join(appDir, config.AppName+".db"), nil
 }
 
 // runSchemas reads and executes all SQL schema files from the embedded filesystem
