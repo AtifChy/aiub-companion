@@ -6,7 +6,7 @@ require (
 	github.com/lmittmann/tint v1.1.3
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
-	github.com/wailsapp/wails/v3 v3.0.0-alpha2.105
+	github.com/wailsapp/wails/v3 v3.0.0-alpha2.106
 	github.com/xuri/excelize/v2 v2.10.1
 	golang.org/x/net v0.56.0
 	modernc.org/sqlite v1.53.0
@@ -31,7 +31,6 @@ require (
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/coder/websocket v1.8.15 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/ebitengine/purego v0.10.1 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/godbus/dbus/v5 v5.2.2 // indirect
 	github.com/google/uuid v1.6.0 // indirect
@@ -42,7 +41,7 @@ require (
 	github.com/mattn/go-isatty v0.0.22 // indirect
 	github.com/ncruces/go-strftime v1.0.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
-	github.com/wailsapp/wails/webview2 v1.0.24 // indirect
+	github.com/wailsapp/wails/webview2 v1.0.27 // indirect
 	golang.org/x/crypto v0.53.0 // indirect
 	golang.org/x/sys v0.46.0 // indirect
 	modernc.org/libc v1.73.4 // indirect
