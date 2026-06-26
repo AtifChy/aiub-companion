@@ -14,14 +14,9 @@ import (
 var schemasFS embed.FS
 
 // open initializes the database connection and creates the schema if it doesn't exist
-func open() (*Service, error) {
-	dbPath, err := dbPath()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get database path: %w", err)
-	}
-
+func open(path string) (*Service, error) {
 	// Open the database connection
-	conn, err := sql.Open("sqlite", dbPath)
+	conn, err := sql.Open("sqlite", path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}

@@ -4,6 +4,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 	_ "modernc.org/sqlite"
@@ -11,7 +12,8 @@ import (
 
 // Service holds the database connection and queries
 type Service struct {
-	db *sql.DB
+	db   *sql.DB
+	path string
 }
 
 func NewService() *Service {
@@ -19,10 +21,17 @@ func NewService() *Service {
 }
 
 func (s *Service) ServiceStartup(ctx context.Context, options application.ServiceOptions) error {
-	instance, err := open()
+	path, err := dbPath()
+	if err != nil {
+		return fmt.Errorf("failed to get database path: %w", err)
+	}
+
+	instance, err := open(path)
 	if err != nil {
 		return err
 	}
+
+	s.path = path
 	s.db = instance.db
 	return nil
 }
