@@ -32,12 +32,13 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 	if err != nil {
 		return fmt.Errorf("failed to determine config path: %w", err)
 	}
-	s.path = path
 
-	config, err := load(s.path)
+	config, err := load(path)
 	if err != nil {
 		slog.Error("Failed to load config on startup, using defaults", "error", err)
 	}
+
+	s.path = path
 	s.config.Store(config)
 	return nil
 }
