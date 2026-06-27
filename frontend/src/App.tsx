@@ -5,7 +5,10 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { routes } from "@/lib/routes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { lazy } from "react";
 import { HashRouter, Navigate, Route, Routes } from "react-router";
+
+const AboutPage = lazy(() => import("@/pages/about"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -53,6 +56,7 @@ function AppRouter() {
             />
           ))}
         </Route>
+        <Route path="/about" element={<AboutPage />} />
       </Routes>
     </HashRouter>
   );

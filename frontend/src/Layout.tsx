@@ -7,20 +7,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
+import { WindowControls } from "@/components/window-controls";
 import { sections } from "@/lib/routes";
-import { cn } from "@/lib/utils";
 import { Window } from "@wailsio/runtime";
-import {
-  CopyIcon,
-  Loader2Icon,
-  MinusIcon,
-  SquareIcon,
-  XIcon,
-} from "lucide-react";
+import { Loader2Icon } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import { matchPath, Outlet, useLocation } from "react-router";
 import { toast } from "sonner";
@@ -121,51 +114,6 @@ function Header({ section, label }: { section: string; label: string }) {
         onClose={() => void Window.Close()}
       />
     </header>
-  );
-}
-
-function WindowControls({
-  maximized,
-  onMinimize,
-  onMaximize,
-  onClose,
-}: {
-  maximized: boolean;
-  onMinimize: () => void;
-  onMaximize: () => void;
-  onClose: () => void;
-}) {
-  return (
-    <div className="wails-no-drag ml-auto flex items-center gap-1">
-      <Button
-        onClick={onMinimize}
-        variant="ghost"
-        className="dark:hover:bg-primary/20 flex size-7 items-center justify-center rounded-sm transition-colors"
-      >
-        <MinusIcon strokeWidth={1.5} className="size-4" />
-      </Button>
-      <Button
-        onClick={onMaximize}
-        variant="ghost"
-        className="dark:hover:bg-primary/20 flex size-7 items-center justify-center rounded-sm transition-colors"
-      >
-        {maximized ? (
-          <CopyIcon strokeWidth={1.5} className="size-3.5 -scale-x-100" />
-        ) : (
-          <SquareIcon strokeWidth={1.5} className="size-3.5" />
-        )}
-      </Button>
-      <Button
-        onClick={onClose}
-        variant="destructive"
-        className={cn(
-          "flex size-7 items-center justify-center rounded-sm transition-colors",
-          "dark:hover:text-destructive text-foreground hover:text-destructive bg-transparent dark:bg-transparent",
-        )}
-      >
-        <XIcon strokeWidth={1.5} className="size-4" />
-      </Button>
-    </div>
   );
 }
 
