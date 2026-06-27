@@ -43,14 +43,17 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     const timer = setTimeout(
       () =>
         ConfigService.SaveConfig(config)
-          .then(() => logger.info("Settings saved successfully"))
+          .then(() => {
+            logger.info("Settings saved successfully");
+            toast.success("Settings saved successfully");
+          })
           .catch((err) => {
             logger.error("Failed to save settings: ", err);
             toast.error("Failed to save settings", {
               description: (err as Error).message,
             });
           }),
-      200,
+      500,
     );
     return () => clearTimeout(timer);
   }, [config]);

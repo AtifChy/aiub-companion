@@ -37,7 +37,7 @@ export function NavGroup({ title, items }: NavGroupProps) {
                   <span>{item.label}</span>
                 </Link>
               }
-              className="mb-1"
+              className="mb-1 group-data-[collapsible=icon]:mt-1"
             />
           </SidebarMenuItem>
         ))}

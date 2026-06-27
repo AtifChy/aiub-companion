@@ -206,7 +206,7 @@
     cursor: pointer;
   }
   html {
-    @apply scrollbar-none overscroll-none font-sans;
+    @apply scrollbar-none overscroll-none font-sans select-none;
   }
 }
 

@@ -21,5 +21,15 @@ export const logger = {
 
 function format(message: string, args: unknown[]): string {
   if (!args.length) return message;
-  return `${message}${args.length ? ":" : ""} ${args.map((arg) => String((arg as Error).message)).join(" ")}`;
+  return `${message}${args.length ? ":" : ""} ${args
+    .map((arg) => {
+      if (arg instanceof Error) {
+        return arg.message;
+      }
+      if (arg && typeof arg === "object") {
+        return JSON.stringify(arg);
+      }
+      return String(arg);
+    })
+    .join(" ")}`;
 }
