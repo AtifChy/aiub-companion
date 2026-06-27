@@ -8,7 +8,10 @@ import {
 import { type Theme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { parseWailsError } from "@/lib/error";
+import { logger } from "@/lib/logger";
 import type { Config } from "@bindings/config";
+import { Service as LogService } from "@bindings/log";
 import { toast } from "sonner";
 import { type Updater } from "use-mutative";
 
@@ -171,13 +174,29 @@ function SettingsView({
 
             <SettingRow
               label="Close to Tray"
-              description="Keep the application running in the background when window closed"
+              description="Minimize the application to the system tray instead of closing it"
             >
               <Switch
                 checked={config.launch.close_to_tray}
                 onCheckedChange={(v) =>
                   updateConfig((draft) => {
                     if (draft) draft.launch.close_to_tray = v;
+                  })
+                }
+                className="cursor-pointer"
+              />
+            </SettingRow>
+
+            <SettingRow
+              label="Keep Alive"
+              description="Continue running the application in the background even when the window is closed"
+            >
+              <Switch
+                disabled={!config.launch.close_to_tray}
+                checked={config.launch.keep_alive}
+                onCheckedChange={(v) =>
+                  updateConfig((draft) => {
+                    if (draft) draft.launch.keep_alive = v;
                   })
                 }
                 className="cursor-pointer"
@@ -238,7 +257,14 @@ function SettingsView({
             >
               <Button
                 variant="outline"
-                onClick={() => toast.error("Not implemented yet")}
+                onClick={() => {
+                  LogService.OpenLogFile().catch((err) => {
+                    logger.error("Failed to open log file", err);
+                    toast.error("Failed to open log file", {
+                      description: parseWailsError(err)?.message,
+                    });
+                  });
+                }}
               >
                 Open Logs
               </Button>
