@@ -2,6 +2,7 @@ package log
 
 import (
 	"context"
+	"fmt"
 
 	"aiub-companion/internal/config"
 	"aiub-companion/internal/event"
@@ -46,4 +47,17 @@ func (s *Service) Warn(message string) {
 
 func (s *Service) Error(message string) {
 	s.logger.L().Error("[frontend] " + message)
+}
+
+func (s *Service) OpenLogFile() error {
+	path, err := logPath()
+	if err != nil {
+		return err
+	}
+
+	if err := application.Get().Browser.OpenFile(path); err != nil {
+		return fmt.Errorf("failed to open log file: %w", err)
+	}
+
+	return nil
 }
