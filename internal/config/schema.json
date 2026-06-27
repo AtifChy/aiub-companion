@@ -29,9 +29,6 @@
         },
         "notifications": {
           "$ref": "#/$defs/notification"
-        },
-        "window": {
-          "$ref": "#/$defs/WindowState"
         }
       },
       "additionalProperties": false,
@@ -41,36 +38,7 @@
         "log_level",
         "sync",
         "launch",
-        "notifications",
-        "window"
-      ]
-    },
-    "WindowState": {
-      "properties": {
-        "width": {
-          "type": "integer"
-        },
-        "height": {
-          "type": "integer"
-        },
-        "x": {
-          "type": "integer"
-        },
-        "y": {
-          "type": "integer"
-        },
-        "maximized": {
-          "type": "boolean"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "width",
-        "height",
-        "x",
-        "y",
-        "maximized"
+        "notifications"
       ]
     },
     "launch": {
@@ -79,6 +47,9 @@
           "type": "boolean"
         },
         "close_to_tray": {
+          "type": "boolean"
+        },
+        "keep_alive": {
           "type": "boolean"
         },
         "restore_window": {
@@ -93,6 +64,7 @@
       "required": [
         "start_minimized",
         "close_to_tray",
+        "keep_alive",
         "restore_window",
         "sidebar_open"
       ]

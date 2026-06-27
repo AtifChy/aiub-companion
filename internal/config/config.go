@@ -27,9 +27,6 @@ type Config struct {
 
 	// Notifications
 	Notifications notification `json:"notifications"`
-
-	// Window state
-	Window WindowState `json:"window"`
 }
 
 type notification struct {
@@ -39,6 +36,7 @@ type notification struct {
 type launch struct {
 	StartMinimized bool `json:"start_minimized"`
 	CloseToTray    bool `json:"close_to_tray"`
+	KeepAlive      bool `json:"keep_alive"`
 	RestoreWindow  bool `json:"restore_window"`
 	SidebarOpen    bool `json:"sidebar_open"`
 }
@@ -49,14 +47,6 @@ type synchronization struct {
 	OnStartup       bool `json:"on_startup"`
 }
 
-type WindowState struct {
-	Width     int  `json:"width"`
-	Height    int  `json:"height"`
-	X         int  `json:"x"`
-	Y         int  `json:"y"`
-	Maximized bool `json:"maximized"`
-}
-
 func defaultConfig() *Config {
 	return &Config{
 		Notifications: notification{
@@ -65,6 +55,7 @@ func defaultConfig() *Config {
 		Launch: launch{
 			StartMinimized: false,
 			CloseToTray:    true,
+			KeepAlive:      false,
 			RestoreWindow:  false,
 			SidebarOpen:    true,
 		},
@@ -75,13 +66,6 @@ func defaultConfig() *Config {
 		},
 		Theme:    "system",
 		LogLevel: "INFO",
-		Window: WindowState{
-			Width:     1024,
-			Height:    768,
-			X:         -1,
-			Y:         -1,
-			Maximized: false,
-		},
 	}
 }
 

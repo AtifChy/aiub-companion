@@ -18,9 +18,9 @@ func init() {
 }
 
 type Service struct {
-	config  atomic.Pointer[Config]
-	path    string
-	writeMu sync.Mutex
+	config atomic.Pointer[Config]
+	path   string
+	mu     sync.Mutex
 }
 
 func NewService() *Service {
@@ -48,13 +48,10 @@ func (s *Service) GetConfig() *Config {
 }
 
 func (s *Service) SaveConfig(config *Config) error {
-	s.writeMu.Lock()
-	defer s.writeMu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	current := s.config.Load()
 	next := *config
-	next.Window = current.Window
-
 	s.config.Store(&next)
 
 	// Emit event to notify listeners of the change
@@ -65,24 +62,9 @@ func (s *Service) SaveConfig(config *Config) error {
 }
 
 func (s *Service) ResetConfig() error {
-	s.writeMu.Lock()
-	defer s.writeMu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	defaults := defaultConfig()
 	s.config.Store(defaults)
 	return save(s.path, defaults)
-}
-
-//wails:ignore
-func (s *Service) UpdateWindowState(state *WindowState) error {
-	s.writeMu.Lock()
-	defer s.writeMu.Unlock()
-
-	current := s.config.Load()
-	next := *current
-	if state != nil {
-		next.Window = *state
-	}
-
-	s.config.Store(&next)
-	return save(s.path, &next)
 }
