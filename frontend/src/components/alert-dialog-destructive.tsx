@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Redo2Icon } from "lucide-react";
+import { useState } from "react";
 
 interface AlertDialogDestructiveProps {
   label: string;
@@ -24,8 +25,10 @@ export function AlertDialogDestructive({
   description,
   onClick,
 }: AlertDialogDestructiveProps) {
+  const [open, setOpen] = useState(false);
+
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger
         render={<Button variant="destructive">{label}</Button>}
       />
@@ -39,7 +42,13 @@ export function AlertDialogDestructive({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel variant="outline">Cancel</AlertDialogCancel>
-          <AlertDialogAction variant="destructive" onClick={onClick}>
+          <AlertDialogAction
+            variant="destructive"
+            onClick={() => {
+              onClick();
+              setOpen(false);
+            }}
+          >
             Continue
           </AlertDialogAction>
         </AlertDialogFooter>
