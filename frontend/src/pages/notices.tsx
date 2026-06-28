@@ -124,7 +124,11 @@ export default function NoticesPage() {
 
   return (
     <ResizablePanelGroup orientation="horizontal" className="flex h-full">
-      <ResizablePanel defaultSize="35%" className="bg-card flex flex-col">
+      <ResizablePanel
+        defaultSize="40%"
+        minSize="35%"
+        className="bg-card flex flex-col"
+      >
         <NoticeListToolbar
           filters={filters}
           onFilterChange={setFilters}
@@ -159,7 +163,7 @@ export default function NoticesPage() {
 
       <ResizableHandle withHandle />
 
-      <ResizablePanel defaultSize="65%" minSize="30%" className="min-w-0">
+      <ResizablePanel defaultSize="60%" minSize="30%" className="min-w-0">
         <DetailView
           notice={detail}
           loading={detailQuery.isLoading}

@@ -35,7 +35,15 @@ function ShellProviders({ children }: { children: React.ReactNode }) {
   const { config } = useSettings();
   return (
     <ThemeProvider>
-      <SidebarProvider defaultOpen={config.launch.sidebar_open}>
+      <SidebarProvider
+        defaultOpen={config.launch.sidebar_open}
+        style={
+          {
+            "--sidebar-width": "14rem",
+            "--sidebar-width-mobile": "14rem",
+          } as React.CSSProperties
+        }
+      >
         <TooltipProvider>{children}</TooltipProvider>
       </SidebarProvider>
     </ThemeProvider>
