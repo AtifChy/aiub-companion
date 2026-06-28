@@ -49,6 +49,7 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 	})
 
 	go s.run(ctx)
+
 	return nil
 }
 
@@ -79,8 +80,8 @@ func (s *Service) run(ctx context.Context) {
 			slog.Error("Failed to send notification", "error", err)
 		}
 
-		app := application.Get()
-		app.Event.Emit(event.EventNoticesSynced, count)
+		application.Get().Event.Emit(event.EventNoticesSynced, int(count))
+
 		slog.Info("Synced notices", "count", count)
 	}
 
