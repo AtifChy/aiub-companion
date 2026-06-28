@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { parseWailsError } from "@/lib/error";
 import { logger } from "@/lib/logger";
-import type { Config } from "@bindings/config";
+import { type Config } from "@bindings/config";
 import { Service as LogService } from "@bindings/log";
 import { toast } from "sonner";
 import { type Updater } from "use-mutative";
@@ -40,7 +40,7 @@ const fetchCountItems: Items<number> = [10, 20, 30, 50].map((v) => ({
 }));
 
 export default function SettingsPage() {
-  const { config, setConfig } = useSettings();
+  const { config, setConfig, resetConfig } = useSettings();
 
   if (!config) {
     return (
@@ -50,16 +50,26 @@ export default function SettingsPage() {
     );
   }
 
-  return <SettingsView config={config} updateConfig={setConfig} />;
+  return (
+    <SettingsView
+      config={config}
+      updateConfig={setConfig}
+      resetConfig={resetConfig}
+    />
+  );
+}
+
+interface SettingsViewProps {
+  config: Config;
+  updateConfig: Updater<Config | undefined>;
+  resetConfig: () => Promise<void>;
 }
 
 function SettingsView({
   config,
   updateConfig,
-}: {
-  config: Config;
-  updateConfig: Updater<Config | undefined>;
-}) {
+  resetConfig,
+}: SettingsViewProps) {
   return (
     <div className="animate-in fade-in-10 flex h-full flex-col duration-200">
       <div className="scrollbar-thumb-accent min-h-0 flex-1 scrollbar-thin scrollbar-gutter-both space-y-8 overflow-y-auto p-6 lg:p-10">
@@ -280,7 +290,7 @@ function SettingsView({
               <AlertDialogDestructive
                 label="Reset Settings"
                 description="Are you sure you want to reset all settings to their default values? This action cannot be undone."
-                onClick={() => toast.error("Not implemented yet")}
+                onClick={() => void resetConfig()}
               />
             </SettingRow>
           </SettingsCard>

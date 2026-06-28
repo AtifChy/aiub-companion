@@ -15,6 +15,7 @@ import { useMutative, type Updater } from "use-mutative";
 interface SettingsContextType {
   config: Config;
   setConfig: Updater<Config | undefined>;
+  resetConfig: () => Promise<void>;
 }
 
 const SettingsContext = createContext<SettingsContextType | null>(null);
@@ -58,6 +59,26 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(timer);
   }, [config]);
 
+  const resetConfig = async () => {
+    try {
+      await ConfigService.ResetConfig();
+
+      const newConfig = await ConfigService.GetConfig();
+      if (newConfig) {
+        skipNextSave.current = true;
+        setConfig(() => rawReturn(structuredClone(newConfig)));
+      }
+
+      logger.info("Settings reset successfully");
+      toast.success("Settings reset successfully");
+    } catch (err) {
+      logger.error("Failed to reset settings: ", err);
+      toast.error("Failed to reset settings", {
+        description: (err as Error).message,
+      });
+    }
+  };
+
   if (!config) {
     return (
       <div className="flex h-screen w-screen items-center justify-center">
@@ -67,7 +88,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <SettingsContext.Provider value={{ config, setConfig }}>
+    <SettingsContext.Provider value={{ config, setConfig, resetConfig }}>
       {children}
     </SettingsContext.Provider>
   );

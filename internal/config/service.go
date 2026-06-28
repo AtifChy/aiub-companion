@@ -66,5 +66,10 @@ func (s *Service) ResetConfig() error {
 	defer s.mu.Unlock()
 	defaults := defaultConfig()
 	s.config.Store(defaults)
+
+	// Emit event to notify listeners of the change
+	application.Get().Event.Emit(event.EventConfigChanged, *defaults)
+
+	// Persist to disk
 	return save(s.path, defaults)
 }
