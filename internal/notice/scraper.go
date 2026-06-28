@@ -216,7 +216,7 @@ func (s *scraper) isAttachment(n *html.Node) bool {
 }
 
 func (s *scraper) fetchHTML(ctx context.Context, url string) (*html.Node, error) {
-	const maxAttempts = 3
+	const maxAttempts = 5
 	backoff := time.Second
 
 	for attempt := 1; attempt <= maxAttempts; attempt++ {
