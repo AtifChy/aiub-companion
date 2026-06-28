@@ -48,6 +48,8 @@ func (w *Window) HideOnClose() bool {
 	return w.opts.HideOnClose
 }
 
+// SetRestoreWindow sets the RestoreWindow option for the window.
+// If true, the window will restore its size and position from the last session.
 func (w *Window) SetRestoreWindow(restore bool) {
 	w.opts.RestoreWindow = restore
 }
