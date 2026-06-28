@@ -21,18 +21,12 @@ func TestValidateSchema(t *testing.T) {
 				"launch": {
 					"start_minimized": true,
 					"close_to_tray": false,
+					"keep_alive": false,
 					"restore_window": false,
 					"sidebar_open": true
 				},
 				"notifications": {
 					"enabled": true
-				},
-				"window": {
-					"width": 1024,
-					"height": 768,
-					"x": -1,
-					"y": -1,
-					"maximized": false
 				}
 			}`,
 			wantErr: false,
@@ -44,8 +38,7 @@ func TestValidateSchema(t *testing.T) {
 				"log_level": "DEBUG",
 				"sync": { "interval_minutes": 15, "fetch_count": 10, "on_startup": true },
 				"launch": { "start_minimized": true, "close_to_tray": false, "restore_window": false, "sidebar_open": true },
-				"notifications": { "enabled": true },
-				"window": { "width": 1024, "height": 768, "x": -1, "y": -1, "maximized": false }
+				"notifications": { "enabled": true }
 			}`,
 			wantErr: true,
 		},
@@ -56,8 +49,7 @@ func TestValidateSchema(t *testing.T) {
 				"log_level": "TRACE",
 				"sync": { "interval_minutes": 15, "fetch_count": 10, "on_startup": true },
 				"launch": { "start_minimized": true, "close_to_tray": false, "restore_window": false, "sidebar_open": true },
-				"notifications": { "enabled": true },
-				"window": { "width": 1024, "height": 768, "x": -1, "y": -1, "maximized": false }
+				"notifications": { "enabled": true }
 			}`,
 			wantErr: true,
 		},
