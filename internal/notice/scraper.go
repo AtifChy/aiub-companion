@@ -257,9 +257,6 @@ func (s *scraper) fetchWithRetriable(ctx context.Context, url string) (*html.Nod
 			return nil, true, fmt.Errorf("timeout fetching %s: %w", url, err)
 		}
 		if dnsErr, ok := errors.AsType[*net.DNSError](err); ok {
-			if dnsErr.IsNotFound {
-				return nil, false, fmt.Errorf("no internet or host found: %w", dnsErr)
-			}
 			return nil, true, fmt.Errorf("DNS error fetching %s: %w", url, dnsErr)
 		}
 		if opErr, ok := errors.AsType[*net.OpError](err); ok {
