@@ -39,6 +39,7 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 	app.Event.On(event.EventConfigChanged, func(e *application.CustomEvent) {
 		if cfg, ok := e.Data.(config.Config); ok {
 			s.main.SetHideOnClose(cfg.Launch.CloseToTray && cfg.Launch.KeepAlive)
+			s.main.SetRestoreWindow(cfg.Launch.RestoreWindow)
 		}
 	})
 

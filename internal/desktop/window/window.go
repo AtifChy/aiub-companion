@@ -48,6 +48,10 @@ func (w *Window) HideOnClose() bool {
 	return w.opts.HideOnClose
 }
 
+func (w *Window) SetRestoreWindow(restore bool) {
+	w.opts.RestoreWindow = restore
+}
+
 // Show brings the window to foreground, creating it if necessary.
 func (w *Window) Show() {
 	if w.handle == nil {
