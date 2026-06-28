@@ -58,12 +58,13 @@ export function useNotices(filter: NoticeFilters, selectedId: string | null) {
   );
 
   useEffect(() => {
-    return Events.On("notices:synced", (count) => {
+    const unsub = Events.On("notices:synced", (count) => {
       void invalidate();
       toast.success(
         `${count.data} new notice${count.data !== 1 ? "s" : ""} synced`,
       );
     });
+    return () => unsub();
   }, [invalidate]);
 
   const toggleRead = async (id: string, next: boolean) => {
