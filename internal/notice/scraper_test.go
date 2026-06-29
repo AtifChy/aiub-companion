@@ -59,7 +59,7 @@ func TestFetchHTML_RetryOn5xxFailure(t *testing.T) {
 		t.Fatal("expected error from repeated 503 responses, got nil")
 	}
 
-	expectedAttempts := int32(3) // maxAttempts configured in fetchHTML
+	expectedAttempts := int32(5) // maxAttempts configured in fetchHTML
 	actualAttempts := attempts.Load()
 	if actualAttempts != expectedAttempts {
 		t.Errorf("expected %d fetch attempts, got %d", expectedAttempts, actualAttempts)

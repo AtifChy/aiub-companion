@@ -64,6 +64,7 @@ func (s *Service) SaveConfig(config *Config) error {
 func (s *Service) ResetConfig() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+
 	defaults := defaultConfig()
 	s.config.Store(defaults)
 
