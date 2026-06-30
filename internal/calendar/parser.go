@@ -503,12 +503,12 @@ type categoryRule struct {
 }
 
 var categoryRules = []categoryRule{
+	{[]string{"payment", "installment"}, EventPayment},
 	{[]string{"permit", "collection for"}, EventDeadline},
 	{[]string{"deadline", "last date"}, EventDeadline},
 	{[]string{"result", "grade"}, EventAcademic},
 	{[]string{"lab", "laboratory"}, EventLab},
 	{[]string{"exam", "midterm", "final"}, EventExam},
-	{[]string{"payment", "installment"}, EventPayment},
 	{[]string{"registration"}, EventRegistration},
 	{[]string{"break", "holiday"}, EventBreak},
 }
