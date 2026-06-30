@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"aiub-companion/internal/calendar"
 	"aiub-companion/internal/config"
 	"aiub-companion/internal/database"
 	"aiub-companion/internal/desktop"
@@ -44,6 +45,7 @@ func main() {
 
 	noticeService := notice.NewService(databaseService)
 	routineService := routine.NewService(databaseService)
+	calendarService := calendar.NewService(noticeService)
 
 	desktopService := desktop.NewService(configService)
 	workerService := worker.NewService(noticeService, configService, notificationService)
@@ -67,6 +69,7 @@ func main() {
 			// Domain logic
 			application.NewService(noticeService),
 			application.NewService(routineService),
+			application.NewService(calendarService),
 
 			// Consumers
 			application.NewService(desktopService),
