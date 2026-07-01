@@ -65,7 +65,7 @@ export default function HelpPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <div className="bg-background animate-in fade-in-10 scrollbar-thumb-accent h-full scrollbar-thin scrollbar-gutter-both space-y-8 overflow-y-auto p-6 duration-200 lg:p-10">
+    <div className="bg-background animate-in fade-in-10 scrollbar-thumb-accent m-0.5 h-full scrollbar-thin scrollbar-gutter-both space-y-8 overflow-y-auto p-6 duration-200 lg:p-10">
       <Header />
 
       {/* FAQ Section */}

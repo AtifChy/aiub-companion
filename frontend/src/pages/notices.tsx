@@ -639,7 +639,7 @@ function DetailView({
         </div>
       </div>
 
-      <div className="scrollbar-thumb-accent scrollbar-thin overflow-y-auto px-6 py-5">
+      <div className="scrollbar-thumb-accent m-0.5 scrollbar-thin overflow-y-auto px-6 py-5">
         {notice.content ? (
           <div
             className="prose prose-sm prose-custom dark:prose-invert prose-li:text-left mx-auto text-center"
