@@ -53,6 +53,13 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 	return nil
 }
 
+func (s *Service) ServiceShutdown() error {
+	if s.cancel != nil {
+		s.cancel()
+	}
+	return nil
+}
+
 func (s *Service) run(ctx context.Context) {
 	cfg := s.config.GetConfig()
 	interval := time.Duration(cfg.Sync.IntervalMinutes) * time.Minute
