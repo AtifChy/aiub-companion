@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { Toaster } from "@/components/ui/sonner";
 import { WindowControls } from "@/components/window-controls";
 import { sections } from "@/lib/routes";
 import { Window } from "@wailsio/runtime";
@@ -51,7 +50,6 @@ export default function Layout() {
             <Outlet />
           </Suspense>
         </main>
-        <Toaster position="top-center" />
       </SidebarInset>
     </div>
   );

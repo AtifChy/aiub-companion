@@ -2,6 +2,7 @@ import Layout from "@/Layout";
 import { SettingsProvider, useSettings } from "@/components/settings-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { routes } from "@/lib/routes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -25,6 +26,7 @@ export default function App() {
       <SettingsProvider>
         <ShellProviders>
           <AppRouter />
+          <Toaster position="top-center" richColors />
         </ShellProviders>
       </SettingsProvider>
     </QueryClientProvider>
