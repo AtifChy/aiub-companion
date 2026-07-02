@@ -89,6 +89,7 @@ export default function NoticesPage() {
   const [filters, setFilters] = useState<NoticeFilters>(INITIAL_FILTERS);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
+  const autoReadRef = useRef<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
   const { listQuery, detailQuery, toggleRead, togglePin } = useNotices(
@@ -102,12 +103,21 @@ export default function NoticesPage() {
 
   const detail = detailQuery.data ?? null;
 
+  useEffect(() => {
+    if (!detail || detailQuery.isLoading) return;
+
+    if (autoReadRef.current !== detail.id) {
+      autoReadRef.current = detail.id;
+
+      if (!detail.isRead) {
+        toggleRead.mutate({ id: detail.id, next: true });
+      }
+    }
+  }, [detail, detailQuery.isLoading, toggleRead]);
+
   const handleSelect = (notice: Notice) => {
     if (notice.id === selectedId) return;
     setSelectedId(notice.id);
-    if (!notice.isRead) {
-      toggleRead.mutate({ id: notice.id, next: true });
-    }
   };
 
   // Focus search input on "/" press
