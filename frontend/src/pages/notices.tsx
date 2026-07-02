@@ -106,7 +106,7 @@ export default function NoticesPage() {
     if (notice.id === selectedId) return;
     setSelectedId(notice.id);
     if (!notice.isRead) {
-      void toggleRead(notice.id, true);
+      toggleRead.mutate({ id: notice.id, next: true });
     }
   };
 
@@ -141,7 +141,7 @@ export default function NoticesPage() {
             })
           }
           syncing={syncing}
-          onSync={() => void sync()}
+          onSync={sync}
           noticeCount={notices.length}
           unreadCount={unreadCount}
           loading={listQuery.isLoading}
@@ -154,7 +154,7 @@ export default function NoticesPage() {
           error={listQuery.error}
           selectedId={selectedId}
           onSelect={handleSelect}
-          onTogglePin={(id, next) => void togglePin(id, next)}
+          onTogglePin={(id, next) => togglePin.mutate({ id, next })}
           onRetry={() => void listQuery.refetch()}
           onClearFilters={() => setFilters(INITIAL_FILTERS)}
           hasActiveFilters={filters.urgent || filters.pinned || filters.unread}
@@ -168,10 +168,11 @@ export default function NoticesPage() {
           notice={detail}
           loading={detailQuery.isLoading}
           onTogglePin={() =>
-            detail && void togglePin(detail.id, !detail.isPinned)
+            detail &&
+            togglePin.mutate({ id: detail.id, next: !detail.isPinned })
           }
           onToggleRead={() =>
-            detail && void toggleRead(detail.id, !detail.isRead)
+            detail && toggleRead.mutate({ id: detail.id, next: !detail.isRead })
           }
         />
       </ResizablePanel>

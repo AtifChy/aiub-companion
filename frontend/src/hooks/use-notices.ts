@@ -2,9 +2,9 @@ import { useSettings } from "@/components/settings-provider";
 import { useDebounce } from "@/hooks/use-debounce";
 import { logger } from "@/lib/logger";
 import { Service as NoticeService, type Notice } from "@bindings/notice";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Events } from "@wailsio/runtime";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
 
 export type Category =
@@ -67,47 +67,11 @@ export function useNotices(filter: NoticeFilters, selectedId: string | null) {
     return () => unsub();
   }, [invalidate]);
 
-  const toggleRead = async (id: string, next: boolean) => {
-    queryClient.setQueriesData<Notice[]>(
-      { queryKey: ["notices"] },
-      (old) =>
-        old?.map((n) => (n.id === id ? { ...n, isRead: next } : n)) ?? old,
-    );
-    queryClient.setQueriesData<Notice>(
-      { queryKey: ["noticeDetails", id] },
-      (old) => (old ? { ...old, isRead: next } : old),
-    );
-    try {
-      await NoticeService.ToggleNoticeRead(id, next);
-    } catch (err) {
-      await invalidate(id);
-      logger.error("Failed to toggle read status: ", err);
-      toast.error("Failed to toggle read status", {
-        description: (err as Error).message,
-      });
-    }
-  };
-
-  const togglePin = async (id: string, next: boolean) => {
-    queryClient.setQueriesData<Notice[]>(
-      { queryKey: ["notices"] },
-      (old) =>
-        old?.map((n) => (n.id === id ? { ...n, isPinned: next } : n)) ?? old,
-    );
-    queryClient.setQueriesData<Notice>(
-      { queryKey: ["noticeDetails", id] },
-      (old) => (old ? { ...old, isPinned: next } : old),
-    );
-    try {
-      await NoticeService.ToggleNoticePinned(id, next);
-    } catch (err) {
-      await invalidate(id);
-      logger.error("Failed to toggle pin status: ", err);
-      toast.error("Failed to toggle pin status", {
-        description: (err as Error).message,
-      });
-    }
-  };
+  const toggleRead = useToggleField("isRead", NoticeService.ToggleNoticeRead);
+  const togglePin = useToggleField(
+    "isPinned",
+    NoticeService.ToggleNoticePinned,
+  );
 
   return {
     listQuery,
@@ -117,30 +81,80 @@ export function useNotices(filter: NoticeFilters, selectedId: string | null) {
   };
 }
 
+function useToggleField(
+  field: "isRead" | "isPinned",
+  mutationFn: (id: string, next: boolean) => Promise<void>,
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, next }: { id: string; next: boolean }) =>
+      mutationFn(id, next),
+
+    onMutate: async ({ id, next }) => {
+      await queryClient.cancelQueries({ queryKey: ["notices"] });
+      await queryClient.cancelQueries({ queryKey: ["noticeDetails", id] });
+
+      const oldList = queryClient.getQueriesData<Notice[]>({
+        queryKey: ["notices"],
+      });
+      const oldDetail = queryClient.getQueryData<Notice>(["noticeDetails", id]);
+
+      queryClient.setQueriesData<Notice[]>(
+        { queryKey: ["notices"] },
+        (old) =>
+          old?.map((n) => (n.id === id ? { ...n, [field]: next } : n)) ?? old,
+      );
+      queryClient.setQueriesData<Notice>(
+        { queryKey: ["noticeDetails", id] },
+        (old) => (old ? { ...old, [field]: next } : old),
+      );
+
+      return { oldList, oldDetail };
+    },
+
+    onError: (err, { id }, context) => {
+      context?.oldList?.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+      if (context?.oldDetail !== undefined) {
+        queryClient.setQueryData(["noticeDetails", id], context.oldDetail);
+      }
+
+      logger.error(`Failed to toggle ${field} status: `, err);
+      toast.error(`Failed to toggle ${field} status`, {
+        description: err.message,
+      });
+    },
+
+    onSettled: (_data, _err, { id }) => {
+      void queryClient.invalidateQueries({ queryKey: ["notices"] });
+      void queryClient.invalidateQueries({ queryKey: ["noticeDetails", id] });
+    },
+  });
+}
+
 export function useSync() {
   const queryClient = useQueryClient();
   const { config } = useSettings();
-  const [syncing, setSyncing] = useState(false);
 
-  const sync = async () => {
-    setSyncing(true);
-    try {
-      const count = await NoticeService.SyncNotices(config.sync.fetch_count);
+  const syncMutation = useMutation({
+    mutationFn: () => NoticeService.SyncNotices(config.sync.fetch_count),
+    onSuccess: (count) => {
       if (count > 0) {
         toast.success(`${count} new notice${count !== 1 ? "s" : ""} synced`);
       } else {
         toast.info("No new notices to sync");
       }
-      await queryClient.invalidateQueries({ queryKey: ["notices"] });
-    } catch (err) {
+      void queryClient.invalidateQueries({ queryKey: ["notices"] });
+    },
+    onError: (err) => {
       logger.error("Failed to sync notices", err);
       toast.error("Failed to sync notices", {
-        description: (err as Error).message,
+        description: err.message,
       });
-    } finally {
-      setSyncing(false);
-    }
-  };
+    },
+  });
 
-  return { syncing, sync };
+  return { syncing: syncMutation.isPending, sync: () => syncMutation.mutate() };
 }
