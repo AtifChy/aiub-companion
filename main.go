@@ -8,6 +8,7 @@ import (
 
 	"aiub-companion/internal/calendar"
 	"aiub-companion/internal/config"
+	_ "aiub-companion/internal/console"
 	"aiub-companion/internal/database"
 	"aiub-companion/internal/desktop"
 	"aiub-companion/internal/log"
