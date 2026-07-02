@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/use-debounce";
 import { logger } from "@/lib/logger";
+import { cn } from "@/lib/utils";
 import { Course, Service as RoutineService } from "@bindings/routine";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Dialogs } from "@wailsio/runtime";
 import {
   CalendarIcon,
@@ -19,6 +20,8 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+
+type CourseStatus = "ongoing" | "upcoming" | "inactive";
 
 const DAYS: readonly string[] = [
   "Sunday",
@@ -53,51 +56,67 @@ export default function RoutinePage() {
   const searchResults = courseQuery.data ?? [];
   const isSearching = courseQuery.isLoading;
 
-  const handleAddCourse = async (classId: string) => {
-    try {
-      await RoutineService.AddToUserRoutine(classId);
+  const addCourseMutation = useMutation({
+    mutationFn: (classId: string) => RoutineService.AddToUserRoutine(classId),
+    onSuccess: () => {
       setSearch("");
       void queryClient.invalidateQueries({ queryKey: ["routine"] });
       toast.success("Course added to routine");
-    } catch (err) {
+    },
+    onError: (err) => {
       logger.error("Failed to add course", err);
       toast.error("Failed to add course", {
-        description: (err as Error).message,
+        description: err.message,
       });
-    }
-  };
+    },
+  });
 
-  const handleRemoveCourse = async (classId: string) => {
-    try {
-      await RoutineService.RemoveFromUserRoutine(classId);
+  const removeCourseMutation = useMutation({
+    mutationFn: (classId: string) =>
+      RoutineService.RemoveFromUserRoutine(classId),
+    onSuccess: () => {
       toast.success("Course removed from routine");
       void queryClient.invalidateQueries({ queryKey: ["routine"] });
-    } catch (err) {
+    },
+    onError: (err) => {
       logger.error("Failed to remove course", err);
       toast.error("Failed to remove course", {
-        description: (err as Error).message,
+        description: err.message,
       });
-    }
-  };
+    },
+  });
 
-  const handleImportCourses = async () => {
-    try {
-      const path = await Dialogs.OpenFile({
-        Title: "Select a file",
-        Filters: [
-          { DisplayName: "Excel files", Pattern: "*.xlsx;*.xls" },
-          { DisplayName: "All files", Pattern: "*.*" },
-        ],
-      });
-      if (!path) return;
-      await RoutineService.ImportOfferedCourses(path);
-      toast.success("Courses imported successfully");
-    } catch (err) {
+  const importCoursesMutation = useMutation({
+    mutationFn: (path: string) => RoutineService.ImportOfferedCourses(path),
+    onSuccess: () => {
+      toast.success("Offered courses database updated");
+    },
+    onError: (err) => {
       logger.error("Failed to import courses", err);
       toast.error("Failed to import courses", {
-        description: (err as Error).message,
+        description: err.message,
       });
-    }
+    },
+  });
+
+  const handleImportCourses = () => {
+    Dialogs.OpenFile({
+      Title: "Select Offered Courses Excel",
+      Filters: [
+        { DisplayName: "Excel files", Pattern: "*.xlsx;*.xls" },
+        { DisplayName: "All files", Pattern: "*.*" },
+      ],
+    })
+      .then((path) => {
+        if (!path) return;
+        importCoursesMutation.mutate(path);
+      })
+      .catch((err) => {
+        logger.error("Failed to open file dialog", err);
+        toast.error("Failed to open file dialog", {
+          description: (err as Error).message,
+        });
+      });
   };
 
   const routineByDay = DAYS.reduce(
@@ -108,179 +127,420 @@ export default function RoutinePage() {
     {} as Record<string, Course[]>,
   );
 
+  const stats: RoutineStatsProps["stats"] = {
+    totalClasses: routine.length,
+    studyHours: routine.reduce((acc, c) => {
+      const duration =
+        parseTimeToMinutes(c.endTime) - parseTimeToMinutes(c.startTime);
+      return acc + (duration > 0 ? duration / 60 : 0);
+    }, 0),
+    activeDays: Object.keys(routineByDay).filter((day) => {
+      const dayCourses = routineByDay[day];
+      return dayCourses !== undefined && dayCourses.length > 0;
+    }).length,
+  };
+
   return (
-    <div className="animate-in fade-in-10 mx-auto flex h-full flex-col gap-6 p-6 duration-200 lg:p-10">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Class Routine</h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Manage your weekly class schedule
-          </p>
-        </div>
+    <div className="animate-in fade-in-10 scrollbar-thumb-accent m-0.5 flex h-full scrollbar-thin flex-col gap-6 overflow-auto p-6 duration-200 lg:p-10">
+      <RoutineHeader onImport={handleImportCourses} />
 
-        <Button variant="outline" onClick={() => void handleImportCourses()}>
-          <FileSpreadsheetIcon className="size-4" />
-          Import Offered Courses
-        </Button>
-      </div>
+      {routine.length > 0 && !loading && <RoutineStats stats={stats} />}
 
-      <div className="relative z-50">
-        <div className="relative">
-          <SearchIcon className="text-muted-foreground absolute top-1/2 left-5 size-5 -translate-1/2" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search Course"
-            className="h-10 pl-10 text-base shadow-sm"
-          />
-          {isSearching && (
-            <Loader2Icon className="text-muted-foreground absolute top-1/2 right-0 size-5 -translate-1/2 animate-spin" />
-          )}
-        </div>
+      <CourseSearch
+        search={search}
+        setSearch={setSearch}
+        searchResults={searchResults}
+        isSearching={isSearching}
+        onAddCourse={(classId) => addCourseMutation.mutate(classId)}
+      />
 
-        {search !== "" && searchResults.length > 0 && (
-          <Card className="scrollbar-thumb-accent fade-in-10 animate-in absolute mt-2 max-h-90 w-full scrollbar-thin overflow-y-auto scroll-smooth rounded p-0 shadow-lg duration-200">
-            <div className="flex flex-col">
-              {searchResults.map((course) => (
-                <div
-                  key={course.classID}
-                  className="hover:bg-accent/50 flex cursor-pointer items-center justify-between border-b px-4 py-3 transition-colors last:border-0"
-                  onClick={() => void handleAddCourse(course.classID)}
-                >
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-2 font-medium">
-                      {course.courseCode && (
-                        <Badge
-                          variant="secondary"
-                          className="font-mono text-[10px]"
-                        >
-                          {course.courseCode}
-                        </Badge>
-                      )}
-                      <span>{course.courseTitle}</span>
-                      <span className="text-muted-foreground text-sm font-normal">
-                        [{course.section}]
-                      </span>
-                    </div>
-                    <div className="text-muted-foreground flex items-center gap-3 text-sm">
-                      <span className="flex items-center gap-1">
-                        <UserIcon className="size-3" /> {course.faculty}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <CalendarIcon className="size-3" /> {course.day}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <ClockIcon className="size-3" /> {course.startTime} -{" "}
-                        {course.endTime}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        )}
-
-        {search !== "" && !isSearching && searchResults.length === 0 && (
-          <Card className="text-muted-foreground animate-in fade-in-10 absolute mt-2 w-full rounded p-4 text-center text-sm shadow-lg duration-200">
-            No courses found
-          </Card>
-        )}
-      </div>
-
-      {/*Weekly Schedule*/}
       {loading ? (
-        <div className="flex flex-1 items-center justify-center">
+        <div className="flex min-h-[300px] flex-1 items-center justify-center">
           <Loader2Icon className="text-muted-foreground size-8 animate-spin" />
         </div>
       ) : routine.length === 0 ? (
-        <div className="flex flex-1 flex-col items-center justify-center text-center">
-          <CalendarIcon className="text-muted-foreground mb-4 size-16" />
-          <h3 className="text-xl font-semibold">Your routine is empty</h3>
-          <p className="text-muted-foreground mt-2">
-            Search for your courses above to start building your weekly
-            schedule.
-          </p>
-        </div>
+        <EmptyState />
       ) : (
-        <div className="flex scrollbar-none flex-col gap-8 overflow-y-auto pb-12">
-          {DAYS.map((day) => {
-            const dayCources = routineByDay[day];
-            if (!dayCources || dayCources.length === 0) return null;
-
-            return (
-              <div key={day} className="flex gap-8">
-                {/*Day Label*/}
-                <div className="w-32 shrink-0">
-                  <h2 className="text-primary bg-background sticky top-0 text-xl font-bold">
-                    {day}
-                  </h2>
-                  <p className="text-muted-foreground text-sm font-medium">
-                    {dayCources.length} Class
-                    {dayCources.length !== 1 ? "es" : ""}
-                  </p>
-                </div>
-
-                {/*Course Cards*/}
-                <div className="my-1 grid flex-1 grid-cols-2 gap-4 xl:grid-cols-3">
-                  {dayCources.map((course) => (
-                    <Card
-                      key={course.classID}
-                      className="group hover:ring-ring/50 relative overflow-hidden shadow-xs transition-all duration-150 hover:ring-3"
-                    >
-                      <div className="bg-primary absolute top-0 left-0 h-full w-1" />
-                      <CardHeader>
-                        <div className="flex items-center gap-2">
-                          {course.courseCode && (
-                            <Badge variant="secondary" className="text-xs">
-                              {course.courseCode}
-                            </Badge>
-                          )}
-                          <Badge variant="outline">{course.type}</Badge>
-                        </div>
-                        <CardTitle>
-                          {course.courseTitle}{" "}
-                          <span className="text-muted-foreground">
-                            [{course.section}]
-                          </span>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="flex flex-col gap-2">
-                        <div className="text-muted-foreground flex items-center gap-2 text-sm">
-                          <ClockIcon className="size-4" />
-                          <span className="text-foreground font-medium">
-                            {course.startTime} - {course.endTime}
-                          </span>
-                        </div>
-                        <div className="text-muted-foreground flex items-center gap-2 text-sm">
-                          <MapPinIcon className="size-4" />
-                          <span>
-                            {course.room} ({course.department})
-                          </span>
-                        </div>
-                        <div className="text-muted-foreground flex items-center gap-2 text-sm">
-                          <UserIcon className="size-4" />
-                          <span>{course.faculty}</span>
-                        </div>
-                      </CardContent>
-
-                      {/*Delete Button*/}
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        className="absolute top-3 right-3 opacity-0 transition-opacity group-hover:opacity-100"
-                        onClick={() => void handleRemoveCourse(course.classID)}
-                      >
-                        <Trash2Icon className="size-4" />
-                      </Button>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <DayScheduleTimeline
+          routineByDay={routineByDay}
+          onRemoveCourse={(classId) => removeCourseMutation.mutate(classId)}
+        />
       )}
     </div>
   );
 }
+
+interface RoutineHeaderProps {
+  onImport: () => void;
+}
+
+function RoutineHeader({ onImport }: RoutineHeaderProps) {
+  return (
+    <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Class Routine</h1>
+        <p className="text-muted-foreground mt-1 text-sm">
+          Manage and visualize your weekly class schedule
+        </p>
+      </div>
+
+      <Button variant="outline" className="w-fit" onClick={onImport}>
+        <FileSpreadsheetIcon className="mr-2 size-4" />
+        Import Offered Courses
+      </Button>
+    </div>
+  );
+}
+
+interface RoutineStatsProps {
+  stats: {
+    totalClasses: number;
+    studyHours: number;
+    activeDays: number;
+  };
+}
+
+function RoutineStats({ stats }: RoutineStatsProps) {
+  return (
+    <div className="animate-in fade-in mb-2 grid grid-cols-1 gap-4 duration-300 md:grid-cols-3">
+      <Card className="bg-card/40 border-muted/30">
+        <CardContent className="flex items-center gap-4">
+          <div className="bg-primary/10 text-primary rounded-xl p-3">
+            <ClockIcon className="size-5" />
+          </div>
+          <div>
+            <p className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+              Weekly Study Load
+            </p>
+            <h3 className="text-lg font-bold">
+              {stats.studyHours.toFixed(1)} Hours
+            </h3>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-card/40 border-muted/30">
+        <CardContent className="flex items-center gap-4">
+          <div className="rounded-xl bg-emerald-500/10 p-3 text-emerald-500">
+            <CalendarIcon className="size-5" />
+          </div>
+          <div>
+            <p className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+              Classes Scheduled
+            </p>
+            <h3 className="text-lg font-bold">
+              {stats.totalClasses} Active Classes
+            </h3>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-card/40 border-muted/30">
+        <CardContent className="flex items-center gap-4">
+          <div className="rounded-xl bg-indigo-500/10 p-3 text-indigo-500">
+            <MapPinIcon className="size-5" />
+          </div>
+          <div>
+            <p className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
+              Active Campus Days
+            </p>
+            <h3 className="text-lg font-bold">
+              {stats.activeDays} Days / Week
+            </h3>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+interface CourseSearchProps {
+  search: string;
+  setSearch: (s: string) => void;
+  searchResults: Course[];
+  isSearching: boolean;
+  onAddCourse: (classId: string) => void;
+}
+
+function CourseSearch({
+  search,
+  setSearch,
+  searchResults,
+  isSearching,
+  onAddCourse,
+}: CourseSearchProps) {
+  return (
+    <div className="relative z-50">
+      <div className="relative">
+        <SearchIcon className="text-muted-foreground absolute top-1/2 left-4 size-4 -translate-y-1/2" />
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search and add offered courses (e.g., Computer Networks, CSE 3101)..."
+          className="h-10 pl-10 text-sm shadow-sm"
+        />
+        {isSearching && (
+          <Loader2Icon className="text-muted-foreground absolute top-1/2 right-4 size-4 -translate-y-1/2 animate-spin" />
+        )}
+      </div>
+
+      {search !== "" && searchResults.length > 0 && (
+        <Card className="scrollbar-thumb-accent bg-popover/95 border-muted/40 fade-in-10 animate-in absolute mt-2 max-h-80 w-full scrollbar-thin overflow-y-auto rounded-lg border shadow-xl backdrop-blur-md duration-200">
+          <div className="flex flex-col">
+            {searchResults.map((course) => (
+              <div
+                key={course.classID}
+                className="hover:bg-accent/60 flex cursor-pointer items-center justify-between border-b px-4 py-3 transition-colors last:border-0"
+                onClick={() => onAddCourse(course.classID)}
+              >
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2 text-sm font-semibold">
+                    {course.courseCode && (
+                      <Badge
+                        variant="secondary"
+                        className="px-1.5 py-0.5 font-mono text-[9px]"
+                      >
+                        {course.courseCode}
+                      </Badge>
+                    )}
+                    <span>{course.courseTitle}</span>
+                    <span className="text-muted-foreground text-xs font-normal">
+                      [{course.section}]
+                    </span>
+                  </div>
+                  <div className="text-muted-foreground flex items-center gap-4 text-[11px]">
+                    <span className="flex items-center gap-1">
+                      <UserIcon className="size-3" /> {course.faculty}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <CalendarIcon className="size-3" /> {course.day}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <ClockIcon className="size-3" /> {course.startTime} -{" "}
+                      {course.endTime}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {search !== "" && !isSearching && searchResults.length === 0 && (
+        <Card className="text-muted-foreground animate-in fade-in-10 border-muted/40 absolute mt-2 w-full rounded-lg border p-4 text-center text-xs shadow-lg duration-200">
+          No matching offered courses found in the database.
+        </Card>
+      )}
+    </div>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="flex min-h-[300px] flex-1 flex-col items-center justify-center py-20 text-center">
+      <div className="bg-muted mb-4 rounded-full p-4">
+        <CalendarIcon className="text-muted-foreground/60 size-10" />
+      </div>
+      <h3 className="text-lg font-bold">Your routine is empty</h3>
+      <p className="text-muted-foreground mt-1 max-w-sm text-xs leading-relaxed">
+        Search for your offered courses in the bar above or import an offered
+        Excel sheet to construct your weekly timeline.
+      </p>
+    </div>
+  );
+}
+
+interface DayScheduleTimelineProps {
+  routineByDay: Record<string, Course[]>;
+  onRemoveCourse: (classId: string) => void;
+}
+
+function DayScheduleTimeline({
+  routineByDay,
+  onRemoveCourse,
+}: DayScheduleTimelineProps) {
+  return (
+    <div className="flex flex-col gap-8 pb-12">
+      {DAYS.map((day) => {
+        const dayCourses = routineByDay[day];
+        if (!dayCourses || dayCourses.length === 0) return null;
+
+        return (
+          <div
+            key={day}
+            className="animate-in fade-in flex flex-col gap-6 border-b pb-6 duration-300 last:border-0 lg:flex-row"
+          >
+            {/* Sticky Side Day Column */}
+            <div className="flex shrink-0 items-baseline justify-between gap-1 lg:w-36 lg:flex-col lg:items-start">
+              <h2 className="text-foreground text-lg font-black tracking-tight">
+                {day}
+              </h2>
+              <Badge
+                variant="secondary"
+                className="px-2 py-0.5 text-[10px] font-bold"
+              >
+                {dayCourses.length}{" "}
+                {dayCourses.length === 1 ? "Class" : "Classes"}
+              </Badge>
+            </div>
+
+            {/* Day Grid Courses */}
+            <div className="grid flex-1 grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {dayCourses.map((course) => (
+                <CourseCard
+                  key={course.classID}
+                  course={course}
+                  onRemoveCourse={onRemoveCourse}
+                />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+interface CourseCardProps {
+  course: Course;
+  onRemoveCourse: (classId: string) => void;
+}
+
+function CourseCard({ course, onRemoveCourse }: CourseCardProps) {
+  const status = getCourseStatus(course);
+  const isLab = course.type?.toLowerCase().includes("lab");
+
+  return (
+    <Card
+      className={cn(
+        "group relative overflow-hidden border-l-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md",
+        isLab ? "border-l-emerald-500" : "border-l-indigo-500",
+        status === "ongoing" &&
+          "border-l-emerald-500 bg-emerald-500/5 shadow-md ring-2 shadow-emerald-500/5 ring-emerald-500",
+      )}
+    >
+      {/* Live Status Tracker Pulses */}
+      {status === "ongoing" && (
+        <span className="absolute top-4 right-4 flex h-2 w-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+        </span>
+      )}
+
+      <CardHeader>
+        <div className="mb-1 flex flex-wrap items-center gap-1.5">
+          {course.courseCode && (
+            <Badge
+              variant="secondary"
+              className="px-1 py-0 font-mono text-[9px] opacity-80"
+            >
+              {course.courseCode}
+            </Badge>
+          )}
+          <Badge
+            variant="outline"
+            className="-ml-1 px-2 py-0 text-[0.65rem] font-medium"
+          >
+            {course.type}
+          </Badge>
+          {status === "ongoing" && (
+            <Badge className="border-0 bg-emerald-500 px-1.5 py-0 text-[8px] font-bold tracking-wider text-white uppercase">
+              Ongoing
+            </Badge>
+          )}
+          {status === "upcoming" && (
+            <Badge className="border-0 bg-amber-500 px-1.5 py-0 text-[8px] font-bold tracking-wider text-white uppercase">
+              Up Next
+            </Badge>
+          )}
+        </div>
+        <CardTitle className="pr-6 text-sm leading-snug font-bold">
+          {course.courseTitle}{" "}
+          <span className="text-muted-foreground mt-0.5 block text-xs font-normal">
+            Section {course.section}
+          </span>
+        </CardTitle>
+      </CardHeader>
+
+      <CardContent className="flex flex-col gap-2 pt-0">
+        <div className="text-muted-foreground flex items-center gap-2 text-xs">
+          <ClockIcon className="text-foreground/60 size-3.5" />
+          <span className="text-foreground/90 font-medium">
+            {course.startTime} - {course.endTime}
+          </span>
+        </div>
+        <div className="text-muted-foreground flex items-center gap-2 text-xs">
+          <MapPinIcon className="text-foreground/60 size-3.5" />
+          <span className="truncate">
+            Room {course.room} ({course.department})
+          </span>
+        </div>
+        <div className="text-muted-foreground flex items-center gap-2 text-xs">
+          <UserIcon className="text-foreground/60 size-3.5" />
+          <span className="truncate">{course.faculty}</span>
+        </div>
+      </CardContent>
+
+      {/* Interactive Trash Trigger */}
+      <Button
+        variant="destructive"
+        size="icon"
+        className="absolute right-3 bottom-3 h-8 w-8 rounded-md opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+        onClick={() => void onRemoveCourse(course.classID)}
+      >
+        <Trash2Icon className="size-4" />
+      </Button>
+    </Card>
+  );
+}
+
+// Helper to determine if a course is ongoing, upcoming (starts within 60 minutes), or inactive
+const getCourseStatus = (course: Course): CourseStatus => {
+  const now = new Date();
+  const daysMap = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  const currentDay = daysMap[now.getDay()];
+
+  if (course.day !== currentDay) return "inactive";
+
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const startMinutes = parseTimeToMinutes(course.startTime);
+  const endMinutes = parseTimeToMinutes(course.endTime);
+
+  if (currentMinutes >= startMinutes && currentMinutes <= endMinutes) {
+    return "ongoing";
+  } else if (
+    currentMinutes < startMinutes &&
+    startMinutes - currentMinutes <= 60
+  ) {
+    return "upcoming";
+  }
+  return "inactive";
+};
+
+// Helper to parse time string ("08:00 AM") to minutes since midnight
+const parseTimeToMinutes = (timeStr: string | undefined): number => {
+  if (!timeStr) return 0;
+  const parts = timeStr.trim().split(" ");
+  if (parts.length < 2) return 0;
+  const timeVal = parts[0];
+  const modifier = parts[1];
+  if (!timeVal || !modifier) return 0;
+
+  const [hoursStr, minutesStr] = timeVal.split(":");
+  let hours = parseInt(hoursStr || "0", 10);
+  const minutes = parseInt(minutesStr || "0", 10);
+
+  if (modifier === "PM" && hours < 12) hours += 12;
+  if (modifier === "AM" && hours === 12) hours = 0;
+
+  return hours * 60 + minutes;
+};
