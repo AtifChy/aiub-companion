@@ -1,5 +1,9 @@
 import { useSettings } from "@/components/settings-provider";
-import { createContext, useContext, useEffect } from "react";
+import {
+  ThemeProvider as NextThemesProvider,
+  useTheme as useNextTheme,
+} from "next-themes";
+import { createContext, useEffect } from "react";
 
 export type Theme = "dark" | "light" | "system";
 
@@ -18,44 +22,26 @@ export function ThemeProvider({
   const { config } = useSettings();
   const theme = (config.theme as Theme) || defaultTheme;
 
-  useEffect(() => {
-    const root = window.document.documentElement;
-
-    const setTheme = (theme: Exclude<Theme, "system">) => {
-      root.classList.remove("light", "dark");
-      root.classList.add(theme);
-    };
-
-    if (theme === "system") {
-      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-
-      const applySystemTheme = () => {
-        setTheme(mediaQuery.matches ? "dark" : "light");
-      };
-      applySystemTheme();
-
-      mediaQuery.addEventListener("change", applySystemTheme);
-      return () => mediaQuery.removeEventListener("change", applySystemTheme);
-    }
-
-    setTheme(theme);
-
-    return undefined;
-  }, [theme]);
-
   return (
     <ThemeProviderContext.Provider {...props} value={theme}>
-      {children}
+      <NextThemesProvider
+        attribute="class"
+        defaultTheme={defaultTheme}
+        enableSystem
+      >
+        <ThemeSync theme={theme} />
+        {children}
+      </NextThemesProvider>
     </ThemeProviderContext.Provider>
   );
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const useTheme = () => {
-  const context = useContext(ThemeProviderContext);
+function ThemeSync({ theme }: { theme: Theme }) {
+  const { setTheme } = useNextTheme();
 
-  if (context === undefined)
-    throw new Error("useTheme must be used within a ThemeProvider");
+  useEffect(() => {
+    setTheme(theme);
+  }, [theme, setTheme]);
 
-  return context;
-};
+  return null;
+}
