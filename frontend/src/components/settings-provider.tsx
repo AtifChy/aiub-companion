@@ -1,12 +1,13 @@
 import { logger } from "@/lib/logger";
 import { Service as ConfigService, type Config } from "@bindings/config";
+import { deepEqual } from "fast-equals";
 import { Loader2Icon } from "lucide-react";
 import { rawReturn } from "mutative";
 import {
   createContext,
   useContext,
   useEffect,
-  useRef,
+  useState,
   type ReactNode,
 } from "react";
 import { toast } from "sonner";
@@ -22,24 +23,20 @@ const SettingsContext = createContext<SettingsContextType | null>(null);
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [config, setConfig] = useMutative<Config | undefined>(undefined);
-  const skipNextSave = useRef(false);
+  const [lastSaved, setLastSaved] = useState<Config | null>(null);
 
   useEffect(() => {
     ConfigService.GetConfig()
       .then((config) => {
-        skipNextSave.current = true;
         setConfig(() => config && rawReturn(structuredClone(config)));
+        setLastSaved(structuredClone(config));
       })
       .catch((err) => logger.error("Failed to load settings: ", err));
   }, [setConfig]);
 
   useEffect(() => {
     if (!config) return;
-
-    if (skipNextSave.current) {
-      skipNextSave.current = false;
-      return;
-    }
+    if (deepEqual(config, lastSaved)) return; // Don't save if the config hasn't changed
 
     const timer = setTimeout(
       () =>
@@ -57,7 +54,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       500,
     );
     return () => clearTimeout(timer);
-  }, [config]);
+  }, [config, lastSaved]);
 
   const resetConfig = async () => {
     try {
@@ -65,8 +62,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
       const newConfig = await ConfigService.GetConfig();
       if (newConfig) {
-        skipNextSave.current = true;
         setConfig(() => rawReturn(structuredClone(newConfig)));
+        setLastSaved(structuredClone(newConfig));
       }
 
       logger.info("Settings reset successfully");
