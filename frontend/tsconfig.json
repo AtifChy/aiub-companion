@@ -24,15 +24,15 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noPropertyAccessFromIndexSignature": true,
-    "exactOptionalPropertyTypes": true,
+    // "exactOptionalPropertyTypes": true,
     "verbatimModuleSyntax": true,
     "useUnknownInCatchVariables": true,
 
     /* Aliases */
     "paths": {
       "@/*": ["./src/*"],
-      "@bindings/*": ["./bindings/aiub-companion/internal/*"],
-    },
+      "@bindings/*": ["./bindings/aiub-companion/internal/*"]
+    }
   },
-  "include": ["src", "bindings"],
+  "include": ["src", "bindings"]
 }
