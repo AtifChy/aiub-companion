@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 
 const cardVariants = cva("", {
@@ -35,10 +35,9 @@ export function SettingsCard({
 }: SettingsCardProps) {
   return (
     <Card size="sm" className="shadow-xs">
-      <CardHeader className={cardVariants({ variant })}>
+      <CardHeader className={cn("border-b", cardVariants({ variant }))}>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
-      <Separator />
       <CardContent className="flex flex-col gap-4">{children}</CardContent>
     </Card>
   );
