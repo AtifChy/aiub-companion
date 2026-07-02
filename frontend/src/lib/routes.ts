@@ -5,7 +5,7 @@ import {
   HelpCircle,
   LineChart,
   Settings,
-  Timer,
+  GraduationCap,
   type LucideIcon,
 } from "lucide-react";
 import type React from "react";
@@ -15,7 +15,7 @@ const NoticesPage = lazy(() => import("@/pages/notices"));
 const CGPAPage = lazy(() => import("@/pages/cgpa"));
 const GPATrendPage = lazy(() => import("@/pages/gpa-trend"));
 const RoutinePage = lazy(() => import("@/pages/routine"));
-const ExamCountdownPage = lazy(() => import("@/pages/exam-countdown"));
+const SemesterPage = lazy(() => import("@/pages/semester"));
 const SettingsPage = lazy(() => import("@/pages/settings"));
 const HelpPage = lazy(() => import("@/pages/help"));
 
@@ -57,10 +57,10 @@ export const sections: Record<Section, RouteItem[]> = {
       component: RoutinePage,
     },
     {
-      label: "Exam Countdown",
-      path: "/exam-countdown",
-      icon: Timer,
-      component: ExamCountdownPage,
+      label: "Semester",
+      path: "/semester",
+      icon: GraduationCap,
+      component: SemesterPage,
     },
   ],
   others: [
