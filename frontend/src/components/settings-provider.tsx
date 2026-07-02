@@ -27,8 +27,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     ConfigService.GetConfig()
       .then((config) => {
-        skipNextSave.current = true;
         setConfig(() => config && rawReturn(structuredClone(config)));
+        skipNextSave.current = true;
       })
       .catch((err) => logger.error("Failed to load settings: ", err));
   }, [setConfig]);
@@ -65,8 +65,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
       const newConfig = await ConfigService.GetConfig();
       if (newConfig) {
-        skipNextSave.current = true;
         setConfig(() => rawReturn(structuredClone(newConfig)));
+        skipNextSave.current = true;
       }
 
       logger.info("Settings reset successfully");
