@@ -3,11 +3,9 @@ import {
   ThemeProvider as NextThemesProvider,
   useTheme as useNextTheme,
 } from "next-themes";
-import { createContext, useEffect } from "react";
+import { useEffect } from "react";
 
 export type Theme = "dark" | "light" | "system";
-
-const ThemeProviderContext = createContext<Theme>("system");
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -17,22 +15,19 @@ type ThemeProviderProps = {
 export function ThemeProvider({
   children,
   defaultTheme = "system",
-  ...props
 }: ThemeProviderProps) {
   const { config } = useSettings();
   const theme = (config.theme as Theme) || defaultTheme;
 
   return (
-    <ThemeProviderContext.Provider {...props} value={theme}>
-      <NextThemesProvider
-        attribute="class"
-        defaultTheme={defaultTheme}
-        enableSystem
-      >
-        <ThemeSync theme={theme} />
-        {children}
-      </NextThemesProvider>
-    </ThemeProviderContext.Provider>
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme={defaultTheme}
+      enableSystem
+    >
+      <ThemeSync theme={theme} />
+      {children}
+    </NextThemesProvider>
   );
 }
 
