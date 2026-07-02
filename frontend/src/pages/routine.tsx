@@ -1,7 +1,7 @@
+import { SearchInput } from "@/components/search-input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/use-debounce";
 import { logger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
@@ -14,7 +14,6 @@ import {
   FileSpreadsheetIcon,
   Loader2Icon,
   MapPinIcon,
-  SearchIcon,
   Trash2Icon,
   UserIcon,
 } from "lucide-react";
@@ -271,21 +270,17 @@ function CourseSearch({
 }: CourseSearchProps) {
   return (
     <div className="relative z-50">
-      <div className="relative">
-        <SearchIcon className="text-muted-foreground absolute top-1/2 left-4 size-4 -translate-y-1/2" />
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search and add offered courses (e.g., Computer Networks, CSE 3101)..."
-          className="h-10 pl-10 text-sm shadow-sm"
-        />
-        {isSearching && (
-          <Loader2Icon className="text-muted-foreground absolute top-1/2 right-4 size-4 -translate-y-1/2 animate-spin" />
-        )}
-      </div>
+      <SearchInput
+        value={search}
+        onValueChange={setSearch}
+        placeholder="Search and add offered courses (e.g., Computer Networks, CSE 3101)..."
+        searching={isSearching}
+        showClearButton={false}
+        className="[&>div:last-child]:right-3 [&>input]:h-10 [&>input]:pl-9 [&>input]:text-sm [&>input]:shadow-sm [&>svg]:size-4 [&>svg:first-child]:left-3 [&>svg:last-child]:right-3 [&>svg:last-child]:size-5"
+      />
 
       {search !== "" && searchResults.length > 0 && (
-        <Card className="scrollbar-thumb-accent bg-popover/95 border-muted/40 fade-in-10 animate-in absolute mt-2 max-h-80 w-full scrollbar-thin overflow-y-auto rounded-lg border shadow-xl backdrop-blur-md duration-200">
+        <Card className="scrollbar-thumb-accent bg-popover/95 border-muted/40 fade-in-10 animate-in absolute mt-2 max-h-80 w-full scrollbar-thin overflow-y-auto rounded-lg border pt-0 pb-0 shadow-xl backdrop-blur-md duration-200">
           <div className="flex flex-col">
             {searchResults.map((course) => (
               <div

@@ -1,7 +1,7 @@
+import { SearchInput } from "@/components/search-input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Browser } from "@wailsio/runtime";
 import {
@@ -11,7 +11,6 @@ import {
   GitBranchIcon,
   HelpCircleIcon,
   InfoIcon,
-  SearchIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -77,16 +76,12 @@ export default function HelpPage() {
           </h2>
 
           {/* Search Box */}
-          <div className="relative w-full sm:w-80">
-            <SearchIcon className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-            <Input
-              type="text"
-              placeholder="Search help topics..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
-          </div>
+          <SearchInput
+            value={searchQuery}
+            onValueChange={setSearchQuery}
+            placeholder="Search help topics..."
+            className="w-full sm:w-80"
+          />
         </div>
 
         <FAQList searchQuery={searchQuery} />

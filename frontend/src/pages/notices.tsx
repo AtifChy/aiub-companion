@@ -1,5 +1,6 @@
 import { AppTooltip } from "@/components/app-tooltip";
 import { HorizontalFadeScroll } from "@/components/horizontal-fade-scroll";
+import { SearchInput } from "@/components/search-input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -46,9 +46,6 @@ import {
   PinIcon,
   PinOffIcon,
   RefreshCwIcon,
-  SearchIcon,
-  SlashIcon,
-  XIcon,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -90,7 +87,6 @@ export default function NoticesPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const autoReadRef = useRef<string | null>(null);
-  const searchRef = useRef<HTMLInputElement>(null);
 
   const { listQuery, detailQuery, toggleRead, togglePin } = useNotices(
     filters,
@@ -120,18 +116,6 @@ export default function NoticesPage() {
     setSelectedId(notice.id);
   };
 
-  // Focus search input on "/" press
-  useEffect(() => {
-    const handler = (event: KeyboardEvent) => {
-      if (event.key === "/" && document.activeElement !== searchRef.current) {
-        event.preventDefault();
-        searchRef.current?.focus();
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, []);
-
   return (
     <ResizablePanelGroup orientation="horizontal" className="flex h-full">
       <ResizablePanel
@@ -155,7 +139,6 @@ export default function NoticesPage() {
           noticeCount={notices.length}
           unreadCount={unreadCount}
           loading={listQuery.isLoading}
-          searchRef={searchRef}
         />
 
         <NoticeList
@@ -201,8 +184,6 @@ interface NoticeListToolbarProps {
   noticeCount: number;
   unreadCount: number;
   loading: boolean;
-
-  searchRef: React.RefObject<HTMLInputElement | null>;
 }
 
 function NoticeListToolbar({
@@ -214,7 +195,6 @@ function NoticeListToolbar({
   noticeCount,
   unreadCount,
   loading,
-  searchRef,
 }: NoticeListToolbarProps) {
   const hasActiveFilters = filters.urgent || filters.pinned || filters.unread;
 
@@ -222,32 +202,11 @@ function NoticeListToolbar({
     <>
       {/*search + categories*/}
       <div className="border-b px-3 py-2.5">
-        <div className="relative">
-          <SearchIcon className="text-muted-foreground absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2" />
-          <Input
-            ref={searchRef}
-            value={filters.search}
-            onChange={(e) =>
-              onFilterChange({ ...filters, search: e.target.value })
-            }
-            placeholder="Search notices…"
-            autoComplete="off"
-            className="pr-7 pl-8 text-xs select-none"
-          />
-          {filters.search ? (
-            <Button
-              variant="ghost"
-              onClick={() => onFilterChange({ ...filters, search: "" })}
-              className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 h-auto -translate-y-1/2 p-0.5"
-            >
-              <XIcon strokeWidth="2.5" className="size-3.5" />
-            </Button>
-          ) : (
-            <div className="text-secondary-foreground/40 border-secondary/10 bg-secondary/20 absolute top-1/2 right-2 -translate-y-1/2 rounded-sm border p-1">
-              <SlashIcon strokeWidth="4" className="size-2.5" />
-            </div>
-          )}
-        </div>
+        <SearchInput
+          value={filters.search}
+          onValueChange={(v) => onFilterChange({ ...filters, search: v })}
+          placeholder="Search notices..."
+        />
 
         <HorizontalFadeScroll className="mt-2 flex scrollbar-none gap-1 overflow-x-auto scroll-smooth px-1 outline-none">
           {CATEGORIES.map((cat) => (
