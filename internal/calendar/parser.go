@@ -51,7 +51,7 @@ func NewParser(calendarType CalendarType) *Parser {
 func (p *Parser) Parse(content string) (*AcademicCalendar, error) {
 	doc, err := html.Parse(strings.NewReader(content))
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse HTML: %v", err)
+		return nil, fmt.Errorf("parse HTML: %v", err)
 	}
 
 	semester, year := p.extractHeaderInfo(doc)
@@ -61,7 +61,7 @@ func (p *Parser) Parse(content string) (*AcademicCalendar, error) {
 
 	events, totalWeeks, err := p.parseTable(doc)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse table: %v", err)
+		return nil, fmt.Errorf("parse table: %v", err)
 	}
 
 	return &AcademicCalendar{

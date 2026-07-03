@@ -81,7 +81,7 @@ func (s *Service) fetchAndParse(ctx context.Context, calType CalendarType) (*Aca
 
 	n, err := s.notice.GetNoticeDetails(ctx, noticeID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch notice %s: %w", noticeID, err)
+		return nil, fmt.Errorf("fetch notice %s: %w", noticeID, err)
 	}
 
 	if n.Content == "" {
@@ -91,7 +91,7 @@ func (s *Service) fetchAndParse(ctx context.Context, calType CalendarType) (*Aca
 	parser := NewParser(calType)
 	calendar, err := parser.Parse(n.Content)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse calendar: %w", err)
+		return nil, fmt.Errorf("parse calendar: %w", err)
 	}
 
 	return calendar, nil

@@ -54,7 +54,7 @@ func loadState(name string) WindowState {
 func saveState(name string, state WindowState) error {
 	path, err := statePath()
 	if err != nil {
-		return fmt.Errorf("failed to determine state path: %w", err)
+		return fmt.Errorf("determine state path: %w", err)
 	}
 
 	var appState AppState
@@ -69,12 +69,12 @@ func saveState(name string, state WindowState) error {
 	appState.Window[name] = state
 
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-		return fmt.Errorf("failed to create state directory: %w", err)
+		return fmt.Errorf("create state directory: %w", err)
 	}
 
 	data, err = json.MarshalIndent(appState, "", "  ")
 	if err != nil {
-		return fmt.Errorf("failed to marshal state: %w", err)
+		return fmt.Errorf("marshal state: %w", err)
 	}
 	return os.WriteFile(path, data, 0o644)
 }

@@ -21,18 +21,18 @@ var compiledSchema *jsonschema.Schema
 func init() {
 	var schema any
 	if err := json.Unmarshal(schemaJSON, &schema); err != nil {
-		panic(fmt.Errorf("failed to unmarshal schema: %w", err))
+		panic(fmt.Errorf("unmarshal schema: %w", err))
 	}
 
 	c := jsonschema.NewCompiler()
 	if err := c.AddResource(schemaURI, schema); err != nil {
-		panic(fmt.Errorf("failed to add schema resource: %w", err))
+		panic(fmt.Errorf("add schema resource: %w", err))
 	}
 
 	var err error
 	compiledSchema, err = c.Compile(schemaURI)
 	if err != nil {
-		panic(fmt.Errorf("failed to compile schema: %w", err))
+		panic(fmt.Errorf("compile schema: %w", err))
 	}
 }
 

@@ -29,14 +29,14 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 func (s *Service) ImportOfferedCourses(ctx context.Context, filePath string) error {
 	file, err := excelize.OpenFile(filePath)
 	if err != nil {
-		return fmt.Errorf("failed to open file: %w", err)
+		return fmt.Errorf("open file: %w", err)
 	}
 	defer func() { _ = file.Close() }()
 
 	sheetName := file.GetSheetName(0)
 	rows, err := file.GetRows(sheetName)
 	if err != nil {
-		return fmt.Errorf("failed to get rows: %w", err)
+		return fmt.Errorf("get rows: %w", err)
 	}
 
 	var (
@@ -91,12 +91,12 @@ func (s *Service) ImportOfferedCourses(ctx context.Context, filePath string) err
 	return s.repo.WithTx(ctx, func(txRepo Repository) error {
 		err := txRepo.ClearOfferedCourses(ctx)
 		if err != nil {
-			return fmt.Errorf("failed to clear offered courses: %w", err)
+			return fmt.Errorf("clear offered courses: %w", err)
 		}
 		for i := range courses {
 			err := txRepo.InsertOfferedCourse(ctx, courses[i])
 			if err != nil {
-				return fmt.Errorf("failed to insert offered course: %w", err)
+				return fmt.Errorf("insert offered course: %w", err)
 			}
 		}
 		return nil

@@ -82,7 +82,7 @@ func load(path string) (*Config, error) {
 		if errors.Is(err, os.ErrNotExist) {
 			return cfg, nil
 		}
-		return cfg, fmt.Errorf("failed to read config file: %w", err)
+		return cfg, fmt.Errorf("read config file: %w", err)
 	}
 
 	if err := validate(data); err != nil {
@@ -96,7 +96,7 @@ func load(path string) (*Config, error) {
 		if typeErr, ok := errors.AsType[*json.UnmarshalTypeError](err); ok {
 			return cfg, fmt.Errorf("invalid JSON type for field %q (expected %s): %w", typeErr.Field, typeErr.Type, err)
 		}
-		return cfg, fmt.Errorf("failed to unmarshal config: %w", err)
+		return cfg, fmt.Errorf("unmarshal config: %w", err)
 	}
 
 	return cfg, nil
@@ -104,17 +104,17 @@ func load(path string) (*Config, error) {
 
 func save(path string, cfg *Config) error {
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-		return fmt.Errorf("failed to create config directory: %w", err)
+		return fmt.Errorf("create config directory: %w", err)
 	}
 
 	data, err := json.MarshalIndent(cfg, "", "  ")
 	if err != nil {
-		return fmt.Errorf("failed to marshal config: %w", err)
+		return fmt.Errorf("marshal config: %w", err)
 	}
 
 	tmp, err := os.CreateTemp(filepath.Dir(path), "config-*.json")
 	if err != nil {
-		return fmt.Errorf("failed to create temp file: %w", err)
+		return fmt.Errorf("create temp file: %w", err)
 	}
 	defer func() {
 		_ = os.Remove(tmp.Name())
@@ -122,16 +122,16 @@ func save(path string, cfg *Config) error {
 
 	if _, err := tmp.Write(data); err != nil {
 		_ = tmp.Close()
-		return fmt.Errorf("failed to write temp file: %w", err)
+		return fmt.Errorf("write temp file: %w", err)
 	}
 
 	if err := tmp.Close(); err != nil {
-		return fmt.Errorf("failed to close temp file: %w", err)
+		return fmt.Errorf("close temp file: %w", err)
 	}
 
 	// atomic rename to avoid partial writes
 	if err := os.Rename(tmp.Name(), path); err != nil {
-		return fmt.Errorf("failed to remove temp file: %w", err)
+		return fmt.Errorf("rename temp file: %w", err)
 	}
 
 	return nil
@@ -140,7 +140,7 @@ func save(path string, cfg *Config) error {
 func configPath() (string, error) {
 	configDir, err := os.UserConfigDir()
 	if err != nil {
-		return "", fmt.Errorf("failed to get user config dir: %w", err)
+		return "", fmt.Errorf("get user config dir: %w", err)
 	}
 	return filepath.Join(configDir, AppName, "config.json"), nil
 }

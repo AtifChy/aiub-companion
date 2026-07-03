@@ -30,7 +30,7 @@ func (s *scraper) ScrapeNotices(ctx context.Context, count int) ([]Notice, error
 
 	doc, err := s.fetchHTML(ctx, url)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch notices: %w", err)
+		return nil, fmt.Errorf("fetch notices: %w", err)
 	}
 
 	cards := findNodesByClass(doc, "div", "notification")
@@ -123,12 +123,12 @@ func (s *scraper) ScrapeNoticeDetails(ctx context.Context, slug string) (NoticeD
 
 	doc, err := s.fetchHTML(ctx, url)
 	if err != nil {
-		return NoticeDetails{}, fmt.Errorf("failed to fetch notice details: %w", err)
+		return NoticeDetails{}, fmt.Errorf("fetch notice details: %w", err)
 	}
 
 	contents := findNodesByClass(doc, "div", "question-column")
 	if len(contents) < 2 {
-		return NoticeDetails{}, fmt.Errorf("invalid notice page structure: expected title and body columns")
+		return NoticeDetails{}, fmt.Errorf("fetch notice details: invalid page structure")
 	}
 
 	title := getInnerText(contents[0])
@@ -230,7 +230,10 @@ func (s *scraper) fetchHTML(ctx context.Context, url string) (*html.Node, error)
 		}
 
 		if attempt == maxAttempts || !retriable {
-			return nil, fmt.Errorf("failed to fetch after %d attempts: %w", attempt, err)
+			if attempt == 1 {
+				return nil, err
+			}
+			return nil, fmt.Errorf("after %d attempts: %w", attempt, err)
 		}
 
 		select {
@@ -241,28 +244,31 @@ func (s *scraper) fetchHTML(ctx context.Context, url string) (*html.Node, error)
 		}
 	}
 
-	return nil, fmt.Errorf("failed to fetch %s after %d attempts", url, maxAttempts)
+	panic("unreachable")
 }
 
 func (s *scraper) fetchWithRetriable(ctx context.Context, url string) (*html.Node, bool, error) {
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
-		return nil, false, fmt.Errorf("failed to create request: %w", err)
+		return nil, false, fmt.Errorf("new request: %w", err)
 	}
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36")
+	req.Header.Set(
+		"User-Agent",
+		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+	)
 
 	resp, err := s.client.Do(req)
 	if err != nil {
 		if netErr, ok := errors.AsType[net.Error](err); ok && netErr.Timeout() {
-			return nil, true, fmt.Errorf("timeout fetching %s: %w", url, err)
+			return nil, true, fmt.Errorf("%s: timeout: %w", url, err)
 		}
 		if dnsErr, ok := errors.AsType[*net.DNSError](err); ok {
-			return nil, true, fmt.Errorf("DNS error fetching %s: %w", url, dnsErr)
+			return nil, true, fmt.Errorf("%s: DNS error: %w", url, dnsErr)
 		}
 		if opErr, ok := errors.AsType[*net.OpError](err); ok {
-			return nil, true, fmt.Errorf("operation error fetching %s: %w", url, opErr)
+			return nil, true, fmt.Errorf("%s: operation error: %w", url, opErr)
 		}
-		return nil, false, fmt.Errorf("failed to fetch %s: %w", url, err)
+		return nil, false, fmt.Errorf("%s: %w", url, err)
 	}
 	defer func() {
 		if closeErr := resp.Body.Close(); closeErr != nil {
@@ -272,12 +278,12 @@ func (s *scraper) fetchWithRetriable(ctx context.Context, url string) (*html.Nod
 
 	if resp.StatusCode != http.StatusOK {
 		is5xx := resp.StatusCode >= 500 && resp.StatusCode < 600
-		return nil, is5xx, fmt.Errorf("unexpected status %d for %s", resp.StatusCode, url)
+		return nil, is5xx, fmt.Errorf("%s: unexpected status %d", url, resp.StatusCode)
 	}
 
 	doc, err := html.Parse(resp.Body)
 	if err != nil {
-		return nil, false, fmt.Errorf("failed to parse HTML: %w", err)
+		return nil, false, fmt.Errorf("%s: parse HTML: %w", url, err)
 	}
 	return doc, false, nil
 }

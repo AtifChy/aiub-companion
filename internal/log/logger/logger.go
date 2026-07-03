@@ -19,7 +19,7 @@ func NewLogger(filepath string) (*Logger, error) {
 		var err error
 		file, err = os.OpenFile(filepath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644)
 		if err != nil {
-			return nil, fmt.Errorf("failed to open log file: %w", err)
+			return nil, fmt.Errorf("open log file: %w", err)
 		}
 	}
 

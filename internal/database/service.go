@@ -23,7 +23,7 @@ func NewService() *Service {
 func (s *Service) ServiceStartup(ctx context.Context, options application.ServiceOptions) error {
 	path, err := dbPath()
 	if err != nil {
-		return fmt.Errorf("failed to get database path: %w", err)
+		return fmt.Errorf("get database path: %w", err)
 	}
 
 	instance, err := open(path)

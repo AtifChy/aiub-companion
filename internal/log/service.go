@@ -56,7 +56,7 @@ func (s *Service) OpenLogFile() error {
 	}
 
 	if err := application.Get().Browser.OpenFile(path); err != nil {
-		return fmt.Errorf("failed to open log file: %w", err)
+		return fmt.Errorf("open log file: %w", err)
 	}
 
 	return nil

@@ -30,7 +30,7 @@ func NewService() *Service {
 func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptions) error {
 	path, err := configPath()
 	if err != nil {
-		return fmt.Errorf("failed to determine config path: %w", err)
+		return fmt.Errorf("determine config path: %w", err)
 	}
 
 	config, err := load(path)

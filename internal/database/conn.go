@@ -18,7 +18,7 @@ func open(path string) (*Service, error) {
 	// Open the database connection
 	conn, err := sql.Open("sqlite", path)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open database: %w", err)
+		return nil, fmt.Errorf("open database: %w", err)
 	}
 
 	// Set connection pool settings
@@ -27,17 +27,17 @@ func open(path string) (*Service, error) {
 	// Enable foreign keys and WAL journal mode
 	if _, err := conn.Exec("PRAGMA foreign_keys = ON;"); err != nil {
 		_ = conn.Close()
-		return nil, fmt.Errorf("failed to enable foreign keys: %w", err)
+		return nil, fmt.Errorf("enable foreign keys: %w", err)
 	}
 	if _, err := conn.Exec("PRAGMA journal_mode = WAL;"); err != nil {
 		_ = conn.Close()
-		return nil, fmt.Errorf("failed to set journal mode: %w", err)
+		return nil, fmt.Errorf("set journal mode: %w", err)
 	}
 
 	// Create the schema if it doesn't exist
 	if err := runSchemas(conn); err != nil {
 		_ = conn.Close()
-		return nil, fmt.Errorf("failed to run schemas: %w", err)
+		return nil, fmt.Errorf("run schemas: %w", err)
 	}
 
 	return &Service{db: conn}, nil
@@ -47,12 +47,12 @@ func open(path string) (*Service, error) {
 func dbPath() (string, error) {
 	configDir, err := os.UserConfigDir()
 	if err != nil {
-		return "", fmt.Errorf("failed to get user config dir: %w", err)
+		return "", fmt.Errorf("get user config dir: %w", err)
 	}
 
 	appDir := filepath.Join(configDir, config.AppName)
 	if err := os.MkdirAll(appDir, 0o755); err != nil {
-		return "", fmt.Errorf("failed to create app dir: %w", err)
+		return "", fmt.Errorf("create app dir: %w", err)
 	}
 	return filepath.Join(appDir, config.AppName+".db"), nil
 }
@@ -61,16 +61,16 @@ func dbPath() (string, error) {
 func runSchemas(conn *sql.DB) error {
 	entries, err := schemasFS.ReadDir("sql/schemas")
 	if err != nil {
-		return fmt.Errorf("failed to read schema dir: %w", err)
+		return fmt.Errorf("read schema dir: %w", err)
 	}
 
 	for _, entry := range entries {
 		sql, err := schemasFS.ReadFile("sql/schemas/" + entry.Name())
 		if err != nil {
-			return fmt.Errorf("failed to read schema file %s: %w", entry.Name(), err)
+			return fmt.Errorf("read schema file %s: %w", entry.Name(), err)
 		}
 		if _, err := conn.Exec(string(sql)); err != nil {
-			return fmt.Errorf("failed to execute schema file %s: %w", entry.Name(), err)
+			return fmt.Errorf("execute schema file %s: %w", entry.Name(), err)
 		}
 	}
 

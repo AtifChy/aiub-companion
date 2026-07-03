@@ -54,7 +54,7 @@ func TestStateLoadingAndSaving(t *testing.T) {
 	// 2. Save active state
 	err := saveState(name, state)
 	if err != nil {
-		t.Fatalf("failed to save window state: %v", err)
+		t.Fatalf("save window state: %v", err)
 	}
 
 	// 3. Load saved state and assert values

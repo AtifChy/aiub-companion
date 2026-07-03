@@ -21,7 +21,7 @@ func SetupLogger() (*logger.Logger, error) {
 
 	log, err := logger.NewLogger(path)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create logger: %w", err)
+		return nil, fmt.Errorf("create logger: %w", err)
 	}
 
 	return log, nil
@@ -35,7 +35,7 @@ func logPath() (string, error) {
 
 	logDir = path.Join(logDir, config.AppName, "logs")
 	if err := os.MkdirAll(logDir, 0o755); err != nil {
-		return "", fmt.Errorf("failed to create log directory: %w", err)
+		return "", fmt.Errorf("create log directory: %w", err)
 	}
 
 	return filepath.Join(logDir, config.AppName+".log"), nil

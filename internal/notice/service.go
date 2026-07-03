@@ -29,7 +29,7 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 func (s *Service) SyncNotices(ctx context.Context, count int) (int64, error) {
 	notices, err := s.client.ScrapeNotices(ctx, count)
 	if err != nil {
-		return 0, fmt.Errorf("failed to scrape notices: %w", err)
+		return 0, fmt.Errorf("scrape notices: %w", err)
 	}
 
 	var newCount int64
@@ -37,7 +37,7 @@ func (s *Service) SyncNotices(ctx context.Context, count int) (int64, error) {
 	err = s.repo.WithTx(ctx, func(txRepo Repository) error {
 		latestOrder, err := txRepo.GetLatestNoticeSourceOrder(ctx)
 		if err != nil {
-			return fmt.Errorf("failed to get latest notice info: %w", err)
+			return fmt.Errorf("get latest notice info: %w", err)
 		}
 		base := latestOrder + 1
 
@@ -45,7 +45,7 @@ func (s *Service) SyncNotices(ctx context.Context, count int) (int64, error) {
 			orderOffset := int64(len(notices) - 1 - i)
 			n, err := txRepo.InsertNotice(ctx, notices[i], base+orderOffset)
 			if err != nil {
-				return fmt.Errorf("failed to insert notice %s: %w", notices[i].ID, err)
+				return fmt.Errorf("insert notice %s: %w", notices[i].ID, err)
 			}
 
 			newCount += n
@@ -53,7 +53,7 @@ func (s *Service) SyncNotices(ctx context.Context, count int) (int64, error) {
 			if n == 0 {
 				err = txRepo.UpdateNotice(ctx, notices[i])
 				if err != nil {
-					return fmt.Errorf("failed to update notice %s: %w", notices[i].ID, err)
+					return fmt.Errorf("update notice %s: %w", notices[i].ID, err)
 				}
 			}
 		}
@@ -71,17 +71,17 @@ func (s *Service) GetNotices(ctx context.Context, filter Filter) ([]Notice, erro
 func (s *Service) GetNoticeDetails(ctx context.Context, id string) (*Notice, error) {
 	notice, err := s.repo.GetNoticeByID(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get notice: %w", err)
+		return nil, fmt.Errorf("get notice: %w", err)
 	}
 
 	if !notice.IsCached {
 		if err := s.populateNoticeCache(ctx, notice); err != nil {
-			return nil, fmt.Errorf("failed to populate notice cache: %w", err)
+			return nil, fmt.Errorf("populate notice cache: %w", err)
 		}
 	} else {
 		notice.Attachments, err = s.repo.GetNoticeAttachments(ctx, id)
 		if err != nil {
-			return nil, fmt.Errorf("failed to get notice attachments: %w", err)
+			return nil, fmt.Errorf("get notice attachments: %w", err)
 		}
 	}
 
@@ -91,18 +91,18 @@ func (s *Service) GetNoticeDetails(ctx context.Context, id string) (*Notice, err
 func (s *Service) populateNoticeCache(ctx context.Context, notice *Notice) error {
 	details, err := s.client.ScrapeNoticeDetails(ctx, notice.ID)
 	if err != nil {
-		return fmt.Errorf("failed to scrape details for notice %s: %w", notice.ID, err)
+		return fmt.Errorf("scrape notice details: %w", err)
 	}
 
 	err = s.repo.WithTx(ctx, func(txRepo Repository) error {
 		err := txRepo.UpdateNoticeDetails(ctx, notice.ID, details.FullTitle, details.Content)
 		if err != nil {
-			return fmt.Errorf("failed to update details: %w", err)
+			return fmt.Errorf("update notice details: %w", err)
 		}
 		for i := range details.Attachments {
 			err := txRepo.UpsertNoticeAttachment(ctx, notice.ID, details.Attachments[i])
 			if err != nil {
-				return fmt.Errorf("failed to upsert attachment: %w", err)
+				return fmt.Errorf("upsert notice attachment: %w", err)
 			}
 		}
 		return nil
