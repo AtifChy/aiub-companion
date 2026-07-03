@@ -121,6 +121,9 @@ func (s *Service) setupTray() {
 	menu.Add("Show").OnClick(func(ctx *application.Context) {
 		s.main.Show()
 	})
+	menu.Add("About").OnClick(func(ctx *application.Context) {
+		s.about.Show()
+	})
 	menu.Add("Quit").OnClick(func(ctx *application.Context) {
 		s.app.Quit()
 	})
