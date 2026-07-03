@@ -45,9 +45,7 @@ jobs:
 
       - name: Install NSIS on Windows
         if: matrix.os == 'windows'
-        uses: repolevedavaj/install-nsis@v1.2.1
-        with:
-          nsis-version: 3.12
+        uses: negrutiu/nsis-install@v3
 
       - name: Install Linux Dependencies
         if: matrix.os == 'linux'
