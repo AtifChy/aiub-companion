@@ -8,6 +8,13 @@ import (
 	"database/sql"
 )
 
+type CalendarCache struct {
+	CalendarType string
+	Data         string
+	Semester     string
+	ScrapedAt    string
+}
+
 type Notice struct {
 	ID          string
 	Title       string

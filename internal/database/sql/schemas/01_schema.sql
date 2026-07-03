@@ -32,6 +32,13 @@ CREATE TABLE IF NOT EXISTS user_states (
   FOREIGN KEY (notice_id) REFERENCES notices (id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS calendar_cache (
+  calendar_type TEXT PRIMARY KEY,
+  data TEXT NOT NULL,
+  semester TEXT NOT NULL,
+  scraped_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS offered_courses (
   class_id TEXT NOT NULL,
   course_code TEXT,
