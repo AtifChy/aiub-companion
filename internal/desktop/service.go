@@ -103,7 +103,7 @@ func (s *Service) handleClose() {
 		s.about.Close()
 	}
 	if !s.config.GetConfig().Launch.CloseToTray {
-		time.AfterFunc(500*time.Millisecond, func() {
+		time.AfterFunc(200*time.Millisecond, func() {
 			s.app.Quit()
 		})
 	}
@@ -125,7 +125,9 @@ func (s *Service) setupTray() {
 		s.about.Show()
 	})
 	menu.Add("Quit").OnClick(func(ctx *application.Context) {
-		s.app.Quit()
+		time.AfterFunc(200*time.Millisecond, func() {
+			s.app.Quit()
+		})
 	})
 
 	systray.SetMenu(menu)
