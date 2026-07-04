@@ -50,9 +50,14 @@ export function useNotices(filter: NoticeFilters, selectedId: string | null) {
 
   const invalidate = useCallback(
     async (id?: string) => {
-      await queryClient.invalidateQueries({ queryKey: ["notices"] });
-      if (!id) return;
-      await queryClient.invalidateQueries({ queryKey: ["noticeDetails", id] });
+      if (!id) {
+        await queryClient.invalidateQueries({ queryKey: ["notices"] });
+        return;
+      }
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["notices"] }),
+        queryClient.invalidateQueries({ queryKey: ["noticeDetails", id] }),
+      ]);
     },
     [queryClient],
   );

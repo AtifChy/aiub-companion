@@ -417,6 +417,7 @@ function NoticeListItem({
           ? "bg-primary/10 border-l-primary border-l-2"
           : "hover:bg-muted/50 border-l-2 border-l-transparent",
       )}
+      role="button"
     >
       <div className="flex items-center justify-between gap-2">
         <div className="mb-1 flex items-center gap-1.5">
