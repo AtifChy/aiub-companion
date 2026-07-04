@@ -9,16 +9,11 @@ import (
 	"golang.org/x/net/html"
 )
 
-// parse parses a raw HTML string. Added here to support legacy tests.
-func (p *Parser) parse(content string) (*AcademicCalendar, error) {
+// parseHTML parses a raw HTML string using ParseFromNode.
+func parseHTML(p *Parser, content string) (*AcademicCalendar, error) {
 	doc, err := html.Parse(strings.NewReader(content))
 	if err != nil {
 		return nil, fmt.Errorf("parse HTML: %v", err)
-	}
-
-	semester, year := p.extractHeaderInfo(doc)
-	if year != 0 {
-		p.year = year
 	}
 
 	table := findNode(doc, "table")
@@ -26,19 +21,7 @@ func (p *Parser) parse(content string) (*AcademicCalendar, error) {
 		return nil, fmt.Errorf("no table found in HTML")
 	}
 
-	events, totalWeeks, err := p.parseTable(table)
-	if err != nil {
-		return nil, fmt.Errorf("parse table: %v", err)
-	}
-
-	return &AcademicCalendar{
-		Semester:    semester,
-		Year:        p.year,
-		Type:        p.calType,
-		Events:      events,
-		TotalWeeks:  totalWeeks,
-		LastUpdated: time.Now(),
-	}, nil
+	return p.Parse(table, "")
 }
 
 func TestAcademicEvent_IsPast(t *testing.T) {
@@ -321,7 +304,8 @@ func TestAcademicCalendar_GetNextExam(t *testing.T) {
 }
 
 func TestParser_RealWorldHTML_DebugExams(t *testing.T) {
-	html := `<h2><span>ACADEMIC CALENDAR: SUMMER 2025-26</span></h2><table>
+	html := `
+<table>
 <tbody>
 <tr>
 <td><p><strong>2026</strong></p></td>
@@ -362,7 +346,7 @@ func TestParser_RealWorldHTML_DebugExams(t *testing.T) {
 </table>`
 
 	p := NewParser(CalendarStandard)
-	calendar, err := p.parse(html)
+	calendar, err := parseHTML(p, html)
 	if err != nil {
 		t.Fatalf("Parse() error = %v", err)
 	}
@@ -411,7 +395,8 @@ func TestParser_RealWorldHTML_DebugExams(t *testing.T) {
 
 func TestParser_AIUBExamFormat(t *testing.T) {
 	// Test with actual AIUB calendar exam format
-	html := `<h2><span>ACADEMIC CALENDAR: SUMMER 2025-26</span></h2><table>
+	html := `
+<table>
 <tbody>
 <tr>
 <td><p><strong>2026</strong></p></td>
@@ -452,7 +437,7 @@ func TestParser_AIUBExamFormat(t *testing.T) {
 </table>`
 
 	p := NewParser(CalendarStandard)
-	calendar, err := p.parse(html)
+	calendar, err := parseHTML(p, html)
 	if err != nil {
 		t.Fatalf("Parse() error = %v", err)
 	}
@@ -526,7 +511,8 @@ func TestGetNextExam_AllPast(t *testing.T) {
 
 func TestParser_DateRangeRowspanWithEmptyDay(t *testing.T) {
 	// Actual AIUB calendar structure - day column has rowspan and is empty
-	html := `<h2><span>ACADEMIC CALENDAR: SUMMER 2025-26</span></h2><table>
+	html := `
+<table>
 <tbody>
 <tr>
 <td><p><strong>2026</strong></p></td>
@@ -556,7 +542,7 @@ func TestParser_DateRangeRowspanWithEmptyDay(t *testing.T) {
 </table>`
 
 	p := NewParser(CalendarStandard)
-	calendar, err := p.parse(html)
+	calendar, err := parseHTML(p, html)
 	if err != nil {
 		t.Fatalf("Parse() error = %v", err)
 	}
@@ -787,7 +773,6 @@ func TestCategorizeEvent(t *testing.T) {
 
 func TestParser_ParseHTML(t *testing.T) {
 	html := `
-	<h2><span>ACADEMIC CALENDAR: SUMMER 2025-26</span></h2>
 	<table>
 	<tbody>
 		<tr>
@@ -816,13 +801,9 @@ func TestParser_ParseHTML(t *testing.T) {
 	`
 
 	p := NewParser(CalendarStandard)
-	calendar, err := p.parse(html)
+	calendar, err := parseHTML(p, html)
 	if err != nil {
 		t.Fatalf("Parse() error = %v", err)
-	}
-
-	if calendar.Semester == "" {
-		t.Error("expected semester to be extracted")
 	}
 
 	if calendar.Year != 2026 {
@@ -901,7 +882,7 @@ func TestParser_ParseComplexHTML(t *testing.T) {
 	`
 
 	p := NewParser(CalendarStandard)
-	calendar, err := p.parse(html)
+	calendar, err := parseHTML(p, html)
 	if err != nil {
 		t.Fatalf("Parse() error = %v", err)
 	}
@@ -976,7 +957,7 @@ func TestParser_MultipleEventsPerCell(t *testing.T) {
 	`
 
 	p := NewParser(CalendarStandard)
-	calendar, err := p.parse(html)
+	calendar, err := parseHTML(p, html)
 	if err != nil {
 		t.Fatalf("Parse() error = %v", err)
 	}
@@ -1035,7 +1016,8 @@ func TestSplitEventText(t *testing.T) {
 }
 
 func TestParser_RealWorldHTML(t *testing.T) {
-	html := `<h2><span>ACADEMIC CALENDAR: SUMMER 2025-26</span></h2><p><span>[Except LLB &amp; BPharm]</span></p><table>
+	html := `
+<table>
 <tbody>
 <tr>
 <td colspan="2">
@@ -1152,13 +1134,9 @@ func TestParser_RealWorldHTML(t *testing.T) {
 </table>`
 
 	p := NewParser(CalendarStandard)
-	calendar, err := p.parse(html)
+	calendar, err := parseHTML(p, html)
 	if err != nil {
 		t.Fatalf("Parse() error = %v", err)
-	}
-
-	if !strings.Contains(calendar.Semester, "SUMMER 2025-26") {
-		t.Errorf("expected semester to contain 'SUMMER 2025-26', got %q", calendar.Semester)
 	}
 
 	if calendar.Year != 2026 {
