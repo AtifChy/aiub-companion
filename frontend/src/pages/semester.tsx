@@ -116,8 +116,8 @@ export default function SemesterPage() {
     : 0;
 
   return (
-    <div className="scrollbar-thumb-accent m-0.5 h-full scrollbar-thin scrollbar-gutter-both overflow-auto">
-      <div className="space-y-6 p-6">
+    <div className="scrollbar-thumb-accent animate-in fade-in-10 m-0.5 h-full scrollbar-thin scrollbar-gutter-both overflow-auto duration-200">
+      <div className="space-y-6 p-6 lg:p-10">
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>

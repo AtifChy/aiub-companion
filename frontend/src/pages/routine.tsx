@@ -140,7 +140,7 @@ export default function RoutinePage() {
   };
 
   return (
-    <div className="animate-in fade-in-10 scrollbar-thumb-accent m-0.5 flex h-full scrollbar-thin flex-col gap-6 overflow-auto p-6 duration-200 lg:p-10">
+    <div className="animate-in fade-in-10 scrollbar-thumb-accent m-0.5 flex h-full scrollbar-thin scrollbar-gutter-both flex-col gap-6 overflow-auto p-6 duration-200 lg:p-10">
       <RoutineHeader onImport={handleImportCourses} />
 
       {routine.length > 0 && !loading && <RoutineStats stats={stats} />}
