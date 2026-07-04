@@ -1,10 +1,45 @@
 package calendar
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 	"time"
+
+	"golang.org/x/net/html"
 )
+
+// parse parses a raw HTML string. Added here to support legacy tests.
+func (p *Parser) parse(content string) (*AcademicCalendar, error) {
+	doc, err := html.Parse(strings.NewReader(content))
+	if err != nil {
+		return nil, fmt.Errorf("parse HTML: %v", err)
+	}
+
+	semester, year := p.extractHeaderInfo(doc)
+	if year != 0 {
+		p.year = year
+	}
+
+	table := findNode(doc, "table")
+	if table == nil {
+		return nil, fmt.Errorf("no table found in HTML")
+	}
+
+	events, totalWeeks, err := p.parseTable(table)
+	if err != nil {
+		return nil, fmt.Errorf("parse table: %v", err)
+	}
+
+	return &AcademicCalendar{
+		Semester:    semester,
+		Year:        p.year,
+		Type:        p.calType,
+		Events:      events,
+		TotalWeeks:  totalWeeks,
+		LastUpdated: time.Now(),
+	}, nil
+}
 
 func TestAcademicEvent_IsPast(t *testing.T) {
 	now := time.Now()
@@ -327,7 +362,7 @@ func TestParser_RealWorldHTML_DebugExams(t *testing.T) {
 </table>`
 
 	p := NewParser(CalendarStandard)
-	calendar, err := p.Parse(html)
+	calendar, err := p.parse(html)
 	if err != nil {
 		t.Fatalf("Parse() error = %v", err)
 	}
@@ -417,7 +452,7 @@ func TestParser_AIUBExamFormat(t *testing.T) {
 </table>`
 
 	p := NewParser(CalendarStandard)
-	calendar, err := p.Parse(html)
+	calendar, err := p.parse(html)
 	if err != nil {
 		t.Fatalf("Parse() error = %v", err)
 	}
@@ -521,7 +556,7 @@ func TestParser_DateRangeRowspanWithEmptyDay(t *testing.T) {
 </table>`
 
 	p := NewParser(CalendarStandard)
-	calendar, err := p.Parse(html)
+	calendar, err := p.parse(html)
 	if err != nil {
 		t.Fatalf("Parse() error = %v", err)
 	}
@@ -781,7 +816,7 @@ func TestParser_ParseHTML(t *testing.T) {
 	`
 
 	p := NewParser(CalendarStandard)
-	calendar, err := p.Parse(html)
+	calendar, err := p.parse(html)
 	if err != nil {
 		t.Fatalf("Parse() error = %v", err)
 	}
@@ -866,7 +901,7 @@ func TestParser_ParseComplexHTML(t *testing.T) {
 	`
 
 	p := NewParser(CalendarStandard)
-	calendar, err := p.Parse(html)
+	calendar, err := p.parse(html)
 	if err != nil {
 		t.Fatalf("Parse() error = %v", err)
 	}
@@ -941,7 +976,7 @@ func TestParser_MultipleEventsPerCell(t *testing.T) {
 	`
 
 	p := NewParser(CalendarStandard)
-	calendar, err := p.Parse(html)
+	calendar, err := p.parse(html)
 	if err != nil {
 		t.Fatalf("Parse() error = %v", err)
 	}
@@ -1117,7 +1152,7 @@ func TestParser_RealWorldHTML(t *testing.T) {
 </table>`
 
 	p := NewParser(CalendarStandard)
-	calendar, err := p.Parse(html)
+	calendar, err := p.parse(html)
 	if err != nil {
 		t.Fatalf("Parse() error = %v", err)
 	}
