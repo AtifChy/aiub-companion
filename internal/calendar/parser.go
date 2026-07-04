@@ -48,18 +48,8 @@ func NewParser(calendarType CalendarType) *Parser {
 	}
 }
 
-func (p *Parser) Parse(content string) (*AcademicCalendar, error) {
-	doc, err := html.Parse(strings.NewReader(content))
-	if err != nil {
-		return nil, fmt.Errorf("parse HTML: %v", err)
-	}
-
-	semester, year := p.extractHeaderInfo(doc)
-	if year != 0 {
-		p.year = year
-	}
-
-	events, totalWeeks, err := p.parseTable(doc)
+func (p *Parser) Parse(table *html.Node, semester string) (*AcademicCalendar, error) {
+	events, totalWeeks, err := p.parseTable(table)
 	if err != nil {
 		return nil, fmt.Errorf("parse table: %v", err)
 	}
@@ -82,10 +72,7 @@ type rowspanState struct {
 	values    map[int]string // column index to value
 }
 
-func (p *Parser) parseTable(doc *html.Node) ([]AcademicEvent, int, error) {
-	var events []AcademicEvent
-	var totalWeek int
-
+func (p *Parser) parseTable(doc *html.Node) (events []AcademicEvent, totalWeek int, err error) {
 	table := findNode(doc, "table")
 	if table == nil {
 		return nil, 0, fmt.Errorf("no table found in HTML")
@@ -434,7 +421,7 @@ func parseMonth(text string) (time.Month, bool) {
 		return 0, false
 	}
 
-	if month, ok := monthMap[text]; ok {
+	if month, ok := monthMap[text[:3]]; ok {
 		return month, true
 	}
 

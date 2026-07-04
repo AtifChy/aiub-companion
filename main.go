@@ -46,7 +46,7 @@ func main() {
 
 	noticeService := notice.NewService(databaseService)
 	routineService := routine.NewService(databaseService)
-	calendarService := calendar.NewService(noticeService)
+	calendarService := calendar.NewService(databaseService)
 
 	desktopService := desktop.NewService(configService)
 	workerService := worker.NewService(noticeService, configService, notificationService)

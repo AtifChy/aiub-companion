@@ -3,52 +3,83 @@ package calendar
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"sync"
 	"time"
 
-	"aiub-companion/internal/notice"
+	"aiub-companion/internal/database"
+
+	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
-var noticeIDMap = map[CalendarType]string{
-	CalendarStandard:  "academic-calendar-summer-2025-26--except-llb--bpharm",
-	CalendarLLBBPharm: "academic-calendar-summer-2025-26--llb-bpharm",
-}
+const cacheTTL = 24 * time.Hour
 
 type Service struct {
-	notice *notice.Service
+	db     *database.Service
+	repo   Repository
+	client Client
 
 	mu        sync.RWMutex
 	cache     map[CalendarType]*AcademicCalendar
 	cacheTime map[CalendarType]time.Time
-	cacheTTL  time.Duration
 }
 
-func NewService(notice *notice.Service) *Service {
+func NewService(db *database.Service) *Service {
 	return &Service{
-		notice:    notice,
+		db:        db,
 		cache:     make(map[CalendarType]*AcademicCalendar),
 		cacheTime: make(map[CalendarType]time.Time),
-		cacheTTL:  24 * time.Hour,
 	}
 }
 
+func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptions) error {
+	s.repo = NewRepository(s.db.DB(), cacheTTL)
+	s.client = NewClient()
+	return nil
+}
+
+// GetAcademicCalendar retrieves the academic calendar for the specified type.
+// It first checks the in-memory cache, then the database cache,
+// and finally fetches and parses the calendar if needed.
 func (s *Service) GetAcademicCalendar(ctx context.Context, calType CalendarType) (*AcademicCalendar, error) {
 	s.mu.RLock()
-	if cached, ok := s.cache[calType]; ok && time.Since(s.cacheTime[calType]) < s.cacheTTL {
+	if cached, ok := s.cache[calType]; ok && time.Since(s.cacheTime[calType]) < cacheTTL {
 		s.mu.RUnlock()
 		return cached, nil
 	}
 	s.mu.RUnlock()
 
+	calendar, err := s.repo.GetCalendarCache(ctx, calType)
+	if err == nil {
+		s.mu.Lock()
+		s.cache[calType] = calendar
+		s.cacheTime[calType] = calendar.LastUpdated
+		s.mu.Unlock()
+		return calendar, nil
+	}
+
+	return s.refresh(ctx, calType)
+}
+
+func (s *Service) RefreshCalendar(ctx context.Context, calType CalendarType) error {
+	_, err := s.refresh(ctx, calType)
+	return err
+}
+
+func (s *Service) refresh(ctx context.Context, calType CalendarType) (*AcademicCalendar, error) {
 	calendar, err := s.fetchAndParse(ctx, calType)
 	if err != nil {
 		s.mu.RLock()
-		cached := s.cache[calType]
+		stale := s.cache[calType]
 		s.mu.RUnlock()
-		if cached != nil {
-			return cached, nil
+		if stale != nil {
+			return stale, nil
 		}
 		return nil, err
+	}
+
+	if err := s.repo.UpsertCalendarCache(ctx, calType, calendar); err != nil {
+		slog.Warn("Failed to cache calendar", "type", calType, "error", err)
 	}
 
 	s.mu.Lock()
@@ -59,43 +90,22 @@ func (s *Service) GetAcademicCalendar(ctx context.Context, calType CalendarType)
 	return calendar, nil
 }
 
-func (s *Service) RefreshCalendar(ctx context.Context, calType CalendarType) error {
-	calendar, err := s.fetchAndParse(ctx, calType)
-	if err != nil {
-		return err
-	}
-
-	s.mu.Lock()
-	s.cache[calType] = calendar
-	s.cacheTime[calType] = time.Now()
-	s.mu.Unlock()
-
-	return nil
-}
-
 func (s *Service) fetchAndParse(ctx context.Context, calType CalendarType) (*AcademicCalendar, error) {
-	noticeID, ok := noticeIDMap[calType]
-	if !ok {
-		return nil, fmt.Errorf("unknown calendar type: %v", calType)
-	}
-
-	n, err := s.notice.GetNoticeDetails(ctx, noticeID)
+	table, semester, err := s.client.ScrapeCalendar(ctx, calType)
 	if err != nil {
-		return nil, fmt.Errorf("fetch notice %s: %w", noticeID, err)
-	}
-
-	if n.Content == "" {
-		return nil, fmt.Errorf("notice %s has empty content", noticeID)
+		return nil, fmt.Errorf("scrape calendar: %w", err)
 	}
 
 	parser := NewParser(calType)
-	calendar, err := parser.Parse(n.Content)
+	calendar, err := parser.Parse(table, semester)
 	if err != nil {
 		return nil, fmt.Errorf("parse calendar: %w", err)
 	}
 
 	return calendar, nil
 }
+
+// Public methods to expose calendar data
 
 func (s *Service) GetCurrentWeek(ctx context.Context, calType CalendarType) (int, error) {
 	calendar, err := s.GetAcademicCalendar(ctx, calType)
