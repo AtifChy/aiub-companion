@@ -206,7 +206,7 @@ export default function SemesterPage() {
               </div>
               {nextExam?.date && (
                 <p className="text-muted-foreground text-xs">
-                  {new Date(nextExam.date as string).toLocaleDateString()}
+                  {new Date(nextExam.date).toLocaleDateString()}
                 </p>
               )}
             </CardContent>
@@ -344,8 +344,8 @@ function EventItem({ event }: { event: AcademicEvent }) {
 }
 
 function formatEventDate(event: AcademicEvent): string {
-  const date = event.date ? new Date(event.date as string) : null;
-  const endDate = event.endDate ? new Date(event.endDate as string) : null;
+  const date = event.date ? new Date(event.date) : null;
+  const endDate = event.endDate ? new Date(event.endDate) : null;
 
   if (!date) return "TBD";
 
