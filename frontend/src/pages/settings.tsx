@@ -1,10 +1,8 @@
 import { AlertDialogDestructive } from "@/components/alert-dialog-destructive";
 import { useSettings } from "@/components/settings-provider";
-import {
-  SettingRow,
-  SettingsCard,
-  SettingSelect,
-} from "@/components/settings/settings";
+import { SettingsCard } from "@/components/settings/settings-card";
+import { SettingRow } from "@/components/settings/settings-row";
+import { SettingSelect } from "@/components/settings/settings-select";
 import { type Theme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
