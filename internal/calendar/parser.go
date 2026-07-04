@@ -386,35 +386,6 @@ func (p *Parser) parseIndividualDates(text string, month time.Month) []time.Time
 	return dates
 }
 
-func (p *Parser) extractHeaderInfo(doc *html.Node) (semester string, year int) {
-	// Find h2 with semester info
-	if h2 := findNode(doc, "h2"); h2 != nil {
-		semester = extractText(h2)
-		parts := strings.Split(semester, ":")
-		if len(parts) > 1 {
-			semester = parts[1]
-		}
-	}
-
-	// Find year from table header
-	table := findNode(doc, "table")
-	if table != nil {
-		// Look for <string>2023</string> in first row
-		if strong := findNode(table, "strong"); strong != nil {
-			text := extractText(strong)
-			if y, err := strconv.Atoi(text); err == nil {
-				year = y
-			}
-		}
-	}
-
-	if year == 0 {
-		year = time.Now().Year()
-	}
-
-	return semester, year
-}
-
 func parseMonth(text string) (time.Month, bool) {
 	text = strings.TrimSpace(strings.ToLower(text))
 	if len(text) < 3 {
