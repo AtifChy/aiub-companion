@@ -50,11 +50,12 @@ function ShellProviders({ children }: { children: React.ReactNode }) {
 }
 
 function AppRouter() {
+  const initialRoute = routes[0];
   return (
     <HashRouter>
       <Routes>
         <Route element={<Layout />}>
-          <Route index element={<Navigate to={routes[0].path} />} />
+          <Route index element={<Navigate to={initialRoute.path} />} />
           {routes.map((route) => (
             <Route
               key={route.path}

@@ -12,7 +12,6 @@ import {
   Settings,
   type LucideIcon,
 } from "lucide-react";
-import type React from "react";
 import type { ComponentType } from "react";
 
 const NoticesPage = lazyWithPreload(() => import("@/pages/notices"));
