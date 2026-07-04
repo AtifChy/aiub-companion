@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar";
+import Loading from "@/components/loading";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -12,7 +13,6 @@ import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { WindowControls } from "@/components/window-controls";
 import { sections } from "@/lib/routes";
 import { Window } from "@wailsio/runtime";
-import { Loader2Icon } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import { matchPath, Outlet, useLocation } from "react-router";
 import { toast } from "sonner";
@@ -46,7 +46,7 @@ export default function Layout() {
       <SidebarInset className="overflow-hidden">
         <Header section={section} label={label} />
         <main className="min-h-0 flex-1 overflow-hidden">
-          <Suspense fallback={<Fallback />}>
+          <Suspense fallback={<Loading />}>
             <Outlet />
           </Suspense>
         </main>
@@ -112,13 +112,5 @@ function Header({ section, label }: { section: string; label: string }) {
         onClose={() => void Window.Close()}
       />
     </header>
-  );
-}
-
-function Fallback() {
-  return (
-    <div className="flex h-full items-center justify-center">
-      <Loader2Icon className="text-muted-foreground size-8 animate-spin" />
-    </div>
   );
 }
