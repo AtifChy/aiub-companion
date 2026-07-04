@@ -100,9 +100,10 @@ export default function SemesterPage() {
     },
   });
 
-  const showLoading = useDelayedLoading(isLoading, 300);
+  const showLoading = useDelayedLoading(isLoading);
 
-  if (showLoading) {
+  if (isLoading) {
+    if (!showLoading) return null;
     return (
       <div className="flex h-full items-center justify-center">
         <Loader2Icon className="text-muted-foreground h-8 w-8 animate-spin" />
@@ -122,7 +123,7 @@ export default function SemesterPage() {
           <div>
             <h1 className="text-3xl font-bold">Semester Dashboard</h1>
             {calendar?.semester && (
-              <p className="text-muted-foreground text-sm">
+              <p className="text-muted-foreground text-sm capitalize">
                 {calendar.semester}
               </p>
             )}
@@ -138,11 +139,7 @@ export default function SemesterPage() {
               </SelectTrigger>
               <SelectContent className="p-1">
                 {CALENDAR_TYPES.map((ct) => (
-                  <SelectItem
-                    key={ct.value}
-                    value={ct.value}
-                    disabled={ct.value === CalendarType.CalendarLLBBPharm}
-                  >
+                  <SelectItem key={ct.value} value={ct.value}>
                     {ct.label}
                   </SelectItem>
                 ))}
