@@ -11,7 +11,6 @@ import (
 type CalendarCache struct {
 	CalendarType string
 	Data         string
-	Semester     string
 	ScrapedAt    string
 }
 

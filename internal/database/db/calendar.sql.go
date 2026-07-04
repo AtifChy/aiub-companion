@@ -10,7 +10,7 @@ import (
 )
 
 const getCalendarCache = `-- name: GetCalendarCache :one
-SELECT data, semester, scraped_at
+SELECT data, scraped_at
 FROM calendar_cache
 WHERE calendar_type = ?
 LIMIT 1
@@ -18,34 +18,31 @@ LIMIT 1
 
 type GetCalendarCacheRow struct {
 	Data      string
-	Semester  string
 	ScrapedAt string
 }
 
 func (q *Queries) GetCalendarCache(ctx context.Context, calendarType string) (GetCalendarCacheRow, error) {
 	row := q.db.QueryRowContext(ctx, getCalendarCache, calendarType)
 	var i GetCalendarCacheRow
-	err := row.Scan(&i.Data, &i.Semester, &i.ScrapedAt)
+	err := row.Scan(&i.Data, &i.ScrapedAt)
 	return i, err
 }
 
 const upsertCalendarCache = `-- name: UpsertCalendarCache :exec
-INSERT INTO calendar_cache (calendar_type, semester, data)
-VALUES (?, ?, ?)
+INSERT INTO calendar_cache (calendar_type, data)
+VALUES (?, ?)
 ON CONFLICT(calendar_type) DO UPDATE
 SET
-  semester = EXCLUDED.semester,
   data = EXCLUDED.data,
   scraped_at = CURRENT_TIMESTAMP
 `
 
 type UpsertCalendarCacheParams struct {
 	CalendarType string
-	Semester     string
 	Data         string
 }
 
 func (q *Queries) UpsertCalendarCache(ctx context.Context, arg UpsertCalendarCacheParams) error {
-	_, err := q.db.ExecContext(ctx, upsertCalendarCache, arg.CalendarType, arg.Semester, arg.Data)
+	_, err := q.db.ExecContext(ctx, upsertCalendarCache, arg.CalendarType, arg.Data)
 	return err
 }

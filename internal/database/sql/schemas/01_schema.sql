@@ -35,7 +35,6 @@ CREATE TABLE IF NOT EXISTS user_states (
 CREATE TABLE IF NOT EXISTS calendar_cache (
   calendar_type TEXT PRIMARY KEY,
   data TEXT NOT NULL,
-  semester TEXT NOT NULL,
   scraped_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
