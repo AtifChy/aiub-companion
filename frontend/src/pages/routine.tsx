@@ -35,25 +35,19 @@ const DAYS: readonly string[] = [
 export default function RoutinePage() {
   const queryClient = useQueryClient();
 
-  const routineQuery = useQuery({
+  const { data: routine, isLoading: loading } = useQuery({
     queryKey: ["routine"],
     queryFn: () => RoutineService.GetUserRoutine(),
   });
 
-  const routine = routineQuery.data ?? [];
-  const loading = routineQuery.isLoading;
-
   const [search, setSearch] = useState("");
   const searchDebounced = useDebounce(search, 300);
 
-  const courseQuery = useQuery({
+  const { data: searchResults, isLoading: isSearching } = useQuery({
     queryKey: ["courses", searchDebounced],
     queryFn: () => RoutineService.SearchOfferedCourses(searchDebounced),
     enabled: searchDebounced.trim().length > 0,
   });
-
-  const searchResults = courseQuery.data ?? [];
-  const isSearching = courseQuery.isLoading;
 
   const addCourseMutation = useMutation({
     mutationFn: (classId: string) => RoutineService.AddToUserRoutine(classId),
@@ -88,6 +82,7 @@ export default function RoutinePage() {
   const importCoursesMutation = useMutation({
     mutationFn: (path: string) => RoutineService.ImportOfferedCourses(path),
     onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["courses"] });
       toast.success("Offered courses database updated");
     },
     onError: (err) => {
@@ -120,19 +115,20 @@ export default function RoutinePage() {
 
   const routineByDay = DAYS.reduce(
     (acc, day) => {
-      acc[day] = routine.filter((c) => c.day === day);
+      acc[day] = routine?.filter((c) => c.day === day) ?? [];
       return acc;
     },
     {} as Record<string, Course[]>,
   );
 
   const stats: RoutineStatsProps["stats"] = {
-    totalClasses: routine.length,
-    studyHours: routine.reduce((acc, c) => {
-      const duration =
-        parseTimeToMinutes(c.endTime) - parseTimeToMinutes(c.startTime);
-      return acc + (duration > 0 ? duration / 60 : 0);
-    }, 0),
+    totalClasses: routine?.length ?? 0,
+    studyHours:
+      routine?.reduce((acc, c) => {
+        const duration =
+          parseTimeToMinutes(c.endTime) - parseTimeToMinutes(c.startTime);
+        return acc + (duration > 0 ? duration / 60 : 0);
+      }, 0) ?? 0,
     activeDays: Object.keys(routineByDay).filter((day) => {
       const dayCourses = routineByDay[day];
       return dayCourses !== undefined && dayCourses.length > 0;
@@ -143,12 +139,14 @@ export default function RoutinePage() {
     <div className="animate-in fade-in-10 scrollbar-thumb-accent m-0.5 flex h-full scrollbar-thin scrollbar-gutter-both flex-col gap-6 overflow-auto p-6 duration-200 lg:p-10">
       <RoutineHeader onImport={handleImportCourses} />
 
-      {routine.length > 0 && !loading && <RoutineStats stats={stats} />}
+      {routine && routine.length > 0 && !loading && (
+        <RoutineStats stats={stats} />
+      )}
 
       <CourseSearch
         search={search}
         setSearch={setSearch}
-        searchResults={searchResults}
+        searchResults={searchResults ?? []}
         isSearching={isSearching}
         onAddCourse={(classId) => addCourseMutation.mutate(classId)}
       />
@@ -157,7 +155,7 @@ export default function RoutinePage() {
         <div className="flex min-h-[300px] flex-1 items-center justify-center">
           <Loader2Icon className="text-muted-foreground size-8 animate-spin" />
         </div>
-      ) : routine.length === 0 ? (
+      ) : routine?.length === 0 ? (
         <EmptyState />
       ) : (
         <DayScheduleTimeline
