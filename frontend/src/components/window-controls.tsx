@@ -16,7 +16,7 @@ export function WindowControls({
   onMaximize,
   onClose,
 }: WindowControlsProps) {
-  const [focused, setFocused] = useState(document.hasFocus());
+  const [focused, setFocused] = useState(() => document.hasFocus());
 
   useEffect(() => {
     const handleFocus = () => setFocused(true);
