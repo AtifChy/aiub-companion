@@ -6,23 +6,11 @@ import {
   SidebarHeader,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
-import { sections } from "@/lib/routes";
+import { AboutPage, sections } from "@/lib/routes";
 import { Service as ConfigService, type BuildInfo } from "@bindings/config";
 import { Service as DesktopService } from "@bindings/desktop";
-import {
-  ChevronsUpDownIcon,
-  CommandIcon,
-  CopyrightIcon,
-  type LucideIcon,
-} from "lucide-react";
+import { ChevronsUpDownIcon, CommandIcon, CopyrightIcon } from "lucide-react";
 import React, { useEffect, useState } from "react";
-
-export type NavItem = {
-  label: string;
-  path: string;
-  icon: LucideIcon;
-  component?: React.ComponentType;
-};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [appInfo, setAppInfo] = useState<BuildInfo | null>(null);
@@ -38,6 +26,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenuButton
           onClick={() => void DesktopService.ShowAboutWindow()}
+          onMouseEnter={() => void AboutPage.preload?.()}
+          onFocus={() => void AboutPage.preload?.()}
           size="lg"
           className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
         >

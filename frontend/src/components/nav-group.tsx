@@ -1,22 +1,16 @@
-import type { LucideIcon } from "lucide-react";
-import { Link, useLocation } from "react-router";
 import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "./ui/sidebar";
-
-export type NavItem = {
-  label: string;
-  path: string;
-  icon: LucideIcon;
-};
+} from "@/components/ui/sidebar";
+import type { RouteItem } from "@/lib/routes";
+import { Link, useLocation } from "react-router";
 
 interface NavGroupProps {
   title: string;
-  items: NavItem[];
+  items: RouteItem[];
 }
 
 export function NavGroup({ title, items }: NavGroupProps) {
@@ -31,6 +25,8 @@ export function NavGroup({ title, items }: NavGroupProps) {
           <SidebarMenuItem key={item.label}>
             <SidebarMenuButton
               isActive={location.pathname === item.path}
+              onMouseEnter={() => void item.component.preload?.()}
+              onFocus={() => void item.component.preload?.()}
               render={
                 <Link to={item.path} className="flex items-center gap-2">
                   <item.icon />

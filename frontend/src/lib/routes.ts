@@ -1,29 +1,35 @@
 import {
+  lazyWithPreload,
+  type PreloadableComponent,
+} from "@/lib/lazy-with-preload";
+import {
   Bell,
   Calculator,
   Calendar,
+  GraduationCap,
   HelpCircle,
   LineChart,
   Settings,
-  GraduationCap,
   type LucideIcon,
 } from "lucide-react";
 import type React from "react";
-import { lazy } from "react";
+import type { ComponentType } from "react";
 
-const NoticesPage = lazy(() => import("@/pages/notices"));
-const CGPAPage = lazy(() => import("@/pages/cgpa"));
-const GPATrendPage = lazy(() => import("@/pages/gpa-trend"));
-const RoutinePage = lazy(() => import("@/pages/routine"));
-const SemesterPage = lazy(() => import("@/pages/semester"));
-const SettingsPage = lazy(() => import("@/pages/settings"));
-const HelpPage = lazy(() => import("@/pages/help"));
+const NoticesPage = lazyWithPreload(() => import("@/pages/notices"));
+const CGPAPage = lazyWithPreload(() => import("@/pages/cgpa"));
+const GPATrendPage = lazyWithPreload(() => import("@/pages/gpa-trend"));
+const RoutinePage = lazyWithPreload(() => import("@/pages/routine"));
+const SemesterPage = lazyWithPreload(() => import("@/pages/semester"));
+const SettingsPage = lazyWithPreload(() => import("@/pages/settings"));
+const HelpPage = lazyWithPreload(() => import("@/pages/help"));
+
+export const AboutPage = lazyWithPreload(() => import("@/pages/about"));
 
 export type RouteItem = {
   label: string;
   path: string;
   icon: LucideIcon;
-  component: React.LazyExoticComponent<React.ComponentType>;
+  component: PreloadableComponent<ComponentType<unknown>>;
 };
 
 type Section = "workspace" | "tools" | "others";
