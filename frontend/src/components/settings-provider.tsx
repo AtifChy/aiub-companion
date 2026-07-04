@@ -2,13 +2,7 @@ import { logger } from "@/lib/logger";
 import { Service as ConfigService, type Config } from "@bindings/config";
 import { Loader2Icon } from "lucide-react";
 import { rawReturn } from "mutative";
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  type ReactNode,
-} from "react";
+import { createContext, use, useEffect, useRef, type ReactNode } from "react";
 import { toast } from "sonner";
 import { useMutative, type Updater } from "use-mutative";
 
@@ -96,7 +90,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
 // eslint-disable-next-line react-refresh/only-export-components
 export function useSettings() {
-  const context = useContext(SettingsContext);
+  const context = use(SettingsContext);
   if (!context)
     throw new Error("useSettings must be used within a SettingsProvider");
   return context;
