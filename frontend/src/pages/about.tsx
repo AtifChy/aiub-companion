@@ -10,6 +10,7 @@ import { toast } from "sonner";
 
 export default function AboutPage() {
   const [appInfo, setAppInfo] = useState<BuildInfo | null>(null);
+  const year = new Date().getFullYear();
 
   useEffect(() => {
     ConfigService.GetBuildInfo()
@@ -53,7 +54,7 @@ export default function AboutPage() {
 
           <div className="text-muted-foreground mt-4 flex items-center gap-1 text-xs">
             <CopyrightIcon className="size-3" />
-            {new Date().getFullYear()} {appInfo?.name}. All rights reserved.
+            {year} {appInfo?.name}. All rights reserved.
           </div>
         </div>
       </div>

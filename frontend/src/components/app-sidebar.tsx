@@ -14,6 +14,7 @@ import React, { useEffect, useState } from "react";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [appInfo, setAppInfo] = useState<BuildInfo | null>(null);
+  const year = new Date().getFullYear();
 
   useEffect(() => {
     ConfigService.GetBuildInfo()
@@ -49,7 +50,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter className="flex items-center truncate group-data-[collapsible=icon]:hidden">
         <div className="text-muted-foreground flex items-center gap-1 text-xs">
           <CopyrightIcon className="size-3" />
-          {new Date().getFullYear()} AIUB Companion
+          {year} AIUB Companion
         </div>
       </SidebarFooter>
     </Sidebar>
