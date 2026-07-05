@@ -283,8 +283,18 @@ function CourseSearch({
             {searchResults.map((course) => (
               <div
                 key={course.classID}
-                className="hover:bg-accent/60 flex cursor-pointer items-center justify-between border-b px-4 py-3 transition-colors last:border-0"
+                tabIndex={0}
                 onClick={() => onAddCourse(course.classID)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    onAddCourse(course.classID);
+                  }
+                }}
+                className={cn(
+                  "hover:bg-accent/60 flex cursor-pointer items-center justify-between border-b px-4 py-3 transition-colors last:border-0",
+                  "focus-visible:ring-ring/50 outline-none focus-visible:rounded focus-visible:ring-3 focus-visible:ring-inset",
+                )}
               >
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2 text-sm font-semibold">
