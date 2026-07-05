@@ -266,7 +266,7 @@ export default function SemesterPage() {
                   </p>
                 ) : (
                   upcomingEvents.map((event, idx) => (
-                    <EventItem key={idx} event={event} />
+                    <EventItem key={event.category + idx} event={event} />
                   ))
                 )}
               </div>
@@ -274,7 +274,7 @@ export default function SemesterPage() {
               <div className="space-y-2">
                 {calendar?.events?.map((event, idx) => (
                   <div
-                    key={idx}
+                    key={event.category + idx}
                     className="flex items-center justify-between rounded-lg border p-3"
                   >
                     <div className="space-y-1">

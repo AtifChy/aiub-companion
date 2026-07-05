@@ -124,7 +124,7 @@ function FAQList({ searchQuery }: { searchQuery: string }) {
       {filteredFaqs.length > 0 ? (
         filteredFaqs.map((faq, idx) => (
           <FAQItem
-            key={idx}
+            key={faq.category + idx}
             faq={faq}
             expanded={expandedIndex === idx}
             onExpand={() => toggleExpand(idx)}
@@ -151,6 +151,7 @@ function FAQItem({
   return (
     <div className="hover:bg-muted/30 transition-colors">
       <button
+        type="button"
         onClick={onExpand}
         className="flex w-full items-center justify-between p-4 text-left font-medium outline-none"
       >

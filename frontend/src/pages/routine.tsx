@@ -281,7 +281,8 @@ function CourseSearch({
         <Card className="scrollbar-thumb-accent bg-popover/95 border-muted/40 fade-in-10 animate-in absolute mt-2 max-h-80 w-full scrollbar-thin overflow-y-auto rounded-lg border pt-0 pb-0 shadow-xl backdrop-blur-md duration-200">
           <div className="flex flex-col">
             {searchResults.map((course) => (
-              <div
+              <button
+                type="button"
                 key={course.classID}
                 tabIndex={0}
                 onClick={() => onAddCourse(course.classID)}
@@ -324,7 +325,7 @@ function CourseSearch({
                     </span>
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </Card>

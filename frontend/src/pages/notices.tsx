@@ -393,7 +393,8 @@ function NoticeListItem({
   onTogglePin,
 }: NoticeListItemProps) {
   return (
-    <div
+    <button
+      type="button"
       onClick={onSelect}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
@@ -402,7 +403,6 @@ function NoticeListItem({
         }
       }}
       tabIndex={0}
-      role="button"
       className={cn(
         "group animate-in fade-in slide-in-from-bottom-5 w-full cursor-pointer border-b p-3 text-left transition-colors duration-300",
         "focus-visible:border-ring focus-visible:ring-ring/50 outline-none focus-visible:rounded focus-visible:border-b-transparent focus-visible:border-l-transparent focus-visible:ring-3 focus-visible:ring-inset",
@@ -472,7 +472,7 @@ function NoticeListItem({
           {notice.summary}
         </p>
       )}
-    </div>
+    </button>
   );
 }
 
@@ -607,6 +607,7 @@ function DetailView({
         {notice.content ? (
           <div
             className="prose prose-sm prose-custom dark:prose-invert prose-li:text-left mx-auto text-center"
+            // react-doctor-disable-next-line react-doctor/dangerous-html-sink
             dangerouslySetInnerHTML={{ __html: notice.content }}
           />
         ) : (
