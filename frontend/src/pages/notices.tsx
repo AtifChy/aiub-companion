@@ -410,6 +410,14 @@ function NoticeListItem({
   return (
     <div
       onClick={onSelect}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          onSelect();
+        }
+      }}
+      tabIndex={0}
+      role="button"
       className={cn(
         "group animate-in fade-in slide-in-from-bottom-5 w-full cursor-pointer border-b p-3 text-left transition-colors duration-300",
         "focus-visible:border-ring focus-visible:ring-ring/50 outline-none focus-visible:rounded focus-visible:border-b-transparent focus-visible:border-l-transparent focus-visible:ring-3 focus-visible:ring-inset",
@@ -417,7 +425,6 @@ function NoticeListItem({
           ? "bg-primary/10 border-l-primary border-l-2"
           : "hover:bg-muted/50 border-l-2 border-l-transparent",
       )}
-      role="button"
     >
       <div className="flex items-center justify-between gap-2">
         <div className="mb-1 flex items-center gap-1.5">
@@ -443,6 +450,7 @@ function NoticeListItem({
           <Button
             variant="ghost"
             onClick={onTogglePin}
+            tabIndex={notice.isPinned ? 0 : -1}
             className={cn(
               "h-auto p-0.5 opacity-0 group-hover:opacity-100",
               notice.isPinned
