@@ -47,7 +47,7 @@ import {
   PinOffIcon,
   RefreshCwIcon,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 const CATEGORIES: Category[] = [
@@ -86,12 +86,8 @@ export default function NoticesPage() {
   const [filters, setFilters] = useState<NoticeFilters>(INITIAL_FILTERS);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const autoReadRef = useRef<string | null>(null);
-
-  const { listQuery, detailQuery, toggleRead, togglePin } = useNotices(
-    filters,
-    selectedId,
-  );
+  const { listQuery, detailQuery, toggleRead, togglePin, readNotice } =
+    useNotices(filters, selectedId);
   const { syncing, sync } = useSync();
 
   const notices = listQuery.data ?? [];
@@ -99,21 +95,10 @@ export default function NoticesPage() {
 
   const detail = detailQuery.data ?? null;
 
-  useEffect(() => {
-    if (!detail || detailQuery.isLoading) return;
-
-    if (autoReadRef.current !== detail.id) {
-      autoReadRef.current = detail.id;
-
-      if (!detail.isRead) {
-        toggleRead.mutate({ id: detail.id, next: true });
-      }
-    }
-  }, [detail, detailQuery.isLoading, toggleRead]);
-
   const handleSelect = (notice: Notice) => {
     if (notice.id === selectedId) return;
     setSelectedId(notice.id);
+    readNotice(notice.id);
   };
 
   return (

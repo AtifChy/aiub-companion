@@ -4,7 +4,7 @@ import { logger } from "@/lib/logger";
 import { Service as NoticeService, type Notice } from "@bindings/notice";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Events } from "@wailsio/runtime";
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { toast } from "sonner";
 
 export type Category =
@@ -42,35 +42,25 @@ export function useNotices(filter: NoticeFilters, selectedId: string | null) {
       }),
   });
 
+  const detailOptions = (id: string) => ({
+    queryKey: ["noticeDetails", id],
+    queryFn: () => NoticeService.GetNoticeDetails(id),
+  });
+
   const detailQuery = useQuery({
-    queryKey: ["noticeDetails", selectedId],
-    queryFn: () => NoticeService.GetNoticeDetails(selectedId!),
+    ...detailOptions(selectedId ?? ""),
     enabled: !!selectedId,
   });
 
-  const invalidate = useCallback(
-    async (id?: string) => {
-      if (!id) {
-        await queryClient.invalidateQueries({ queryKey: ["notices"] });
-        return;
-      }
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["notices"] }),
-        queryClient.invalidateQueries({ queryKey: ["noticeDetails", id] }),
-      ]);
-    },
-    [queryClient],
-  );
-
   useEffect(() => {
     const unsub = Events.On("notices:synced", (count) => {
-      void invalidate();
+      void queryClient.invalidateQueries({ queryKey: ["notices"] });
       toast.success(
         `${count.data} new notice${count.data !== 1 ? "s" : ""} synced`,
       );
     });
     return () => unsub();
-  }, [invalidate]);
+  }, [queryClient]);
 
   const toggleRead = useToggleField("isRead", NoticeService.ToggleNoticeRead);
   const togglePin = useToggleField(
@@ -78,11 +68,21 @@ export function useNotices(filter: NoticeFilters, selectedId: string | null) {
     NoticeService.ToggleNoticePinned,
   );
 
+  const readNotice = (id: string) => {
+    void queryClient.fetchQuery(detailOptions(id)).then((detail) => {
+      if (!detail?.isRead) {
+        toggleRead.mutate({ id, next: true });
+      }
+      return detail;
+    });
+  };
+
   return {
     listQuery,
     detailQuery,
     toggleRead,
     togglePin,
+    readNotice,
   };
 }
 
