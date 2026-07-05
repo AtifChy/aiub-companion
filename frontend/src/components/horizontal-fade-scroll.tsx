@@ -1,11 +1,5 @@
 import { cn } from "@/lib/utils";
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 type ScrollState = {
   left: boolean;
@@ -27,7 +21,7 @@ export function HorizontalFadeScroll({
   });
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const checkOverflow = useCallback(() => {
+  const checkOverflow = () => {
     const container = scrollRef.current;
     if (container) {
       const { scrollLeft, scrollWidth, clientWidth } = container;
@@ -37,7 +31,7 @@ export function HorizontalFadeScroll({
         prev.left === left && prev.right === right ? prev : { left, right },
       );
     }
-  }, []);
+  };
 
   useLayoutEffect(() => {
     const container = scrollRef.current;
@@ -49,24 +43,22 @@ export function HorizontalFadeScroll({
     resizeObserver.observe(container);
 
     return () => resizeObserver.disconnect();
-  }, [checkOverflow]);
+  }, []);
 
-  const handleWheel = useCallback((e: WheelEvent) => {
+  const handleWheel = (e: WheelEvent) => {
     const container = scrollRef.current;
     if (!container) return;
 
     e.preventDefault();
     container.scrollLeft += e.deltaY / 2;
-  }, []);
+  };
 
   useEffect(() => {
     const container = scrollRef.current;
     if (!container) return;
-
     container.addEventListener("wheel", handleWheel, { passive: false });
-
     return () => container.removeEventListener("wheel", handleWheel);
-  }, [handleWheel]);
+  }, []);
 
   return (
     <div
