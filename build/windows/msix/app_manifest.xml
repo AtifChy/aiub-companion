@@ -8,15 +8,15 @@
   IgnorableNamespaces="uap3">
   
   <Identity 
-    Name="com.example.aiubcompanion"
-    Publisher="CN=My Company"
+    Name="io.github.atifchy.aiub-companion"
+    Publisher="CN=AIUB Companion"
     Version="0.1.0.0" 
     ProcessorArchitecture="x64" />
   
   <Properties>
     <DisplayName>My Product</DisplayName>
-    <PublisherDisplayName>My Company</PublisherDisplayName>
-    <Description>A aiub-companion application</Description>
+    <PublisherDisplayName>AIUB Companion</PublisherDisplayName>
+    <Description>AIUB Companion</Description>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
   
@@ -29,10 +29,10 @@
   </Resources>
   
   <Applications>
-    <Application Id="com.example.aiubcompanion" Executable="aiub-companion.exe" EntryPoint="Windows.FullTrustApplication">
+    <Application Id="io.github.atifchy.aiub-companion" Executable="aiub-companion.exe" EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements
         DisplayName="My Product"
-        Description="A aiub-companion application"
+        Description="AIUB Companion"
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png">
