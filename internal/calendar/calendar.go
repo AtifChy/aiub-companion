@@ -53,21 +53,34 @@ func (e *AcademicEvent) DaysUntil() int {
 	return daysBetween(e.Date, now)
 }
 
+type Week struct {
+	Number int       `json:"number"`
+	Start  time.Time `json:"start"`
+	End    time.Time `json:"end"`
+}
+
 type AcademicCalendar struct {
-	Semester    string          `json:"semester"`
-	Year        int             `json:"year"`
 	Type        CalendarType    `json:"type"`
-	TotalWeeks  int             `json:"totalWeeks"`
-	Events      []AcademicEvent `json:"events"`
 	LastUpdated time.Time       `json:"lastUpdated"`
+	Semester    string          `json:"semester"`
+	Events      []AcademicEvent `json:"events"`
+	Weeks       []Week          `json:"weeks"`
+	TotalWeeks  int             `json:"totalWeeks"`
+	Year        int             `json:"year"`
 }
 
 func (c *AcademicCalendar) GetCurrentWeek() int {
 	now := time.Now()
-	for _, event := range c.Events {
-		if event.IsInRange(now) {
-			return event.Week
+	for _, w := range c.Weeks {
+		if !isBeforeDay(now, w.Start) && !isAfterDay(now, w.End) {
+			return w.Number
 		}
+	}
+	if len(c.Weeks) > 0 && isBeforeDay(now, c.Weeks[0].Start) {
+		return 1
+	}
+	if len(c.Weeks) > 0 && isAfterDay(now, c.Weeks[len(c.Weeks)-1].End) {
+		return c.TotalWeeks
 	}
 	return 0
 }

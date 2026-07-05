@@ -3,6 +3,7 @@ package calendar
 import (
 	"fmt"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -26,11 +27,11 @@ var monthMap = map[string]time.Month{
 }
 
 var (
-	reFullDate  = regexp.MustCompile(`(?i)^([a-z]+)\s+(\d{1,2}),?\s+(\d{4})$`)       // Pattern: "July 13, 2023"
-	reMonthDay  = regexp.MustCompile(`(?i)^([a-z]+)\s+(\d{1,2})$`)                   // Pattern: "July 13"
-	reDateRange = regexp.MustCompile(`(\d{1,2})\s*-\s*(\d{1,2})(?:\s+([A-Za-z]+))?`) // Pattern: "7 - 13" or "28 - 4 Jul"
-	reParen     = regexp.MustCompile(`\([^)]*\)`)                                    // Pattern: "(Sat)"
-	reWeekNum   = regexp.MustCompile(`(\d+)`)                                        // Pattern: "Week 1", "Week 2", etc.
+	reFullDate  = regexp.MustCompile(`(?i)^([a-z]+)\s+(\d{1,2}),?\s+(\d{4})$`)                        // Pattern: "July 13, 2023"
+	reMonthDay  = regexp.MustCompile(`(?i)^([a-z]+)\s+(\d{1,2})$`)                                    // Pattern: "July 13"
+	reDateRange = regexp.MustCompile(`(?i)(\d{1,2})(?:\s+([a-z]+))?\s*-\s*(\d{1,2})(?:\s+([a-z]+))?`) // Pattern: "7 - 13" or "28 - 4 Jul" or "28 Sep - 4 Oct"
+	reParen     = regexp.MustCompile(`\([^)]*\)`)                                                     // Pattern: "(Sat)"
+	reWeekNum   = regexp.MustCompile(`(\d+)`)                                                         // Pattern: "Week 1", "Week 2", etc.
 
 	reParagraph = regexp.MustCompile(`<p[^>]*>([\s\S]*?)</p>`) // Pattern to match <p>...</p> blocks
 	reTag       = regexp.MustCompile(`<[^>]*>`)                // Pattern to match HTML tags
@@ -49,7 +50,7 @@ func NewParser(calendarType CalendarType) *Parser {
 }
 
 func (p *Parser) Parse(table *html.Node, semester string) (*AcademicCalendar, error) {
-	events, totalWeeks, err := p.parseTable(table)
+	events, weeks, totalWeeks, err := p.parseTable(table)
 	if err != nil {
 		return nil, fmt.Errorf("parse table: %v", err)
 	}
@@ -59,6 +60,7 @@ func (p *Parser) Parse(table *html.Node, semester string) (*AcademicCalendar, er
 		Year:        p.year,
 		Type:        p.calType,
 		Events:      events,
+		Weeks:       weeks,
 		TotalWeeks:  totalWeeks,
 		LastUpdated: time.Now(),
 	}, nil
@@ -70,12 +72,13 @@ type rowspanState struct {
 	dateRange string
 	counters  map[int]int    // column index to remaining rowspan count
 	values    map[int]string // column index to value
+	weeks     map[int]Week   // week number to Week struct
 }
 
-func (p *Parser) parseTable(doc *html.Node) (events []AcademicEvent, totalWeek int, err error) {
+func (p *Parser) parseTable(doc *html.Node) (events []AcademicEvent, weeks []Week, totalWeek int, err error) {
 	table := findNode(doc, "table")
 	if table == nil {
-		return nil, 0, fmt.Errorf("no table found in HTML")
+		return nil, nil, 0, fmt.Errorf("no table found in HTML")
 	}
 
 	tbody := findNode(table, "tbody")
@@ -86,6 +89,7 @@ func (p *Parser) parseTable(doc *html.Node) (events []AcademicEvent, totalWeek i
 	state := &rowspanState{
 		counters: make(map[int]int),
 		values:   make(map[int]string),
+		weeks:    make(map[int]Week),
 	}
 
 	for row := tbody.FirstChild; row != nil; row = row.NextSibling {
@@ -100,7 +104,15 @@ func (p *Parser) parseTable(doc *html.Node) (events []AcademicEvent, totalWeek i
 		events = append(events, rowEvents...)
 	}
 
-	return events, totalWeek, nil
+	weeks = make([]Week, 0, len(state.weeks))
+	for _, w := range state.weeks {
+		weeks = append(weeks, w)
+	}
+	sort.Slice(weeks, func(i, j int) bool {
+		return weeks[i].Number < weeks[j].Number
+	})
+
+	return events, weeks, totalWeek, nil
 }
 
 func (p *Parser) parseRow(row *html.Node, state *rowspanState) ([]AcademicEvent, int) {
@@ -175,6 +187,15 @@ func (p *Parser) parseRow(row *html.Node, state *rowspanState) ([]AcademicEvent,
 	if week := colValues[2]; week != "" {
 		if w := parseWeek(week); w > 0 {
 			state.week = w
+		}
+	}
+	if state.week > 0 && state.dateRange != "" {
+		if result, ok := p.parseDateRange(state.dateRange, state.month); ok {
+			state.weeks[state.week] = Week{
+				Number: state.week,
+				Start:  result.StartDate,
+				End:    result.EndDate,
+			}
 		}
 	}
 
@@ -310,49 +331,54 @@ func (p *Parser) parseDateRange(text string, month time.Month) (DateParseResult,
 	text = replacer.Replace(text)
 
 	match := reDateRange.FindStringSubmatch(text)
-	if len(match) < 3 {
+	if len(match) < 5 {
 		return DateParseResult{}, false
 	}
 
 	startDay, err1 := strconv.Atoi(match[1])
-	endDay, err2 := strconv.Atoi(match[2])
+	endDay, err2 := strconv.Atoi(match[3])
 	if err1 != nil || err2 != nil {
 		return DateParseResult{}, false
 	}
 
-	// Determine the end month
-	var endMonth time.Month
-	if match[3] != "" {
-		if m, ok := parseMonth(match[3]); ok {
-			endMonth = m
-		} else {
-			endMonth = month
+	// Determine the start month
+	startMonth := month
+	if match[2] != "" {
+		if m, ok := parseMonth(match[2]); ok {
+			startMonth = m
 		}
-	} else {
-		endMonth = month
 	}
 
-	startDate := time.Date(p.year, month, startDay, 0, 0, 0, 0, time.Local)
+	// Determine the end month
+	endMonth := startMonth
+	if match[4] != "" {
+		if m, ok := parseMonth(match[4]); ok {
+			endMonth = m
+		}
+	}
+
+	startYear := p.year
+	startDate := time.Date(startYear, startMonth, startDay, 0, 0, 0, 0, time.Local)
 
 	var endDate time.Time
-	if endMonth != month {
+	if endMonth != startMonth {
 		// Cross-month range
-		endYear := p.year
-		if endMonth < month {
+		endYear := startYear
+		if endMonth < startMonth {
 			endYear++ // Next year
 		}
 		endDate = time.Date(endYear, endMonth, endDay, 0, 0, 0, 0, time.Local)
 	} else if endDay < startDay {
 		// Cross-month without explicit month
-		nextMonth := month + 1
-		nextYear := p.year
+		nextMonth := startMonth + 1
+		nextYear := startYear
 		if nextMonth > time.December {
 			nextMonth = time.January
 			nextYear++
 		}
 		endDate = time.Date(nextYear, nextMonth, endDay, 0, 0, 0, 0, time.Local)
 	} else {
-		endDate = time.Date(p.year, endMonth, endDay, 0, 0, 0, 0, time.Local)
+		endDate = time.Date(startYear, endMonth, endDay, 0, 0, 0, 0, time.Local)
 	}
 
 	return DateParseResult{

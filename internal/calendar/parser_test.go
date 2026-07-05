@@ -104,26 +104,26 @@ func TestAcademicCalendar_GetCurrentWeek(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		events   []AcademicEvent
+		weeks    []Week
 		expected int
 	}{
 		{
 			name: "current week found",
-			events: []AcademicEvent{
-				{Date: now.Add(-24 * time.Hour), Week: 3},
-				{Date: now, Week: 4, EndDate: new(now.Add(7 * 24 * time.Hour))},
+			weeks: []Week{
+				{Number: 3, Start: now.Add(-14 * 24 * time.Hour), End: now.Add(-7 * 24 * time.Hour)},
+				{Number: 4, Start: now.Add(-1 * time.Hour), End: now.Add(7 * 24 * time.Hour)},
 			},
 			expected: 4,
 		},
 		{
-			name:     "no events",
-			events:   []AcademicEvent{},
+			name:     "no weeks",
+			weeks:    []Week{},
 			expected: 0,
 		},
 		{
 			name: "no current week",
-			events: []AcademicEvent{
-				{Date: now.Add(-10 * 24 * time.Hour), Week: 1},
+			weeks: []Week{
+				{Number: 1, Start: now.Add(-21 * 24 * time.Hour), End: now.Add(-14 * 24 * time.Hour)},
 			},
 			expected: 0,
 		},
@@ -131,7 +131,7 @@ func TestAcademicCalendar_GetCurrentWeek(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cal := &AcademicCalendar{Events: tt.events}
+			cal := &AcademicCalendar{Weeks: tt.weeks}
 			if got := cal.GetCurrentWeek(); got != tt.expected {
 				t.Errorf("GetCurrentWeek() = %d, want %d", got, tt.expected)
 			}
@@ -140,6 +140,7 @@ func TestAcademicCalendar_GetCurrentWeek(t *testing.T) {
 }
 
 func TestAcademicCalendar_GetProgressPercentage(t *testing.T) {
+	now := time.Now()
 	tests := []struct {
 		name        string
 		totalWeeks  int
@@ -157,8 +158,8 @@ func TestAcademicCalendar_GetProgressPercentage(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			cal := &AcademicCalendar{
 				TotalWeeks: tt.totalWeeks,
-				Events: []AcademicEvent{
-					{Date: time.Now(), Week: tt.currentWeek, EndDate: new(time.Now().Add(7 * 24 * time.Hour))},
+				Weeks: []Week{
+					{Number: tt.currentWeek, Start: now.Add(-1 * time.Hour), End: now.Add(7 * 24 * time.Hour)},
 				},
 			}
 			got := cal.GetProgressPercentage()
@@ -644,6 +645,7 @@ func TestParser_ParseIndividualDates(t *testing.T) {
 
 func TestParser_ParseDateRange(t *testing.T) {
 	p := NewParser(CalendarStandard)
+	p.year = 2026
 
 	tests := []struct {
 		name       string
@@ -651,13 +653,18 @@ func TestParser_ParseDateRange(t *testing.T) {
 		month      time.Month
 		startDay   int
 		startMonth time.Month
+		startYear  int
 		endDay     int
 		endMonth   time.Month
+		endYear    int
 	}{
-		{"same month range", "7 - 13", time.June, 7, time.June, 13, time.June},
-		{"same month with en-dash", "14 – 20", time.June, 14, time.June, 20, time.June},
-		{"cross-month range", "28 - 4 Jul", time.June, 28, time.June, 4, time.July},
-		{"cross-month no explicit month", "30 - 5", time.June, 30, time.June, 5, time.July},
+		{"same month range", "7 - 13", time.June, 7, time.June, 2026, 13, time.June, 2026},
+		{"same month with en-dash", "14 – 20", time.June, 14, time.June, 2026, 20, time.June, 2026},
+		{"cross-month range", "28 - 4 Jul", time.June, 28, time.June, 2026, 4, time.July, 2026},
+		{"cross-month no explicit month", "30 - 5", time.June, 30, time.June, 2026, 5, time.July, 2026},
+		{"cross-year range with explicit month", "28 - 3 Jan", time.December, 28, time.December, 2026, 3, time.January, 2027},
+		{"cross-year range no explicit month", "30 - 5", time.December, 30, time.December, 2026, 5, time.January, 2027},
+		{"cross-month range with en-dash and explicit month", "28 Sep – 4 Oct", time.September, 28, time.September, 2026, 4, time.October, 2026},
 	}
 
 	for _, tt := range tests {
@@ -671,12 +678,12 @@ func TestParser_ParseDateRange(t *testing.T) {
 				t.Fatal("expected IsRange to be true")
 			}
 
-			if result.StartDate.Day() != tt.startDay || result.StartDate.Month() != tt.startMonth {
-				t.Errorf("start date = %v, want day %d in %v", result.StartDate, tt.startDay, tt.startMonth)
+			if result.StartDate.Day() != tt.startDay || result.StartDate.Month() != tt.startMonth || result.StartDate.Year() != tt.startYear {
+				t.Errorf("start date = %v, want %02d-%v-%d", result.StartDate, tt.startDay, tt.startMonth, tt.startYear)
 			}
 
-			if result.EndDate.Day() != tt.endDay || result.EndDate.Month() != tt.endMonth {
-				t.Errorf("end date = %v, want day %d in %v", result.EndDate, tt.endDay, tt.endMonth)
+			if result.EndDate.Day() != tt.endDay || result.EndDate.Month() != tt.endMonth || result.EndDate.Year() != tt.endYear {
+				t.Errorf("end date = %v, want %02d-%v-%d", result.EndDate, tt.endDay, tt.endMonth, tt.endYear)
 			}
 		})
 	}
