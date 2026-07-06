@@ -1,6 +1,5 @@
-minimumReleaseAge: 4320
+minimumReleaseAge: 4320 # 3 days
 trustPolicy: no-downgrade
-trustPolicyExclude:
-  - semver@6.3.1
+trustPolicyIgnoreAfter: 525600 # 1 year
 allowBuilds:
   msw: true
