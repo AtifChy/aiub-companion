@@ -1,4 +1,6 @@
 minimumReleaseAge: 4320 # 3 days
+minimumReleaseAgeExclude:
+  - "@wailsio/runtime"
 trustPolicy: no-downgrade
 trustPolicyIgnoreAfter: 525600 # 1 year
 allowBuilds:
