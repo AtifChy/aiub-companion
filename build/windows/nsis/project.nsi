@@ -21,9 +21,9 @@ Unicode true
 ####
 ## !define INFO_PROJECTNAME    "my-project" # Default "aiub-companion"
 ## !define INFO_COMPANYNAME    "My Company" # Default "AIUB Companion"
-## !define INFO_PRODUCTNAME    "My Product Name" # Default "My Product"
+## !define INFO_PRODUCTNAME    "My Product Name" # Default "AIUB Companion"
 ## !define INFO_PRODUCTVERSION "1.0.0"     # Default "0.1.0"
-## !define INFO_COPYRIGHT      "(c) Now, AIUB Companion" # Default "(c) 2026, AIUB Companion"
+## !define INFO_COPYRIGHT      "(c) Now, My Company" # Default "(c) 2026, AIUB Companion"
 ###
 ## !define PRODUCT_EXECUTABLE  "Application.exe"      # Default "${INFO_PROJECTNAME}.exe"
 ## !define UNINST_KEY_NAME     "UninstKeyInRegistry"  # Default "${INFO_COMPANYNAME}${INFO_PRODUCTNAME}"

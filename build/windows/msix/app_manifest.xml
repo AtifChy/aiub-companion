@@ -9,12 +9,12 @@
   
   <Identity 
     Name="io.github.atifchy.aiub-companion"
-    Publisher="CN=AIUB Companion"
+    Publisher="AIUB Companion"
     Version="0.1.0.0" 
     ProcessorArchitecture="x64" />
   
   <Properties>
-    <DisplayName>My Product</DisplayName>
+    <DisplayName>AIUB Companion</DisplayName>
     <PublisherDisplayName>AIUB Companion</PublisherDisplayName>
     <Description>AIUB Companion</Description>
     <Logo>Assets\StoreLogo.png</Logo>
@@ -31,7 +31,7 @@
   <Applications>
     <Application Id="io.github.atifchy.aiub-companion" Executable="aiub-companion.exe" EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements
-        DisplayName="My Product"
+        DisplayName="AIUB Companion"
         Description="AIUB Companion"
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"

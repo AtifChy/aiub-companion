@@ -7,9 +7,9 @@
     <key>CFBundleIdentifier</key>
     <string>io.github.atifchy.aiub-companion</string>
     <key>CFBundleName</key>
-    <string>My Product</string>
+    <string>AIUB Companion</string>
     <key>CFBundleDisplayName</key>
-    <string>My Product</string>
+    <string>AIUB Companion</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>

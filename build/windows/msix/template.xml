@@ -10,11 +10,11 @@
     <Installer
         Path="aiub-companion.exe"
         Arguments=""
-        InstallLocation="C:\Program Files\AIUB Companion\My Product">
+        InstallLocation="C:\Program Files\AIUB Companion\AIUB Companion">
     </Installer>
     <PackageInformation
-        PackageName="My Product"
-        PackageDisplayName="My Product"
+        PackageName="AIUB Companion"
+        PackageDisplayName="AIUB Companion"
         PublisherName="CN=AIUB Companion"
         PublisherDisplayName="AIUB Companion"
         Version="0.1.0.0"
@@ -27,7 +27,7 @@
             <Application
                 Id="io.github.atifchy.aiub-companion"
                 Description="AIUB Companion"
-                DisplayName="My Product"
+                DisplayName="AIUB Companion"
                 ExecutableName="aiub-companion.exe"
                 EntryPoint="Windows.FullTrustApplication">
                 
@@ -41,7 +41,7 @@
         </Dependencies>
         <Properties>
             <Framework>false</Framework>
-            <DisplayName>My Product</DisplayName>
+            <DisplayName>AIUB Companion</DisplayName>
             <PublisherDisplayName>AIUB Companion</PublisherDisplayName>
             <Description>AIUB Companion</Description>
             <Logo>Assets\AppIcon.png</Logo>
