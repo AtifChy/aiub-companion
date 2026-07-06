@@ -1,9 +1,5 @@
 import { useSettings } from "@/components/settings-provider";
-import {
-  ThemeProvider as NextThemesProvider,
-  useTheme as useNextTheme,
-} from "next-themes";
-import { useEffect } from "react";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 export type Theme = "dark" | "light" | "system";
 
@@ -17,26 +13,16 @@ export function ThemeProvider({
   defaultTheme = "system",
 }: ThemeProviderProps) {
   const { config } = useSettings();
-  const theme = (config.theme as Theme) || defaultTheme;
+  const theme = config.theme as Theme;
 
   return (
     <NextThemesProvider
       attribute="class"
       defaultTheme={defaultTheme}
       enableSystem
+      forcedTheme={theme}
     >
-      <ThemeSync theme={theme} />
       {children}
     </NextThemesProvider>
   );
-}
-
-function ThemeSync({ theme }: { theme: Theme }) {
-  const { setTheme } = useNextTheme();
-
-  useEffect(() => {
-    setTheme(theme);
-  }, [theme, setTheme]);
-
-  return null;
 }

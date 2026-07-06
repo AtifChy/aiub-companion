@@ -10,6 +10,7 @@ import { parseWailsError } from "@/lib/error";
 import { logger } from "@/lib/logger";
 import { type Config } from "@bindings/config";
 import { Service as LogService } from "@bindings/log";
+import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { type Updater } from "use-mutative";
 
@@ -68,6 +69,7 @@ function SettingsView({
   updateConfig,
   resetConfig,
 }: SettingsViewProps) {
+  const { setTheme } = useTheme();
   return (
     <div className="animate-in fade-in-10 flex h-full flex-col duration-200">
       <div className="scrollbar-thumb-accent m-0.5 min-h-0 flex-1 scrollbar-thin scrollbar-gutter-both space-y-8 overflow-y-auto p-6 lg:p-10">
@@ -90,7 +92,10 @@ function SettingsView({
                 value={config.theme}
                 onValueChange={(v) => {
                   updateConfig((draft) => {
-                    if (draft) draft.theme = v;
+                    if (draft) {
+                      draft.theme = v;
+                      setTheme(v);
+                    }
                   });
                 }}
               />
