@@ -6,7 +6,9 @@ on:
       - "v*" # Trigger on any version tag, e.g., v0.1.0
   workflow_dispatch:
 
-permissions: write-all
+permissions:
+  contents: write
+  pull-requests: read
 
 jobs:
   build:
@@ -88,6 +90,8 @@ jobs:
         with:
           config: .cliff.toml
           args: --latest
+        env:
+          GITHUB_REPO: ${{ github.repository }}
 
       - name: Create Github Release
         uses: softprops/action-gh-release@v3
@@ -114,6 +118,7 @@ jobs:
           args: --verbose
         env:
           OUTPUT: CHANGELOG.md
+          GITHUB_REPO: ${{ github.repository }}
 
       - name: Commit Changelog
         run: |
