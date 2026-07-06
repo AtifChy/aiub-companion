@@ -88,7 +88,6 @@ jobs:
         with:
           config: .cliff.toml
           args: --latest
-          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Github Release
         uses: softprops/action-gh-release@v3
