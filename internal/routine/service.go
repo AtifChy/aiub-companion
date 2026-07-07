@@ -3,13 +3,10 @@ package routine
 import (
 	"context"
 	"fmt"
-	"regexp"
-	"strings"
 
 	"aiub-companion/internal/database"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
-	"github.com/xuri/excelize/v2"
 )
 
 type Service struct {
@@ -27,139 +24,33 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 }
 
 func (s *Service) ImportOfferedCourses(ctx context.Context, filePath string) error {
-	file, err := excelize.OpenFile(filePath)
+	rows, err := readRows(filePath)
 	if err != nil {
-		return fmt.Errorf("open file: %w", err)
+		return err
 	}
-	defer func() { _ = file.Close() }()
 
-	sheetName := file.GetSheetName(0)
-	rows, err := file.GetRows(sheetName)
+	courses, err := parseCourses(rows)
 	if err != nil {
-		return fmt.Errorf("get rows: %w", err)
+		return err
 	}
 
-	var (
-		idx         columnIndex
-		headerFound bool
-		courses     []Course
-	)
+	return s.saveCourses(ctx, courses)
+}
 
-	courses = make([]Course, 0, len(rows))
-
-	sectionRe := regexp.MustCompile(`\s*\[[A-Z0-9]+\]$`)
-
-	for _, row := range rows {
-		if !headerFound {
-			if idx, headerFound = parseColumnIndex(row); !headerFound {
-				continue
-			}
-			continue
-		}
-
-		get := func(col int) string {
-			if col < 0 || col >= len(row) {
-				return ""
-			}
-			return strings.TrimSpace(row[col])
-		}
-
-		classID := get(idx.classID)
-		courseTitle := get(idx.courseTitle)
-		courseTitle = sectionRe.ReplaceAllString(courseTitle, "")
-		section := get(idx.section)
-
-		if classID == "" || courseTitle == "" || section == "" {
-			continue
-		}
-
-		courses = append(courses, Course{
-			ClassID:     classID,
-			CourseCode:  get(idx.courseCode),
-			CourseTitle: courseTitle,
-			Section:     section,
-			Faculty:     get(idx.faculty),
-			Type:        get(idx.classType),
-			Day:         get(idx.day),
-			StartTime:   get(idx.startTime),
-			EndTime:     get(idx.endTime),
-			Room:        get(idx.room),
-			Department:  get(idx.department),
-		})
-	}
-
+func (s *Service) saveCourses(ctx context.Context, courses []Course) error {
 	return s.repo.WithTx(ctx, func(txRepo Repository) error {
-		err := txRepo.ClearOfferedCourses(ctx)
-		if err != nil {
+		if err := txRepo.ClearOfferedCourses(ctx); err != nil {
 			return fmt.Errorf("clear offered courses: %w", err)
 		}
+
 		for i := range courses {
-			err := txRepo.InsertOfferedCourse(ctx, courses[i])
-			if err != nil {
+			if err := txRepo.InsertOfferedCourse(ctx, courses[i]); err != nil {
 				return fmt.Errorf("insert offered course: %w", err)
 			}
 		}
+
 		return nil
 	})
-}
-
-type columnIndex struct {
-	classID     int
-	courseCode  int
-	courseTitle int
-	section     int
-	faculty     int
-	classType   int
-	day         int
-	startTime   int
-	endTime     int
-	room        int
-	department  int
-}
-
-func parseColumnIndex(headerRow []string) (columnIndex, bool) {
-	idx := columnIndex{
-		classID:     -1,
-		courseCode:  -1,
-		courseTitle: -1,
-		section:     -1,
-		faculty:     -1,
-		classType:   -1,
-		day:         -1,
-		startTime:   -1,
-		endTime:     -1,
-		room:        -1,
-		department:  -1,
-	}
-
-	for col, cell := range headerRow {
-		switch strings.ToLower(strings.TrimSpace(cell)) {
-		case "class id":
-			idx.classID = col
-		case "course code":
-			idx.courseCode = col
-		case "course title":
-			idx.courseTitle = col
-		case "section":
-			idx.section = col
-		case "faculty":
-			idx.faculty = col
-		case "type":
-			idx.classType = col
-		case "day":
-			idx.day = col
-		case "start time":
-			idx.startTime = col
-		case "end time":
-			idx.endTime = col
-		case "room":
-			idx.room = col
-		case "department":
-			idx.department = col
-		}
-	}
-
-	return idx, idx.classID != -1 && idx.courseTitle != -1
 }
 
 func (s *Service) GetUserRoutine(ctx context.Context) ([]Course, error) {
