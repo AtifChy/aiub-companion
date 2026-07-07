@@ -28,10 +28,10 @@ const (
 type AcademicEvent struct {
 	Date          time.Time     `json:"date"`
 	EndDate       *time.Time    `json:"endDate,omitempty"`
-	Week          int           `json:"week,omitempty"`
-	WeekDateRange string        `json:"weekDateRange,omitempty"`
 	Title         string        `json:"title"`
 	Category      EventCategory `json:"category"`
+	WeekDateRange string        `json:"weekDateRange,omitempty"`
+	Week          int           `json:"week,omitempty"`
 }
 
 func (e *AcademicEvent) IsPast() bool {
@@ -54,9 +54,9 @@ func (e *AcademicEvent) DaysUntil() int {
 }
 
 type Week struct {
-	Number int       `json:"number"`
 	Start  time.Time `json:"start"`
 	End    time.Time `json:"end"`
+	Number int       `json:"number"`
 }
 
 type AcademicCalendar struct {

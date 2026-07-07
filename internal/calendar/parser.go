@@ -38,8 +38,8 @@ var (
 )
 
 type Parser struct {
-	year    int
 	calType CalendarType
+	year    int
 }
 
 func NewParser(calendarType CalendarType) *Parser {
@@ -67,12 +67,12 @@ func (p *Parser) Parse(table *html.Node, semester string) (*AcademicCalendar, er
 }
 
 type rowspanState struct {
-	month     time.Month
-	week      int
-	dateRange string
 	counters  map[int]int    // column index to remaining rowspan count
 	values    map[int]string // column index to value
 	weeks     map[int]Week   // week number to Week struct
+	dateRange string
+	month     time.Month
+	week      int
 }
 
 func (p *Parser) parseTable(doc *html.Node) (events []AcademicEvent, weeks []Week, totalWeek int, err error) {
@@ -245,10 +245,10 @@ func (p *Parser) parseRow(row *html.Node, state *rowspanState) ([]AcademicEvent,
 }
 
 type DateParseResult struct {
-	Dates     []time.Time
-	IsRange   bool
 	StartDate time.Time
 	EndDate   time.Time
+	Dates     []time.Time
+	IsRange   bool
 }
 
 func (p *Parser) parseDayColumn(dayStr string, month time.Month, fallbackRange string) DateParseResult {
@@ -482,19 +482,19 @@ func cleanTitle(text string) string {
 }
 
 type categoryRule struct {
-	keywords []string
 	category EventCategory
+	keywords []string
 }
 
 var categoryRules = []categoryRule{
-	{[]string{"payment", "installment"}, EventPayment},
-	{[]string{"permit", "collection for"}, EventDeadline},
-	{[]string{"deadline", "last date"}, EventDeadline},
-	{[]string{"result", "grade"}, EventAcademic},
-	{[]string{"lab", "laboratory"}, EventLab},
-	{[]string{"exam", "midterm", "final"}, EventExam},
-	{[]string{"registration"}, EventRegistration},
-	{[]string{"break", "holiday"}, EventBreak},
+	{EventPayment, []string{"payment", "installment"}},
+	{EventDeadline, []string{"permit", "collection for"}},
+	{EventDeadline, []string{"deadline", "last date"}},
+	{EventAcademic, []string{"result", "grade"}},
+	{EventLab, []string{"lab", "laboratory"}},
+	{EventExam, []string{"exam", "midterm", "final"}},
+	{EventRegistration, []string{"registration"}},
+	{EventBreak, []string{"break", "holiday"}},
 }
 
 func categorizeEvent(title string) EventCategory {

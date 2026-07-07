@@ -15,13 +15,15 @@ import (
 const cacheTTL = 24 * time.Hour
 
 type Service struct {
-	db     *database.Service
+	db *database.Service
+
 	repo   Repository
 	client Client
 
-	mu        sync.RWMutex
 	cache     map[CalendarType]*AcademicCalendar
 	cacheTime map[CalendarType]time.Time
+
+	mu sync.RWMutex
 }
 
 func NewService(db *database.Service) *Service {

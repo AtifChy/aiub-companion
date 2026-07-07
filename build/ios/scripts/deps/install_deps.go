@@ -18,13 +18,13 @@ import (
 )
 
 type Dependency struct {
-	Name       string
 	CheckFunc  func() (bool, string) // Returns (success, details)
-	Required   bool
-	InstallCmd []string
+	Name       string
 	InstallMsg string
 	SuccessMsg string
 	FailureMsg string
+	InstallCmd []string
+	Required   bool
 }
 
 func main() {
