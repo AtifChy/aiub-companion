@@ -1,3 +1,20 @@
+## [0.2.50] - 2026-07-07
+
+### 🚜 Refactor
+
+- Simplify theme provider logic [`9255a7e`](https://github.com/AtifChy/aiub-companion/commit/9255a7ea605d6d3a93ce7ef3288aa01c226d87d1)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(ci)* Add github token to release workflow [`681ddff`](https://github.com/AtifChy/aiub-companion/commit/681ddff88a67724198345923b6527eb97907ef19)
+- *(ci)* Add changelog generation workflow [`c1ea487`](https://github.com/AtifChy/aiub-companion/commit/c1ea48759e481e4204de25d8ee3bc5787b9d9052)
+- Update changelog [skip ci] [`0408c54`](https://github.com/AtifChy/aiub-companion/commit/0408c541bd88c90b1ccff96bebec2efc369737f7)
+- Comment out unsupported platforms [`2785700`](https://github.com/AtifChy/aiub-companion/commit/27857005a23eae7a8ca9c347d4cf1e5b7ce8cd44)
+- *(ci)* Define github repo for release workflow [`e956f8c`](https://github.com/AtifChy/aiub-companion/commit/e956f8cfa26550bc80d6b26fc99479fb55d21170)
+
+### ◀️ Revert
+
+- *(ci)* Add github token to release workflow [`839410b`](https://github.com/AtifChy/aiub-companion/commit/839410b5b240d7bdd8ac954f165ba6f74c385f30)
 ## [0.2.42] - 2026-07-06
 
 ### 🚀 Features
