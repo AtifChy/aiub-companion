@@ -248,7 +248,7 @@ func (s *scraper) fetchHTML(ctx context.Context, url string) (*html.Node, error)
 }
 
 func (s *scraper) fetchWithRetriable(ctx context.Context, url string) (*html.Node, bool, error) {
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, false, fmt.Errorf("new request: %w", err)
 	}

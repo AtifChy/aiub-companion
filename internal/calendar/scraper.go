@@ -27,7 +27,7 @@ func (s *scraper) ScrapeCalendar(ctx context.Context, calType CalendarType) (tab
 		return nil, "", fmt.Errorf("unsupported calendar type: %s", calType)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "GET", calendarURL, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, calendarURL, nil)
 	if err != nil {
 		return nil, "", fmt.Errorf("new request: %w", err)
 	}
