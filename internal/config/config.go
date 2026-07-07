@@ -116,9 +116,7 @@ func save(path string, cfg *Config) error {
 	if err != nil {
 		return fmt.Errorf("create temp file: %w", err)
 	}
-	defer func() {
-		_ = os.Remove(tmp.Name())
-	}()
+	defer func() { _ = os.Remove(tmp.Name()) }()
 
 	if _, err := tmp.Write(data); err != nil {
 		_ = tmp.Close()

@@ -34,9 +34,7 @@ func main() {
 		os.Exit(1)
 	}
 	slog.SetDefault(logger.Logger)
-	defer func() {
-		_ = logger.Close()
-	}()
+	defer func() { _ = logger.Close() }()
 
 	// Initialize Services
 	notificationService := notifications.New()

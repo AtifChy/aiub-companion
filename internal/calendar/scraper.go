@@ -40,9 +40,7 @@ func (s *scraper) ScrapeCalendar(ctx context.Context, calType CalendarType) (tab
 	if err != nil {
 		return nil, "", fmt.Errorf("fetching calendar: %w", err)
 	}
-	defer func() {
-		_ = resp.Body.Close()
-	}()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, "", fmt.Errorf("unexpected status %d", resp.StatusCode)
