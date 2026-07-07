@@ -91,7 +91,7 @@ func main() {
 		SingleInstance: &application.SingleInstanceOptions{
 			UniqueID: config.ID,
 			AdditionalData: map[string]string{
-				"launchTime": time.Now().Format(time.RFC1123),
+				"launchTime": time.Now().Format(time.DateTime),
 			},
 		},
 		Logger: logger.Logger,
