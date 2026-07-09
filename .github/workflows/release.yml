@@ -20,8 +20,10 @@ jobs:
         include:
           - platform: windows-latest
             os: windows
+            arch: amd64
           - platform: ubuntu-latest
             os: linux
+            arch: amd64
 
     steps:
       - name: Checkout Code
@@ -60,6 +62,39 @@ jobs:
 
       - name: Build & Package Installer
         run: wails3 package
+
+      - name: Rename Windows Artifacts
+        if: matrix.os == 'windows'
+        shell: pwsh
+        run: |
+          Rename-Item `
+            "bin/${{ github.event.repository.name }}-${{ matrix.arch }}-installer.exe" `
+            "${{ github.event.repository.name }}-${{ matrix.os }}-${{ matrix.arch }}-installer.exe"
+
+          Rename-Item `
+            "bin/${{ github.event.repository.name }}.exe" `
+            "${{ github.event.repository.name }}-${{ matrix.os }}-${{ matrix.arch }}.exe"
+
+      - name: Rename Linux Artifacts
+        if: matrix.os == 'linux'
+        run: |
+          for file in bin/*; do
+            ext="${file##*.}"
+            case "$ext" in
+              AppImage)
+                mv "$file" "bin/${{ github.event.repository.name }}-${{ matrix.os }}-${{ matrix.arch }}.AppImage"
+                ;;
+              deb)
+                mv "$file" "bin/${{ github.event.repository.name }}-${{ matrix.os }}-${{ matrix.arch }}.deb"
+                ;;
+              rpm)
+                mv "$file" "bin/${{ github.event.repository.name }}-${{ matrix.os }}-${{ matrix.arch }}.rpm"
+                ;;
+              zst)
+                mv "$file" "bin/${{ github.event.repository.name }}-${{ matrix.os }}-${{ matrix.arch }}.pkg.tar.zst"
+                ;;
+            esac
+          done
 
       - name: Upload Workflow Artifacts
         uses: actions/upload-artifact@v7
