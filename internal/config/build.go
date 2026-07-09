@@ -8,9 +8,13 @@ const (
 )
 
 var (
-	Version   = "dev"
-	BuildTime = "unknown"
+	version   = "dev"
+	buildTime = "unknown"
 )
+
+func Version() string {
+	return version
+}
 
 type BuildInfo struct {
 	Name      string `json:"name"`
@@ -21,7 +25,7 @@ type BuildInfo struct {
 func (s *Service) GetBuildInfo() BuildInfo {
 	return BuildInfo{
 		Name:      DisplayName,
-		Version:   Version,
-		BuildTime: BuildTime,
+		Version:   version,
+		BuildTime: buildTime,
 	}
 }

@@ -26,7 +26,7 @@ tasks:
           EXTRA_TAGS: "{{.EXTRA_TAGS}}"
           OBFUSCATED: "{{.OBFUSCATED}}"
           GARBLE_ARGS: "{{.GARBLE_ARGS}}"
-          LDFLAGS: "-X {{.MODULE}}/internal/config.Version={{.VERSION}} -X {{.MODULE}}/internal/config.BuildTime={{.BUILD_TIME}}"
+          LDFLAGS: "-X {{.MODULE}}/internal/config.version={{.VERSION}} -X {{.MODULE}}/internal/config.buildTime={{.BUILD_TIME}}"
     vars:
       # Default to CGO_ENABLED=0 if not explicitly set
       CGO_ENABLED: '{{.CGO_ENABLED | default "0"}}'

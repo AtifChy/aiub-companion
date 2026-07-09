@@ -29,7 +29,7 @@ tasks:
           EXTRA_TAGS: "{{.EXTRA_TAGS}}"
           OBFUSCATED: "{{.OBFUSCATED}}"
           GARBLE_ARGS: "{{.GARBLE_ARGS}}"
-          LDFLAGS: "-X {{.MODULE}}/internal/config.Version={{.VERSION}} -X {{.MODULE}}/internal/config.BuildTime={{.BUILD_TIME}}"
+          LDFLAGS: "-X {{.MODULE}}/internal/config.version={{.VERSION}} -X {{.MODULE}}/internal/config.buildTime={{.BUILD_TIME}}"
     vars:
       DEFAULT_OUTPUT: "{{.BIN_DIR}}/{{.APP_NAME}}"
       OUTPUT: "{{ .OUTPUT | default .DEFAULT_OUTPUT }}"
