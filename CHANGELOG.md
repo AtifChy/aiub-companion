@@ -1,3 +1,22 @@
+## [0.2.61] - 2026-07-09
+
+### 🚜 Refactor
+
+- *(routine)* Extract course parsing logic [`8a6163d`](https://github.com/AtifChy/aiub-companion/commit/8a6163d79b6199b4f75a4ab58f05cccffdde3971)
+- Update launch time format [`ee5a1c7`](https://github.com/AtifChy/aiub-companion/commit/ee5a1c73e1453124b4bcbdab5ac55bf1d52ee431)
+- Use http method constant [`4a3e415`](https://github.com/AtifChy/aiub-companion/commit/4a3e415da2cbfc2e026d126ef9ea75b3c613c394)
+- Simplify window maximize logic [`274cb91`](https://github.com/AtifChy/aiub-companion/commit/274cb91074ea81f1ae3a4f0b687952601209cbfb)
+- Use lowercase build info variables [`84812f1`](https://github.com/AtifChy/aiub-companion/commit/84812f16dae24a1a5398360b7c4db7fcea809712)
+
+### 🎨 Styling
+
+- Reorder struct fields [`1e82eda`](https://github.com/AtifChy/aiub-companion/commit/1e82eda624da4582128cd32620d1f3ac269770a5)
+- Format defer calls concisely [`0de0a05`](https://github.com/AtifChy/aiub-companion/commit/0de0a05f7ddb8d9a7928dd716bfc39b0dcae1eaa)
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelog [skip ci] [`e55d86c`](https://github.com/AtifChy/aiub-companion/commit/e55d86c7c67eb4716ceb2163e26ed6e7eb92772b)
+- *(ci)* Rename release artifacts by os and arch [`f7facb7`](https://github.com/AtifChy/aiub-companion/commit/f7facb727fe87e36fef2bc5e7a524aae8eae442c)
 ## [0.2.50] - 2026-07-07
 
 ### 🚜 Refactor
