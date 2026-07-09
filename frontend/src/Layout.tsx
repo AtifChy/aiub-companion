@@ -15,7 +15,6 @@ import { sections } from "@/lib/routes";
 import { Window } from "@wailsio/runtime";
 import { Suspense, useEffect, useState } from "react";
 import { matchPath, Outlet, useLocation } from "react-router";
-import { toast } from "sonner";
 
 export default function Layout() {
   const location = useLocation();
@@ -58,30 +57,11 @@ export default function Layout() {
 function Header({ section, label }: { section: string; label: string }) {
   const [maximized, setMaximized] = useState(false);
 
-  useEffect(() => {
-    const handleResize = () => {
-      Window.IsMaximised()
-        .then(setMaximized)
-        .catch((err) => {
-          toast.error("Failed to get window state", {
-            description: (err as Error).message,
-          });
-        });
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  useEffect(() => void Window.IsMaximised().then(setMaximized), []);
 
   const toggleMaximize = async () => {
-    if (maximized) {
-      await Window.UnMaximise();
-    } else {
-      await Window.Maximise();
-    }
-    setMaximized(!maximized);
+    await Window.ToggleMaximise();
+    setMaximized(await Window.IsMaximised());
   };
 
   return (
