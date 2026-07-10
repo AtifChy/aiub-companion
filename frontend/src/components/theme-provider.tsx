@@ -8,10 +8,7 @@ type ThemeProviderProps = {
   defaultTheme?: Theme;
 };
 
-export function ThemeProvider({
-  children,
-  defaultTheme = "system",
-}: ThemeProviderProps) {
+export function ThemeProvider({ children, defaultTheme = "system" }: ThemeProviderProps) {
   const { config } = useSettings();
   const theme = config.theme as Theme;
 

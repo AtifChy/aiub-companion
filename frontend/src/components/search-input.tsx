@@ -40,7 +40,7 @@ export function SearchInput({
 
   return (
     <div className={cn("relative", className)} {...props}>
-      <SearchIcon className="text-muted-foreground absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2" />
+      <SearchIcon className="absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
       <Input
         ref={innerRef}
         value={value}
@@ -50,19 +50,19 @@ export function SearchInput({
         className="pr-7 pl-8 text-xs"
       />
       {searching ? (
-        <Loader2Icon className="text-muted-foreground absolute top-1/2 right-2 size-3.5 -translate-y-1/2 animate-spin" />
+        <Loader2Icon className="absolute top-1/2 right-2 size-3.5 -translate-y-1/2 animate-spin text-muted-foreground" />
       ) : value ? (
         (showClearButton ?? true) && (
           <Button
             variant="ghost"
             onClick={() => onValueChange("")}
-            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 h-auto -translate-y-1/2 p-0.5"
+            className="absolute top-1/2 right-2 h-auto -translate-y-1/2 p-0.5 text-muted-foreground hover:text-foreground"
           >
             <XIcon strokeWidth="2.5" className="size-3.5" />
           </Button>
         )
       ) : (
-        <div className="text-secondary-foreground/40 border-secondary/10 bg-secondary/20 absolute top-1/2 right-2 -translate-y-1/2 rounded-sm border p-1">
+        <div className="absolute top-1/2 right-2 -translate-y-1/2 rounded-sm border border-secondary/10 bg-secondary/20 p-1 text-secondary-foreground/40">
           <SlashIcon strokeWidth="4" className="size-2.5" />
         </div>
       )}

@@ -32,13 +32,13 @@ export function WindowControls({
   }, []);
 
   return (
-    <div className="wails-no-drag ml-auto flex items-center gap-1">
+    <div className="ml-auto flex items-center gap-1 wails-no-drag">
       {onMinimize && (
         <Button
           onClick={onMinimize}
           variant="ghost"
           className={cn(
-            "dark:hover:bg-primary/20 flex size-7 items-center justify-center rounded-sm transition-colors",
+            "flex size-7 items-center justify-center rounded-sm transition-colors dark:hover:bg-primary/20",
             focused ? "text-foreground" : "text-muted-foreground",
           )}
         >
@@ -50,7 +50,7 @@ export function WindowControls({
           onClick={onMaximize}
           variant="ghost"
           className={cn(
-            "dark:hover:bg-primary/20 flex size-7 items-center justify-center rounded-sm transition-colors",
+            "flex size-7 items-center justify-center rounded-sm transition-colors dark:hover:bg-primary/20",
             focused ? "text-foreground" : "text-muted-foreground",
           )}
         >
@@ -66,7 +66,7 @@ export function WindowControls({
         variant="destructive"
         className={cn(
           "flex size-7 items-center justify-center rounded-sm transition-colors",
-          "dark:hover:text-destructive hover:text-destructive bg-transparent dark:bg-transparent",
+          "bg-transparent hover:text-destructive dark:bg-transparent dark:hover:text-destructive",
           focused ? "text-foreground" : "text-muted-foreground",
         )}
       >

@@ -64,14 +64,14 @@ export default function HelpPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <div className="bg-background animate-in fade-in-10 scrollbar-thumb-accent m-0.5 h-full scrollbar-thin scrollbar-gutter-both space-y-8 overflow-y-auto p-6 duration-200 lg:p-10">
+    <div className="m-0.5 h-full animate-in scrollbar-thin scrollbar-thumb-accent scrollbar-gutter-both space-y-8 overflow-y-auto bg-background p-6 duration-200 fade-in-10 lg:p-10">
       <Header />
 
       {/* FAQ Section */}
       <div className="space-y-4">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <h2 className="flex items-center gap-2 text-xl font-bold">
-            <HelpCircleIcon className="text-muted-foreground h-5 w-5" />
+            <HelpCircleIcon className="h-5 w-5 text-muted-foreground" />
             Frequently Asked Questions
           </h2>
 
@@ -97,9 +97,8 @@ function Header() {
   return (
     <div className="space-y-2">
       <h1 className="text-3xl font-bold tracking-tight">Help</h1>
-      <p className="text-muted-foreground text-sm">
-        Find answers, view quick guides, and get the most out of your AIUB
-        Companion.
+      <p className="text-sm text-muted-foreground">
+        Find answers, view quick guides, and get the most out of your AIUB Companion.
       </p>
     </div>
   );
@@ -120,7 +119,7 @@ function FAQList({ searchQuery }: { searchQuery: string }) {
   };
 
   return (
-    <div className="bg-card divide-y overflow-hidden rounded-lg border">
+    <div className="divide-y overflow-hidden rounded-lg border bg-card">
       {filteredFaqs.length > 0 ? (
         filteredFaqs.map((faq, idx) => (
           <FAQItem
@@ -131,7 +130,7 @@ function FAQList({ searchQuery }: { searchQuery: string }) {
           />
         ))
       ) : (
-        <div className="text-muted-foreground p-8 text-center">
+        <div className="p-8 text-center text-muted-foreground">
           No results found matching "{searchQuery}"
         </div>
       )}
@@ -149,7 +148,7 @@ function FAQItem({
   onExpand: () => void;
 }) {
   return (
-    <div className="hover:bg-muted/30 transition-colors">
+    <div className="transition-colors hover:bg-muted/30">
       <button
         type="button"
         onClick={onExpand}
@@ -160,13 +159,13 @@ function FAQItem({
           <span className="text-sm sm:text-base">{faq.question}</span>
         </div>
         {expanded ? (
-          <ChevronUpIcon className="text-muted-foreground size-4 shrink-0" />
+          <ChevronUpIcon className="size-4 shrink-0 text-muted-foreground" />
         ) : (
-          <ChevronDownIcon className="text-muted-foreground size-4 shrink-0" />
+          <ChevronDownIcon className="size-4 shrink-0 text-muted-foreground" />
         )}
       </button>
       {expanded && (
-        <div className="text-muted-foreground animate-in fade-in slide-in-from-top-1 px-4 pb-4 text-sm leading-relaxed duration-200">
+        <div className="animate-in px-4 pb-4 text-sm leading-relaxed text-muted-foreground duration-200 fade-in slide-in-from-top-1">
           {faq.answer}
         </div>
       )}
@@ -185,9 +184,7 @@ function Footer() {
             variant="outline"
             className="gap-2"
             onClick={() => {
-              Browser.OpenURL(
-                "https://github.com/atifchy/aiub-companion",
-              ).catch((err) =>
+              Browser.OpenURL("https://github.com/atifchy/aiub-companion").catch((err) =>
                 toast.error(`Failed to open URL`, {
                   description: err instanceof Error ? err.message : String(err),
                 }),
@@ -218,11 +215,9 @@ function Footer() {
       {/* Diagnostics Card */}
       <Card className="bg-muted/40">
         <CardContent className="flex gap-3">
-          <InfoIcon className="text-muted-foreground mt-0.5 h-5 w-5 shrink-0" />
-          <div className="text-muted-foreground space-y-1 text-xs">
-            <p className="text-foreground font-semibold">
-              App Diagnostics Information
-            </p>
+          <InfoIcon className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
+          <div className="space-y-1 text-xs text-muted-foreground">
+            <p className="font-semibold text-foreground">App Diagnostics Information</p>
             <p>Storage: Local SQLite / JSON files</p>
             <p>Configuration Path: AppData/Roaming/aiub-companion</p>
             <p>Logs level: Configurable via Settings page</p>
@@ -237,37 +232,25 @@ const getCategoryBadge = (category: string) => {
   switch (category) {
     case "routine":
       return (
-        <Badge
-          variant="secondary"
-          className="border-none bg-blue-500/10 text-blue-500"
-        >
+        <Badge variant="secondary" className="border-none bg-blue-500/10 text-blue-500">
           Routine
         </Badge>
       );
     case "notices":
       return (
-        <Badge
-          variant="secondary"
-          className="border-none bg-emerald-500/10 text-emerald-500"
-        >
+        <Badge variant="secondary" className="border-none bg-emerald-500/10 text-emerald-500">
           Notices
         </Badge>
       );
     case "settings":
       return (
-        <Badge
-          variant="secondary"
-          className="border-none bg-amber-500/10 text-amber-500"
-        >
+        <Badge variant="secondary" className="border-none bg-amber-500/10 text-amber-500">
           Settings
         </Badge>
       );
     default:
       return (
-        <Badge
-          variant="secondary"
-          className="border-none bg-purple-500/10 text-purple-500"
-        >
+        <Badge variant="secondary" className="border-none bg-purple-500/10 text-purple-500">
           General
         </Badge>
       );

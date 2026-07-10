@@ -57,11 +57,7 @@ function AppRouter() {
         <Route element={<Layout />}>
           <Route index element={<Navigate to={initialRoute.path} />} />
           {routes.map((route) => (
-            <Route
-              key={route.path}
-              path={route.path}
-              element={<route.component />}
-            />
+            <Route key={route.path} path={route.path} element={<route.component />} />
           ))}
         </Route>
 

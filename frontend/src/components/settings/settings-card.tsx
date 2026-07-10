@@ -20,11 +20,7 @@ interface SettingsCardProps {
   children: React.ReactNode;
 }
 
-export function SettingsCard({
-  title,
-  variant = "default",
-  children,
-}: SettingsCardProps) {
+export function SettingsCard({ title, variant = "default", children }: SettingsCardProps) {
   return (
     <Card size="sm" className="shadow-xs">
       <CardHeader className={cn("border-b", cardVariants({ variant }))}>

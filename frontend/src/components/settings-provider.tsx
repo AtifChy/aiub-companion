@@ -76,7 +76,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   if (!config) {
     return (
       <div className="flex h-screen w-screen items-center justify-center">
-        <Loader2Icon className="text-muted-foreground size-8 animate-spin" />
+        <Loader2Icon className="size-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -91,7 +91,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 // eslint-disable-next-line react-refresh/only-export-components
 export function useSettings() {
   const context = use(SettingsContext);
-  if (!context)
-    throw new Error("useSettings must be used within a SettingsProvider");
+  if (!context) throw new Error("useSettings must be used within a SettingsProvider");
   return context;
 }

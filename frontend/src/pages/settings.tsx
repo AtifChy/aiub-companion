@@ -21,12 +21,10 @@ const themeItems: Items<Theme> = ["light", "dark", "system"].map((v) => ({
   label: v.charAt(0).toUpperCase() + v.slice(1),
 }));
 
-const logLevelItems: Items<string> = ["DEBUG", "INFO", "WARNING", "ERROR"].map(
-  (v) => ({
-    value: v,
-    label: v.charAt(0) + v.slice(1).toLowerCase(),
-  }),
-);
+const logLevelItems: Items<string> = ["DEBUG", "INFO", "WARNING", "ERROR"].map((v) => ({
+  value: v,
+  label: v.charAt(0) + v.slice(1).toLowerCase(),
+}));
 
 const syncIntervalItems: Items<number> = [30, 60, 120, 180, 360].map((v) => ({
   value: v,
@@ -49,13 +47,7 @@ export default function SettingsPage() {
     );
   }
 
-  return (
-    <SettingsView
-      config={config}
-      updateConfig={setConfig}
-      resetConfig={resetConfig}
-    />
-  );
+  return <SettingsView config={config} updateConfig={setConfig} resetConfig={resetConfig} />;
 }
 
 interface SettingsViewProps {
@@ -64,18 +56,14 @@ interface SettingsViewProps {
   resetConfig: () => Promise<void>;
 }
 
-function SettingsView({
-  config,
-  updateConfig,
-  resetConfig,
-}: SettingsViewProps) {
+function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) {
   const { setTheme } = useTheme();
   return (
-    <div className="animate-in fade-in-10 flex h-full flex-col duration-200">
-      <div className="scrollbar-thumb-accent m-0.5 min-h-0 flex-1 scrollbar-thin scrollbar-gutter-both space-y-8 overflow-y-auto p-6 lg:p-10">
+    <div className="flex h-full animate-in flex-col duration-200 fade-in-10">
+      <div className="m-0.5 min-h-0 flex-1 scrollbar-thin scrollbar-thumb-accent scrollbar-gutter-both space-y-8 overflow-y-auto p-6 lg:p-10">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-          <p className="text-muted-foreground mt-2 text-sm">
+          <p className="mt-2 text-sm text-muted-foreground">
             Manage your app preferences and configurations
           </p>
         </div>
@@ -83,10 +71,7 @@ function SettingsView({
         <div className="grid gap-6">
           {/*Appearance*/}
           <SettingsCard title="Appearance">
-            <SettingRow
-              label="Theme"
-              description="Select your prefered color theme"
-            >
+            <SettingRow label="Theme" description="Select your prefered color theme">
               <SettingSelect
                 items={themeItems}
                 value={config.theme}
@@ -104,10 +89,7 @@ function SettingsView({
 
           {/*Notifications*/}
           <SettingsCard title="Notifications">
-            <SettingRow
-              label="Enable"
-              description="Show desktop alert for new notices"
-            >
+            <SettingRow label="Enable" description="Show desktop alert for new notices">
               <Switch
                 checked={config.notifications.enabled}
                 onCheckedChange={(v) =>
@@ -231,10 +213,7 @@ function SettingsView({
               />
             </SettingRow>
 
-            <SettingRow
-              label="Sidebar Open"
-              description="Keep the sidebar open on app start"
-            >
+            <SettingRow label="Sidebar Open" description="Keep the sidebar open on app start">
               <Switch
                 checked={config.launch.sidebar_open}
                 onCheckedChange={(v) =>

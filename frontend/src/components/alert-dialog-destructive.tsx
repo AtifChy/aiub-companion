@@ -29,9 +29,7 @@ export function AlertDialogDestructive({
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger
-        render={<Button variant="destructive">{label}</Button>}
-      />
+      <AlertDialogTrigger render={<Button variant="destructive">{label}</Button>} />
       <AlertDialogContent size="sm">
         <AlertDialogHeader>
           <AlertDialogMedia className="bg-destructive/10 text-destructive">

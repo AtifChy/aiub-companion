@@ -1,7 +1,4 @@
-import {
-  lazyWithPreload,
-  type PreloadableComponent,
-} from "@/lib/lazy-with-preload";
+import { lazyWithPreload, type PreloadableComponent } from "@/lib/lazy-with-preload";
 import {
   Bell,
   Calculator,
@@ -86,10 +83,7 @@ export const sections: Record<Section, RouteItem[]> = {
 
 export const routes = Object.values(sections)
   .flat()
-  .filter(
-    (item): item is RouteItem & { component: React.ComponentType } =>
-      !!item.component,
-  ) as [
+  .filter((item): item is RouteItem & { component: React.ComponentType } => !!item.component) as [
   RouteItem & { component: React.ComponentType },
   ...(RouteItem & { component: React.ComponentType })[],
 ];

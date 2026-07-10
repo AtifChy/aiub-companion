@@ -11,10 +11,7 @@ interface HorizontalFadeScrollProps {
   className?: string;
 }
 
-export function HorizontalFadeScroll({
-  children,
-  className,
-}: HorizontalFadeScrollProps) {
+export function HorizontalFadeScroll({ children, className }: HorizontalFadeScrollProps) {
   const [scrollState, setScrollState] = useState<ScrollState>({
     left: false,
     right: false,

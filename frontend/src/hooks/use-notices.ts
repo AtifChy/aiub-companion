@@ -55,18 +55,13 @@ export function useNotices(filter: NoticeFilters, selectedId: string | null) {
   useEffect(() => {
     const unsub = Events.On("notices:synced", (count) => {
       void queryClient.invalidateQueries({ queryKey: ["notices"] });
-      toast.success(
-        `${count.data} new notice${count.data !== 1 ? "s" : ""} synced`,
-      );
+      toast.success(`${count.data} new notice${count.data !== 1 ? "s" : ""} synced`);
     });
     return () => unsub();
   }, [queryClient]);
 
   const toggleRead = useToggleField("isRead", NoticeService.ToggleNoticeRead);
-  const togglePin = useToggleField(
-    "isPinned",
-    NoticeService.ToggleNoticePinned,
-  );
+  const togglePin = useToggleField("isPinned", NoticeService.ToggleNoticePinned);
 
   const readNotice = (id: string) => {
     void queryClient.fetchQuery(detailOptions(id)).then((detail) => {
@@ -93,8 +88,7 @@ function useToggleField(
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, next }: { id: string; next: boolean }) =>
-      mutationFn(id, next),
+    mutationFn: ({ id, next }: { id: string; next: boolean }) => mutationFn(id, next),
 
     onMutate: async ({ id, next }) => {
       await queryClient.cancelQueries({ queryKey: ["notices"] });
@@ -107,12 +101,10 @@ function useToggleField(
 
       queryClient.setQueriesData<Notice[]>(
         { queryKey: ["notices"] },
-        (old) =>
-          old?.map((n) => (n.id === id ? { ...n, [field]: next } : n)) ?? old,
+        (old) => old?.map((n) => (n.id === id ? { ...n, [field]: next } : n)) ?? old,
       );
-      queryClient.setQueriesData<Notice>(
-        { queryKey: ["noticeDetails", id] },
-        (old) => (old ? { ...old, [field]: next } : old),
+      queryClient.setQueriesData<Notice>({ queryKey: ["noticeDetails", id] }, (old) =>
+        old ? { ...old, [field]: next } : old,
       );
 
       return { oldList, oldDetail };

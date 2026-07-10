@@ -5,12 +5,7 @@ export interface WailsError {
 }
 
 function isWailsError(value: unknown): value is WailsError {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "message" in value &&
-    "kind" in value
-  );
+  return typeof value === "object" && value !== null && "message" in value && "kind" in value;
 }
 
 export function parseWailsError(raw: unknown): WailsError | null {

@@ -12,11 +12,7 @@ import {
 import { useDelayedLoading } from "@/hooks/use-delayed-loading";
 import { logger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
-import {
-  Service as CalendarService,
-  CalendarType,
-  type AcademicEvent,
-} from "@bindings/calendar";
+import { Service as CalendarService, CalendarType, type AcademicEvent } from "@bindings/calendar";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BookOpenIcon,
@@ -59,21 +55,18 @@ const CATEGORY_ICONS: Record<string, React.ElementType> = {
 export default function SemesterPage() {
   const queryClient = useQueryClient();
 
-  const [calendarType, setCalendarType] = useState<CalendarType>(
-    CalendarType.CalendarStandard,
-  );
+  const [calendarType, setCalendarType] = useState<CalendarType>(CalendarType.CalendarStandard);
   const [view, setView] = useState<"timeline" | "all">("timeline");
 
   const calendarQuery = useQuery({
     queryKey: ["calendar", calendarType],
     queryFn: async () => {
-      const [calendar, currentWeek, nextExam, upcomingEvents] =
-        await Promise.all([
-          CalendarService.GetAcademicCalendar(calendarType),
-          CalendarService.GetCurrentWeek(calendarType),
-          CalendarService.GetNextExam(calendarType),
-          CalendarService.GetUpcomingEvents(calendarType, 10),
-        ]);
+      const [calendar, currentWeek, nextExam, upcomingEvents] = await Promise.all([
+        CalendarService.GetAcademicCalendar(calendarType),
+        CalendarService.GetCurrentWeek(calendarType),
+        CalendarService.GetNextExam(calendarType),
+        CalendarService.GetUpcomingEvents(calendarType, 10),
+      ]);
       return { calendar, currentWeek, nextExam, upcomingEvents };
     },
   });
@@ -106,26 +99,22 @@ export default function SemesterPage() {
     if (!showLoading) return null;
     return (
       <div className="flex h-full items-center justify-center">
-        <Loader2Icon className="text-muted-foreground h-8 w-8 animate-spin" />
+        <Loader2Icon className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
-  const progress = calendar?.totalWeeks
-    ? (currentWeek / calendar.totalWeeks) * 100
-    : 0;
+  const progress = calendar?.totalWeeks ? (currentWeek / calendar.totalWeeks) * 100 : 0;
 
   return (
-    <div className="scrollbar-thumb-accent animate-in fade-in-10 m-0.5 h-full scrollbar-thin scrollbar-gutter-both overflow-auto duration-200">
+    <div className="m-0.5 h-full animate-in scrollbar-thin scrollbar-thumb-accent scrollbar-gutter-both overflow-auto duration-200 fade-in-10">
       <div className="space-y-6 p-6 lg:p-10">
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold">Semester Dashboard</h1>
             {calendar?.semester && (
-              <p className="text-muted-foreground text-sm capitalize">
-                {calendar.semester}
-              </p>
+              <p className="text-sm text-muted-foreground capitalize">{calendar.semester}</p>
             )}
           </div>
           <div className="flex items-center gap-2">
@@ -151,9 +140,7 @@ export default function SemesterPage() {
               onClick={() => mutate(calendarType)}
               disabled={isPending}
             >
-              <RefreshCwIcon
-                className={cn("h-4 w-4", isPending && "animate-spin")}
-              />
+              <RefreshCwIcon className={cn("h-4 w-4", isPending && "animate-spin")} />
             </Button>
           </div>
         </div>
@@ -162,17 +149,13 @@ export default function SemesterPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Current Week
-              </CardTitle>
-              <CalendarDaysIcon className="text-muted-foreground h-4 w-4" />
+              <CardTitle className="text-sm font-medium">Current Week</CardTitle>
+              <CalendarDaysIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                Week {currentWeek || "—"}
-              </div>
+              <div className="text-2xl font-bold">Week {currentWeek || "—"}</div>
               {calendar?.totalWeeks && (
-                <p className="text-muted-foreground text-xs">
+                <p className="text-xs text-muted-foreground">
                   of {calendar.totalWeeks} total weeks
                 </p>
               )}
@@ -181,28 +164,24 @@ export default function SemesterPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Semester Progress
-              </CardTitle>
-              <TrophyIcon className="text-muted-foreground h-4 w-4" />
+              <CardTitle className="text-sm font-medium">Semester Progress</CardTitle>
+              <TrophyIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{progress.toFixed(0)}%</div>
-              <Progress value={progress} className="*:bg-accent mt-2 h-2" />
+              <Progress value={progress} className="mt-2 h-2 *:bg-accent" />
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Next Exam</CardTitle>
-              <TargetIcon className="text-muted-foreground h-4 w-4" />
+              <TargetIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {nextExam ? nextExam.title : "—"}
-              </div>
+              <div className="text-2xl font-bold">{nextExam ? nextExam.title : "—"}</div>
               {nextExam?.date && (
-                <p className="text-muted-foreground text-xs">
+                <p className="text-xs text-muted-foreground">
                   {nextExam.date.toLocaleDateString()}
                 </p>
               )}
@@ -211,18 +190,12 @@ export default function SemesterPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Events
-              </CardTitle>
-              <BookOpenIcon className="text-muted-foreground h-4 w-4" />
+              <CardTitle className="text-sm font-medium">Total Events</CardTitle>
+              <BookOpenIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {calendar?.events?.length ?? 0}
-              </div>
-              <p className="text-muted-foreground text-xs">
-                events this semester
-              </p>
+              <div className="text-2xl font-bold">{calendar?.events?.length ?? 0}</div>
+              <p className="text-xs text-muted-foreground">events this semester</p>
             </CardContent>
           </Card>
         </div>
@@ -258,12 +231,10 @@ export default function SemesterPage() {
             {view === "timeline" ? (
               <div className="relative space-y-4">
                 {/* Timeline line */}
-                <div className="bg-border absolute top-2 bottom-2 left-[11px] w-px" />
+                <div className="absolute top-2 bottom-2 left-[11px] w-px bg-border" />
 
                 {upcomingEvents.length === 0 ? (
-                  <p className="text-muted-foreground py-8 text-center">
-                    No upcoming events
-                  </p>
+                  <p className="py-8 text-center text-muted-foreground">No upcoming events</p>
                 ) : (
                   upcomingEvents.map((event, idx) => (
                     <EventItem key={event.category + idx} event={event} />
@@ -279,9 +250,7 @@ export default function SemesterPage() {
                   >
                     <div className="space-y-1">
                       <p className="font-medium">{event.title}</p>
-                      <p className="text-muted-foreground text-sm">
-                        {formatEventDate(event)}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{formatEventDate(event)}</p>
                     </div>
                     <Badge
                       variant="outline"
@@ -307,8 +276,7 @@ export default function SemesterPage() {
 function EventItem({ event }: { event: AcademicEvent }) {
   const Icon = CATEGORY_ICONS[event.category] ?? BookOpenIcon;
   const style =
-    CATEGORY_STYLES[event.category] ??
-    "border-gray-500/20 bg-gray-500/10 text-gray-500";
+    CATEGORY_STYLES[event.category] ?? "border-gray-500/20 bg-gray-500/10 text-gray-500";
 
   return (
     <div className="relative flex gap-4 pl-8">
@@ -326,7 +294,7 @@ function EventItem({ event }: { event: AcademicEvent }) {
         <div className="flex items-start justify-between gap-2">
           <div className="space-y-1">
             <p className="leading-none font-medium">{event.title}</p>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-sm text-muted-foreground">
               {formatEventDate(event)}
               {event.week && ` • Week ${event.week}`}
             </p>

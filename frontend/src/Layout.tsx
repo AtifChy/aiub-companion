@@ -25,18 +25,15 @@ export default function Layout() {
         matchPath({ path: item.path, end: true }, location.pathname),
       );
       if (match) {
-        return {
-          section: key as keyof typeof sections,
-          label: match.label,
-        };
+        return { section: key as keyof typeof sections, label: match.label };
       }
     }
     return null;
   })();
 
   const { section, label } = breadcrumb ?? {
-    section: "Workspace",
-    label: "Unknown",
+    section: "workspace",
+    label: "unknown",
   };
 
   return (
@@ -67,7 +64,7 @@ function Header({ section, label }: { section: string; label: string }) {
   return (
     <header
       onDoubleClick={() => void toggleMaximize()}
-      className="wails-drag sticky top-0 z-50 flex h-11 shrink-0 items-center gap-2 border-b p-2 transition-[width,height] ease-linear"
+      className="sticky top-0 z-50 flex h-11 shrink-0 items-center gap-2 border-b p-2 transition-[width,height] ease-linear wails-drag"
     >
       <SidebarTrigger />
       <Separator

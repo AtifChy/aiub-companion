@@ -13,20 +13,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Separator } from "@/components/ui/separator";
 import { Toggle } from "@/components/ui/toggle";
 import { useDelayedLoading } from "@/hooks/use-delayed-loading";
-import {
-  useNotices,
-  useSync,
-  type Category,
-  type NoticeFilters,
-} from "@/hooks/use-notices";
+import { useNotices, useSync, type Category, type NoticeFilters } from "@/hooks/use-notices";
 import { logger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
 import type { Notice } from "@bindings/notice";
@@ -86,8 +77,10 @@ export default function NoticesPage() {
   const [filters, setFilters] = useState<NoticeFilters>(INITIAL_FILTERS);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const { listQuery, detailQuery, toggleRead, togglePin, readNotice } =
-    useNotices(filters, selectedId);
+  const { listQuery, detailQuery, toggleRead, togglePin, readNotice } = useNotices(
+    filters,
+    selectedId,
+  );
   const { syncing, sync } = useSync();
 
   const notices = listQuery.data ?? [];
@@ -103,11 +96,7 @@ export default function NoticesPage() {
 
   return (
     <ResizablePanelGroup orientation="horizontal" className="flex h-full">
-      <ResizablePanel
-        defaultSize="40%"
-        minSize="35%"
-        className="bg-card flex flex-col"
-      >
+      <ResizablePanel defaultSize="40%" minSize="35%" className="flex flex-col bg-card">
         <NoticeListToolbar
           filters={filters}
           onFilterChange={setFilters}
@@ -145,13 +134,8 @@ export default function NoticesPage() {
         <DetailView
           notice={detail}
           loading={detailQuery.isLoading}
-          onTogglePin={() =>
-            detail &&
-            togglePin.mutate({ id: detail.id, next: !detail.isPinned })
-          }
-          onToggleRead={() =>
-            detail && toggleRead.mutate({ id: detail.id, next: !detail.isRead })
-          }
+          onTogglePin={() => detail && togglePin.mutate({ id: detail.id, next: !detail.isPinned })}
+          onToggleRead={() => detail && toggleRead.mutate({ id: detail.id, next: !detail.isRead })}
         />
       </ResizablePanel>
     </ResizablePanelGroup>
@@ -202,7 +186,7 @@ function NoticeListToolbar({
               className={cn(
                 "cursor-pointer font-semibold capitalize",
                 filters.category !== cat &&
-                  "text-muted-foreground hover:text-foreground hover:border-foreground/20",
+                  "text-muted-foreground hover:border-foreground/20 hover:text-foreground",
               )}
             >
               {cat}
@@ -212,21 +196,17 @@ function NoticeListToolbar({
       </div>
 
       {/*list header*/}
-      <div className="text-muted-foreground flex items-center justify-between border-b px-2 py-1.5 text-[0.7rem]">
+      <div className="flex items-center justify-between border-b px-2 py-1.5 text-[0.7rem] text-muted-foreground">
         <span>
           {loading ? (
             "Loading…"
           ) : (
             <div className="flex h-0 items-center">
-              <span className="text-foreground font-semibold">
-                {noticeCount} notices
-              </span>
+              <span className="font-semibold text-foreground">{noticeCount} notices</span>
               {unreadCount > 0 && (
                 <>
                   <DotIcon />
-                  <span className="text-primary font-semibold">
-                    {unreadCount} unread
-                  </span>
+                  <span className="font-semibold text-primary">{unreadCount} unread</span>
                 </>
               )}
             </div>
@@ -240,9 +220,9 @@ function NoticeListToolbar({
                 render={
                   <Button variant="ghost" className="h-auto p-0.5">
                     {hasActiveFilters ? (
-                      <FilterXIcon className="fill-primary/20 text-primary size-3.5" />
+                      <FilterXIcon className="size-3.5 fill-primary/20 text-primary" />
                     ) : (
-                      <FilterIcon className="fill-foreground/20 size-3.5" />
+                      <FilterIcon className="size-3.5 fill-foreground/20" />
                     )}
                   </Button>
                 }
@@ -255,18 +235,13 @@ function NoticeListToolbar({
                   <DropdownMenuCheckboxItem
                     key={key}
                     checked={filters[key]}
-                    onCheckedChange={(v) =>
-                      onFilterChange({ ...filters, [key]: v })
-                    }
+                    onCheckedChange={(v) => onFilterChange({ ...filters, [key]: v })}
                   >
                     {key.charAt(0).toUpperCase() + key.slice(1)}
                   </DropdownMenuCheckboxItem>
                 ))}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  disabled={!hasActiveFilters}
-                  onClick={onFilterClear}
-                >
+                <DropdownMenuItem disabled={!hasActiveFilters} onClick={onFilterClear}>
                   Clear
                 </DropdownMenuItem>
               </DropdownMenuGroup>
@@ -274,15 +249,8 @@ function NoticeListToolbar({
           </DropdownMenu>
 
           <AppTooltip content="Sync notices">
-            <Button
-              variant="ghost"
-              onClick={onSync}
-              disabled={syncing}
-              className="h-auto p-0.5"
-            >
-              <RefreshCwIcon
-                className={cn("size-3.5", syncing && "animate-spin")}
-              />
+            <Button variant="ghost" onClick={onSync} disabled={syncing} className="h-auto p-0.5">
+              <RefreshCwIcon className={cn("size-3.5", syncing && "animate-spin")} />
             </Button>
           </AppTooltip>
         </div>
@@ -317,18 +285,16 @@ function NoticeList({
   if (loading) {
     return (
       <div className="flex h-32 items-center justify-center">
-        <Loader2Icon className="text-muted-foreground size-5 animate-spin" />
+        <Loader2Icon className="size-5 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-muted-foreground flex flex-col items-center gap-1 px-4 py-16 text-center">
+      <div className="flex flex-col items-center gap-1 px-4 py-16 text-center text-muted-foreground">
         <InboxIcon className="size-8 opacity-20" />
-        <p className="text-destructive text-xs font-semibold">
-          Failed to load notices
-        </p>
+        <p className="text-xs font-semibold text-destructive">Failed to load notices</p>
         <p className="text-[0.65rem] break-all">{error.message}</p>
         <Button
           variant="ghost"
@@ -344,7 +310,7 @@ function NoticeList({
 
   if (notices.length === 0) {
     return (
-      <div className="text-muted-foreground flex flex-col items-center gap-2 px-4 py-16 text-center">
+      <div className="flex flex-col items-center gap-2 px-4 py-16 text-center text-muted-foreground">
         <InboxIcon className="size-9 opacity-20" />
         <p className="text-xs">No notices found</p>
         {hasActiveFilters && (
@@ -362,7 +328,7 @@ function NoticeList({
   }
 
   return (
-    <div className="scrollbar-thumb-accent flex-1 scrollbar-thin overflow-y-auto">
+    <div className="flex-1 scrollbar-thin scrollbar-thumb-accent overflow-y-auto">
       {notices.map((notice) => (
         <NoticeListItem
           key={notice.id}
@@ -386,12 +352,7 @@ interface NoticeListItemProps {
   onTogglePin: (e: React.MouseEvent) => void;
 }
 
-function NoticeListItem({
-  notice,
-  selected,
-  onSelect,
-  onTogglePin,
-}: NoticeListItemProps) {
+function NoticeListItem({ notice, selected, onSelect, onTogglePin }: NoticeListItemProps) {
   return (
     <button
       type="button"
@@ -404,18 +365,16 @@ function NoticeListItem({
       }}
       tabIndex={0}
       className={cn(
-        "group animate-in fade-in slide-in-from-bottom-5 w-full cursor-pointer border-b p-3 text-left transition-colors duration-300",
-        "focus-visible:border-ring focus-visible:ring-ring/50 outline-none focus-visible:rounded focus-visible:border-b-transparent focus-visible:border-l-transparent focus-visible:ring-3 focus-visible:ring-inset",
+        "group w-full animate-in cursor-pointer border-b p-3 text-left transition-colors duration-300 slide-in-from-bottom-5 fade-in",
+        "outline-none focus-visible:rounded focus-visible:border-ring focus-visible:border-b-transparent focus-visible:border-l-transparent focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-inset",
         selected
-          ? "bg-primary/10 border-l-primary border-l-2"
-          : "hover:bg-muted/50 border-l-2 border-l-transparent",
+          ? "border-l-2 border-l-primary bg-primary/10"
+          : "border-l-2 border-l-transparent hover:bg-muted/50",
       )}
     >
       <div className="flex items-center justify-between gap-2">
         <div className="mb-1 flex items-center gap-1.5">
-          {!notice.isRead && (
-            <CircleIcon className="fill-primary text-primary size-1.5" />
-          )}
+          {!notice.isRead && <CircleIcon className="size-1.5 fill-primary text-primary" />}
           <Badge
             className={cn(
               "h-4 px-1.5 py-0 text-[0.6rem] font-semibold tracking-wider uppercase",
@@ -427,7 +386,7 @@ function NoticeListItem({
           {notice.isUrgent && (
             <Badge
               variant="destructive"
-              className="border-destructive/20 h-4 border px-1.5 py-0 text-[0.6rem] font-semibold tracking-wider uppercase"
+              className="h-4 border border-destructive/20 px-1.5 py-0 text-[0.6rem] font-semibold tracking-wider uppercase"
             >
               urgent
             </Badge>
@@ -439,19 +398,19 @@ function NoticeListItem({
             className={cn(
               "h-auto p-0.5 opacity-0 group-hover:opacity-100",
               notice.isPinned
-                ? "text-chart-4 hover:text-chart-4/50 opacity-100"
+                ? "text-chart-4 opacity-100 hover:text-chart-4/50"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
             {notice.isPinned ? (
-              <PinIcon className="fill-foreground/20 size-3" />
+              <PinIcon className="size-3 fill-foreground/20" />
             ) : (
-              <PinOffIcon className="fill-foreground/20 size-3" />
+              <PinOffIcon className="size-3 fill-foreground/20" />
             )}
           </Button>
         </div>
 
-        <span className="text-muted-foreground text-[0.65rem]">
+        <span className="text-[0.65rem] text-muted-foreground">
           {formatDate(notice.postedDate)}
         </span>
       </div>
@@ -459,18 +418,14 @@ function NoticeListItem({
       <p
         className={cn(
           "line-clamp-1 text-sm leading-snug",
-          notice.isRead
-            ? "text-muted-foreground font-medium"
-            : "text-foreground font-semibold",
+          notice.isRead ? "font-medium text-muted-foreground" : "font-semibold text-foreground",
         )}
       >
         {notice.fullTitle || notice.title}
       </p>
 
       {notice.summary && (
-        <p className="text-muted-foreground line-clamp-2 text-[0.7rem]">
-          {notice.summary}
-        </p>
+        <p className="line-clamp-2 text-[0.7rem] text-muted-foreground">{notice.summary}</p>
       )}
     </button>
   );
@@ -483,26 +438,21 @@ interface DetailViewProps {
   onToggleRead: () => void;
 }
 
-function DetailView({
-  notice,
-  loading,
-  onTogglePin,
-  onToggleRead,
-}: DetailViewProps) {
+function DetailView({ notice, loading, onTogglePin, onToggleRead }: DetailViewProps) {
   const showLoader = useDelayedLoading(loading);
 
   if (loading) {
     if (!showLoader) return null;
     return (
       <div className="flex h-full items-center justify-center">
-        <Loader2Icon className="text-muted-foreground size-10 animate-spin" />
+        <Loader2Icon className="size-10 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (!notice) {
     return (
-      <div className="text-muted-foreground flex h-full flex-col items-center justify-center gap-3">
+      <div className="flex h-full flex-col items-center justify-center gap-3 text-muted-foreground">
         <InboxIcon className="size-12 opacity-20" />
         <p className="text-sm">Select a notice to read it</p>
       </div>
@@ -511,7 +461,7 @@ function DetailView({
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div className="bg-card border-b px-6 py-4">
+      <div className="border-b bg-card px-6 py-4">
         <div className="flex flex-wrap items-center gap-2">
           <Badge
             className={cn(
@@ -542,21 +492,17 @@ function DetailView({
         </h1>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <span className="text-muted-foreground text-xs">
-            {formatDate(notice.postedDate)}
-          </span>
+          <span className="text-xs text-muted-foreground">{formatDate(notice.postedDate)}</span>
 
           <div className="flex items-center">
-            <AppTooltip
-              content={notice.isRead ? "Mark as unread" : "Mark as read"}
-            >
+            <AppTooltip content={notice.isRead ? "Mark as unread" : "Mark as read"}>
               <Toggle
                 pressed={notice.isRead}
                 onPressedChange={onToggleRead}
                 size="sm"
-                className="aria-pressed:hover:bg-muted aria-pressed:bg-transparent"
+                className="aria-pressed:bg-transparent aria-pressed:hover:bg-muted"
               >
-                <div className="group-aria-pressed/toggle:text-chart-3 hover:text-chart-3/50 flex items-center gap-1">
+                <div className="flex items-center gap-1 group-aria-pressed/toggle:text-chart-3 hover:text-chart-3/50">
                   {notice.isRead ? (
                     <CircleCheckBigIcon className="size-3.5" />
                   ) : (
@@ -570,9 +516,9 @@ function DetailView({
                 pressed={notice.isPinned}
                 onPressedChange={onTogglePin}
                 size="sm"
-                className="aria-pressed:hover:bg-muted aria-pressed:bg-transparent"
+                className="aria-pressed:bg-transparent aria-pressed:hover:bg-muted"
               >
-                <div className="*:fill-foreground/20 group-aria-pressed/toggle:text-chart-4 hover:text-chart-4/50 flex items-center gap-1">
+                <div className="flex items-center gap-1 *:fill-foreground/20 group-aria-pressed/toggle:text-chart-4 hover:text-chart-4/50">
                   {notice.isPinned ? (
                     <PinOffIcon className="size-3.5" />
                   ) : (
@@ -586,14 +532,12 @@ function DetailView({
                 variant="ghost"
                 className="hover:text-primary"
                 onClick={() =>
-                  void Browser.OpenURL("https://aiub.edu/" + notice.id).catch(
-                    (err) => {
-                      logger.error("Failed to open URL", err);
-                      toast.error("Failed to open URL", {
-                        description: (err as Error).message,
-                      });
-                    },
-                  )
+                  void Browser.OpenURL("https://aiub.edu/" + notice.id).catch((err) => {
+                    logger.error("Failed to open URL", err);
+                    toast.error("Failed to open URL", {
+                      description: (err as Error).message,
+                    });
+                  })
                 }
               >
                 <ExternalLinkIcon className="size-3.5" />
@@ -603,24 +547,22 @@ function DetailView({
         </div>
       </div>
 
-      <div className="scrollbar-thumb-accent m-0.5 scrollbar-thin overflow-y-auto px-6 py-5">
+      <div className="m-0.5 scrollbar-thin scrollbar-thumb-accent overflow-y-auto px-6 py-5">
         {notice.content ? (
           <div
-            className="prose prose-sm prose-custom dark:prose-invert prose-li:text-left mx-auto text-center"
+            className="mx-auto prose prose-sm text-center prose-custom dark:prose-invert prose-li:text-left"
             // react-doctor-disable-next-line react-doctor/dangerous-html-sink
             dangerouslySetInnerHTML={{ __html: notice.content }}
           />
         ) : (
-          <p className="text-muted-foreground text-sm italic">
-            No content available
-          </p>
+          <p className="text-sm text-muted-foreground italic">No content available</p>
         )}
 
         {notice.attachments?.length > 0 && (
           <div className="mt-4">
             <Separator className="mb-4" />
             <h3 className="mb-2.5 flex items-center gap-1.5 text-xs tracking-wider uppercase">
-              <PaperclipIcon className="text-primary size-3.5" />
+              <PaperclipIcon className="size-3.5 text-primary" />
               Attachments
             </h3>
             <div className="flex flex-col gap-1.5">
@@ -650,20 +592,16 @@ function AttachmentItem({ attachment }: AttachmentItemProps) {
   };
 
   return (
-    <div className="bg-muted/40 border-border hover:bg-muted flex justify-between rounded border px-3 py-2.5">
+    <div className="flex justify-between rounded border border-border bg-muted/40 px-3 py-2.5 hover:bg-muted">
       <div className="flex min-w-0 items-center gap-2">
-        <FileTextIcon className="text-primary size-3.5" />
-        <span className="truncate text-xs font-medium">
-          {attachment.label || "Attachment"}
-        </span>
+        <FileTextIcon className="size-3.5 text-primary" />
+        <span className="truncate text-xs font-medium">{attachment.label || "Attachment"}</span>
       </div>
       <div className="ml-3 flex shrink-0 items-center">
-        <AppTooltip
-          content={attachment.localPath ? "Open local file" : "Download"}
-        >
+        <AppTooltip content={attachment.localPath ? "Open local file" : "Download"}>
           <Button
             variant="ghost"
-            className="hover:text-muted-foreground h-auto p-0.5"
+            className="h-auto p-0.5 hover:text-muted-foreground"
             onClick={openUrl}
           >
             {attachment.localPath ? (

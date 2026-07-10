@@ -32,7 +32,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           size="lg"
           className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
         >
-          <div className="bg-sidebar-primary text-sidebar-primary-foreground flex size-8 items-center justify-center rounded-lg">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
             <CommandIcon size="6" />
           </div>
           <div className="flex flex-col gap-0.5 truncate leading-none group-data-[collapsible=icon]:hidden">
@@ -48,7 +48,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavGroup title="others" items={sections.others} />
       </SidebarContent>
       <SidebarFooter className="flex items-center truncate group-data-[collapsible=icon]:hidden">
-        <div className="text-muted-foreground flex items-center gap-1 text-xs">
+        <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <CopyrightIcon className="size-3" />
           {year} AIUB Companion
         </div>
