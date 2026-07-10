@@ -1,7 +1,7 @@
 import { useSettings } from "@/components/settings-provider";
 import { useDebounce } from "@/hooks/use-debounce";
 import { logger } from "@/lib/logger";
-import { Service as NoticeService, type Notice } from "@bindings/notice";
+import { Notice, Service as NoticeService } from "@bindings/notice";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Events } from "@wailsio/runtime";
 import { useEffect } from "react";
@@ -101,10 +101,12 @@ function useToggleField(
 
       queryClient.setQueriesData<Notice[]>(
         { queryKey: ["notices"] },
-        (old) => old?.map((n) => (n.id === id ? { ...n, [field]: next } : n)) ?? old,
+        (old) =>
+          old?.map((n) => (n.id === id ? Object.assign(new Notice(), n, { [field]: next }) : n)) ??
+          old,
       );
       queryClient.setQueriesData<Notice>({ queryKey: ["noticeDetails", id] }, (old) =>
-        old ? { ...old, [field]: next } : old,
+        old ? Object.assign(new Notice(), old, { [field]: next }) : old,
       );
 
       return { oldList, oldDetail };

@@ -458,7 +458,7 @@ function CourseCard({ course, onRemoveCourse }: CourseCardProps) {
         variant="destructive"
         size="icon"
         className="absolute right-3 bottom-3 h-8 w-8 rounded-md opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-        onClick={() => void onRemoveCourse(course.classID)}
+        onClick={() => onRemoveCourse(course.classID)}
       >
         <Trash2Icon className="size-4" />
       </Button>
