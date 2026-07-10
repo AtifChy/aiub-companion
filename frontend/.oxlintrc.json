@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["typescript", "unicorn", "oxc", "react"],
+  "plugins": ["eslint", "typescript", "unicorn", "oxc", "react", "react-perf", "promise"],
   "categories": {
     "correctness": "error"
   },
@@ -12,6 +12,8 @@
     "eslint-plugin-react-you-might-not-need-an-effect"
   ],
   "rules": {
+    "typescript/no-misused-promises": "error",
+
     // React Hooks
     "react-hooks-js/config": "error",
     "react-hooks-js/error-boundaries": "error",
