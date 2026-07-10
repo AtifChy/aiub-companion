@@ -54,6 +54,7 @@ const CATEGORIES: Category[] = [
 ];
 
 type AltCategory = Exclude<Category, "all">;
+
 const categoryStyles: Record<AltCategory, string> = {
   admission: "border-blue-500/20 bg-blue-500/10 text-blue-500",
   exam: "border-red-500/20 bg-red-500/10 text-red-500",
