@@ -5,6 +5,7 @@ const (
 	AppName     = "aiub-companion"
 	DisplayName = "AIUB Companion"
 	Description = "Desktop companion app for AIUB notices and tools"
+	Repo        = "atifchy/aiub-companion"
 )
 
 var (

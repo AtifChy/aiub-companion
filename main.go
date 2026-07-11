@@ -14,6 +14,7 @@ import (
 	"aiub-companion/internal/log"
 	"aiub-companion/internal/notice"
 	"aiub-companion/internal/routine"
+	"aiub-companion/internal/updater"
 	"aiub-companion/internal/worker"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
@@ -38,6 +39,7 @@ func main() {
 
 	// Initialize Services
 	notificationService := notifications.New()
+	updaterService := updater.NewService(config.Version(), config.Repo)
 
 	databaseService := database.NewService()
 	configService := config.NewService()
@@ -64,6 +66,7 @@ func main() {
 
 			// Independent
 			application.NewService(notificationService),
+			application.NewService(updaterService),
 
 			// Domain logic
 			application.NewService(noticeService),
@@ -94,6 +97,10 @@ func main() {
 		},
 		Logger: logger.Logger,
 	})
+
+	if err := updaterService.Init(app); err != nil {
+		slog.Error("Failed to initialize updater service", "error", err)
+	}
 
 	// Run the application. This blocks until the application has been exited.
 	err = app.Run()
