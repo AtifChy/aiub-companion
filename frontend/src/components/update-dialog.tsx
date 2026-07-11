@@ -116,8 +116,8 @@ function Markdown({ children }: { children: string }) {
   return (
     <div
       className={cn(
-        "prose prose-sm prose-custom select-none dark:prose-invert",
-        "prose-a:rounded-sm prose-a:bg-primary/10 prose-a:px-1 prose-a:no-underline [&_a_code]:before:content-none [&_a_code]:after:content-none",
+        "prose prose-sm prose-custom select-text dark:prose-invert",
+        "prose-a:no-underline prose-code:rounded-sm prose-code:bg-primary/10 prose-code:px-1 [&_code]:before:content-none [&_code]:after:content-none",
       )}
       dangerouslySetInnerHTML={{ __html: html }}
     />
