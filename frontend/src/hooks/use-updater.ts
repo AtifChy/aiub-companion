@@ -26,8 +26,8 @@ export function useUpdater() {
 
   const install = useMutation({
     mutationFn: async () => {
-      await UpdaterService.DownloadAndInstallUpdate();
-      await UpdaterService.Restart();
+      await UpdaterService.DownloadUpdate();
+      await UpdaterService.InstallUpdate();
     },
     onError: (err) => {
       logger.error("Error installing update:", err);

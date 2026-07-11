@@ -93,7 +93,7 @@ func (s *Service) CheckForUpdates(ctx context.Context) (*Release, error) {
 	}, nil
 }
 
-func (s *Service) DownloadAndInstallUpdate(ctx context.Context) error {
+func (s *Service) DownloadUpdate(ctx context.Context) error {
 	app := application.Get()
 
 	if app == nil || app.Updater == nil {
@@ -108,7 +108,7 @@ func (s *Service) DownloadAndInstallUpdate(ctx context.Context) error {
 	return nil
 }
 
-func (s *Service) Restart(ctx context.Context) error {
+func (s *Service) InstallUpdate(ctx context.Context) error {
 	app := application.Get()
 
 	if app == nil || app.Updater == nil {
