@@ -53,11 +53,11 @@ export function useNotices(filter: NoticeFilters, selectedId: string | null) {
   });
 
   useEffect(() => {
-    const unsub = Events.On("notices:synced", (count) => {
+    const unsubscribe = Events.On("notices:synced", (count) => {
       void queryClient.invalidateQueries({ queryKey: ["notices"] });
       toast.success(`${count.data} new notice${count.data !== 1 ? "s" : ""} synced`);
     });
-    return () => unsub();
+    return unsubscribe;
   }, [queryClient]);
 
   const toggleRead = useToggleField("isRead", NoticeService.ToggleNoticeRead);
