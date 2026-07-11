@@ -7,14 +7,13 @@ import { type Theme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { UpdateDialog } from "@/components/update-dialog";
+import { useUpdater } from "@/hooks/use-updater";
 import { parseWailsError } from "@/lib/error";
 import { logger } from "@/lib/logger";
 import { type Config } from "@bindings/config";
 import { Service as LogService } from "@bindings/log";
-import { Release, Service as UpdaterService } from "@bindings/updater";
 import { System } from "@wailsio/runtime";
 import { useTheme } from "next-themes";
-import { useState } from "react";
 import { toast } from "sonner";
 import { type Updater } from "use-mutative";
 
@@ -62,46 +61,7 @@ interface SettingsViewProps {
 
 function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) {
   const { setTheme } = useTheme();
-
-  const [checking, setChecking] = useState(false);
-  const [installing, setInstalling] = useState(false);
-  const [latestRelease, setLatestRelease] = useState<Release | null>(null);
-  const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
-
-  const handleCheckUpdate = async () => {
-    setChecking(true);
-    try {
-      const release = await UpdaterService.CheckForUpdates();
-      if (release) {
-        setLatestRelease(release);
-        setUpdateDialogOpen(true);
-      } else {
-        toast.info("You are using the latest version");
-      }
-    } catch (err) {
-      logger.error("Failed to check for updates", err);
-      toast.error("Failed to check for updates");
-    } finally {
-      setChecking(false);
-    }
-  };
-
-  const handleInstallUpdate = async () => {
-    setInstalling(true);
-    try {
-      toast.info("Installing update...");
-
-      await UpdaterService.DownloadAndInstallUpdate();
-
-      await UpdaterService.Restart();
-    } catch (err) {
-      logger.error("Failed to install update", err);
-      toast.error("Failed to install update");
-
-      setInstalling(false);
-      setUpdateDialogOpen(false);
-    }
-  };
+  const { release, dialogOpen, setDialogOpen, check, install } = useUpdater();
 
   return (
     <div className="flex h-full animate-in flex-col duration-200 fade-in-10">
@@ -281,12 +241,8 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
               </SettingRow>
 
               <SettingRow label="Check for Updates" description="Manually check for updates">
-                <Button
-                  variant="outline"
-                  disabled={checking}
-                  onClick={() => void handleCheckUpdate()}
-                >
-                  {checking ? "Checking..." : "Check Now"}
+                <Button variant="outline" disabled={check.isPending} onClick={() => check.mutate()}>
+                  {check.isPending ? "Checking..." : "Check Now"}
                 </Button>
               </SettingRow>
             </SettingsCard>
@@ -346,11 +302,11 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
       </div>
 
       <UpdateDialog
-        open={updateDialogOpen}
-        onOpenChange={setUpdateDialogOpen}
-        release={latestRelease}
-        onClick={() => void handleInstallUpdate()}
-        downloading={installing}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        release={release}
+        onClick={() => install.mutate()}
+        downloading={install.isPending}
       />
     </div>
   );
