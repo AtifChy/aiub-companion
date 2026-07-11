@@ -6,11 +6,15 @@ import { SettingSelect } from "@/components/settings/settings-select";
 import { type Theme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { UpdateDialog } from "@/components/update-dialog";
 import { parseWailsError } from "@/lib/error";
 import { logger } from "@/lib/logger";
 import { type Config } from "@bindings/config";
 import { Service as LogService } from "@bindings/log";
+import { Release, Service as UpdaterService } from "@bindings/updater";
+import { System } from "@wailsio/runtime";
 import { useTheme } from "next-themes";
+import { useState } from "react";
 import { toast } from "sonner";
 import { type Updater } from "use-mutative";
 
@@ -58,6 +62,47 @@ interface SettingsViewProps {
 
 function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) {
   const { setTheme } = useTheme();
+
+  const [checking, setChecking] = useState(false);
+  const [installing, setInstalling] = useState(false);
+  const [latestRelease, setLatestRelease] = useState<Release | null>(null);
+  const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
+
+  const handleCheckUpdate = async () => {
+    setChecking(true);
+    try {
+      const release = await UpdaterService.CheckForUpdates();
+      if (release) {
+        setLatestRelease(release);
+        setUpdateDialogOpen(true);
+      } else {
+        toast.info("You are using the latest version");
+      }
+    } catch (err) {
+      logger.error("Failed to check for updates", err);
+      toast.error("Failed to check for updates");
+    } finally {
+      setChecking(false);
+    }
+  };
+
+  const handleInstallUpdate = async () => {
+    setInstalling(true);
+    try {
+      toast.info("Installing update...");
+
+      await UpdaterService.DownloadAndInstallUpdate();
+
+      await UpdaterService.Restart();
+    } catch (err) {
+      logger.error("Failed to install update", err);
+      toast.error("Failed to install update");
+
+      setInstalling(false);
+      setUpdateDialogOpen(false);
+    }
+  };
+
   return (
     <div className="flex h-full animate-in flex-col duration-200 fade-in-10">
       <div className="m-0.5 min-h-0 flex-1 scrollbar-thin scrollbar-thumb-accent scrollbar-gutter-both space-y-8 overflow-y-auto p-6 lg:p-10">
@@ -226,11 +271,32 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
             </SettingRow>
           </SettingsCard>
 
+          {System.IsWindows() && (
+            <SettingsCard title="Updates">
+              <SettingRow
+                label="Auto Check for Updates"
+                description="Automatically check for updates"
+              >
+                <Switch className="cursor-pointer" />
+              </SettingRow>
+
+              <SettingRow label="Check for Updates" description="Manually check for updates">
+                <Button
+                  variant="outline"
+                  disabled={checking}
+                  onClick={() => void handleCheckUpdate()}
+                >
+                  {checking ? "Checking..." : "Check Now"}
+                </Button>
+              </SettingRow>
+            </SettingsCard>
+          )}
+
           {/*Advanced*/}
           <SettingsCard title="Advanced">
             <SettingRow
               label="Log Level"
-              description="Ammount of information logged by the application"
+              description="Amount of information logged by the application"
             >
               <SettingSelect
                 items={logLevelItems}
@@ -278,6 +344,14 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
           </SettingsCard>
         </div>
       </div>
+
+      <UpdateDialog
+        open={updateDialogOpen}
+        onOpenChange={setUpdateDialogOpen}
+        release={latestRelease}
+        onClick={() => void handleInstallUpdate()}
+        downloading={installing}
+      />
     </div>
   );
 }
