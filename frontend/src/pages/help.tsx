@@ -1,7 +1,6 @@
 import { SearchInput } from "@/components/search-input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Browser } from "@wailsio/runtime";
 import {
@@ -10,7 +9,6 @@ import {
   ExternalLinkIcon,
   GitBranchIcon,
   HelpCircleIcon,
-  InfoIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -211,19 +209,6 @@ function Footer() {
           </Button>
         </div>
       </div>
-
-      {/* Diagnostics Card */}
-      <Card className="bg-muted/40">
-        <CardContent className="flex gap-3">
-          <InfoIcon className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
-          <div className="space-y-1 text-xs text-muted-foreground">
-            <p className="font-semibold text-foreground">App Diagnostics Information</p>
-            <p>Storage: Local SQLite / JSON files</p>
-            <p>Configuration Path: AppData/Roaming/aiub-companion</p>
-            <p>Logs level: Configurable via Settings page</p>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
