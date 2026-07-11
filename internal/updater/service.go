@@ -26,10 +26,15 @@ func NewService(currentVersion, githubRepo string) *Service {
 
 //wails:ignore
 func (s *Service) Init(app *application.App) error {
+	token := os.Getenv("GITHUB_TOKEN")
+	if token != "" {
+		slog.Info("Using GitHub token for updater")
+	}
+
 	gh, err := github.New(github.Config{
 		Repository: s.githubRepo,
 		Prerelease: false,
-		Token:      os.Getenv("GITHUB_TOKEN"),
+		Token:      token,
 	})
 	if err != nil {
 		return fmt.Errorf("github provider: %w", err)
