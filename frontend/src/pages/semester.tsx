@@ -107,7 +107,7 @@ export default function SemesterPage() {
   const progress = calendar?.totalWeeks ? (currentWeek / calendar.totalWeeks) * 100 : 0;
 
   return (
-    <div className="m-0.5 h-full animate-in scrollbar-thin scrollbar-thumb-accent scrollbar-gutter-both overflow-auto duration-200 fade-in-10">
+    <div className="mr-0.5 h-full animate-in scrollbar-thin scrollbar-thumb-accent scrollbar-gutter-both overflow-auto duration-200 fade-in-10">
       <div className="space-y-6 p-6 lg:p-10">
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

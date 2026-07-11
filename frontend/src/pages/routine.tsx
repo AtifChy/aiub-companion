@@ -134,7 +134,7 @@ export default function RoutinePage() {
   };
 
   return (
-    <div className="m-0.5 flex h-full animate-in scrollbar-thin scrollbar-thumb-accent scrollbar-gutter-both flex-col gap-6 overflow-auto p-6 duration-200 fade-in-10 lg:p-10">
+    <div className="mr-0.5 flex h-full animate-in scrollbar-thin scrollbar-thumb-accent scrollbar-gutter-both flex-col gap-6 overflow-auto p-6 duration-200 fade-in-10 lg:p-10">
       <RoutineHeader onImport={handleImportCourses} />
 
       {routine && routine.length > 0 && !loading && <RoutineStats stats={stats} />}

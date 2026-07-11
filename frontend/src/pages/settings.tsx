@@ -65,7 +65,7 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
 
   return (
     <div className="flex h-full animate-in flex-col duration-200 fade-in-10">
-      <div className="m-0.5 min-h-0 flex-1 scrollbar-thin scrollbar-thumb-accent scrollbar-gutter-both space-y-8 overflow-y-auto p-6 lg:p-10">
+      <div className="mr-0.5 min-h-0 flex-1 scrollbar-thin scrollbar-thumb-accent scrollbar-gutter-both space-y-8 overflow-y-auto p-6 lg:p-10">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
           <p className="mt-2 text-sm text-muted-foreground">

@@ -548,7 +548,7 @@ function DetailView({ notice, loading, onTogglePin, onToggleRead }: DetailViewPr
         </div>
       </div>
 
-      <div className="m-0.5 scrollbar-thin scrollbar-thumb-accent overflow-y-auto px-6 py-5">
+      <div className="mr-0.5 scrollbar-thin scrollbar-thumb-accent overflow-y-auto px-6 py-5">
         {notice.content ? (
           <div
             className="mx-auto prose prose-sm text-center prose-custom dark:prose-invert prose-li:text-left"
