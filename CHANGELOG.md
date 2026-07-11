@@ -1,3 +1,24 @@
+## [0.2.75] - 2026-07-11
+
+### 🚀 Features
+
+- *(updater)* Add updater service [`c5f406f`](https://github.com/AtifChy/aiub-companion/commit/c5f406f1b978a54f368a1dc8650b4501e52a444b)
+- *(main)* Initialize updater service [`0798665`](https://github.com/AtifChy/aiub-companion/commit/0798665f49703c37f2b257b3144db41fe2a03c81)
+- *(frontend:updater)* Add update dialog and functionality [`1906203`](https://github.com/AtifChy/aiub-companion/commit/19062034d07f9247c1a3fa775ab1a8053fccdeea)
+
+### 🚜 Refactor
+
+- Apply linting rules to frontend [`f00184c`](https://github.com/AtifChy/aiub-companion/commit/f00184c3d47ffba8d68a306e4f8cda021af75671)
+- *(notices)* Rename event unsubscribe variable [`f2a668c`](https://github.com/AtifChy/aiub-companion/commit/f2a668ccce5153b03ad6fe8fcd44d351a2d9d00f)
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelog [skip ci] [`a905fba`](https://github.com/AtifChy/aiub-companion/commit/a905fba94f59c8cb80bfdca2ac40731a3ba86c16)
+- Switch to `oxfmt` for formatting [`45c4835`](https://github.com/AtifChy/aiub-companion/commit/45c48350c9257ed9d09b3b042011366b8d012206)
+- *(fmt)* Apply `oxfmt` formatting on frontend files [`122dac8`](https://github.com/AtifChy/aiub-companion/commit/122dac86e72367013a87a9e0de136863c3036e03)
+- *(lint)* Switch from `eslint` to `oxlint` [`3f7901a`](https://github.com/AtifChy/aiub-companion/commit/3f7901a2f70be86b392e8eff82d81aada417b3ef)
+- *(lint)* Add oxlint plugins and rules [`1e8e8c6`](https://github.com/AtifChy/aiub-companion/commit/1e8e8c66c84e1689f6045fee04347ace435185b0)
+- *(lint)* Update linting rules [`e8ea743`](https://github.com/AtifChy/aiub-companion/commit/e8ea743d64b0f196bfb152683f914b1b0e7aa930)
 ## [0.2.61] - 2026-07-09
 
 ### 🚜 Refactor
