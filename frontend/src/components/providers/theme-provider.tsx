@@ -1,4 +1,4 @@
-import { useSettings } from "@/components/settings-provider";
+import { useSettings } from "@/components/providers/settings-provider";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 export type Theme = "dark" | "light" | "system";

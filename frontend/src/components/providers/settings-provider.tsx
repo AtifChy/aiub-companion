@@ -1,5 +1,5 @@
+import { Button } from "@/components/ui/button";
 import { logger } from "@/lib/logger";
-import { Button } from "@base-ui/react";
 import { Service as ConfigService, type Config } from "@bindings/config";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2Icon } from "lucide-react";
