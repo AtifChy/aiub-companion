@@ -179,9 +179,9 @@ func (q *Queries) InsertNotice(ctx context.Context, arg InsertNoticeParams) (int
 	return result.RowsAffected()
 }
 
-const searchNoticesWithState = `-- name: SearchNoticesWithState :many
+const listNoticesWithState = `-- name: ListNoticesWithState :many
 SELECT
-  n.id, n.title, n.summary, n.full_title, n.content, n.posted_date, n.category, n.is_cached, n.is_urgent, n.source_order, n.created_at, n.updated_at,
+  n.id, n.title, n.summary, n.full_title, n.content, n.posted_date, n.category, n.is_cached, n.is_urgent, n.source_order,
   COALESCE(s.is_pinned, 0) AS is_pinned,
   COALESCE(s.is_read, 0) AS is_read
 FROM
@@ -190,40 +190,33 @@ FROM
 WHERE
   (
     CAST(?1 AS TEXT) IS NULL
-    OR n.rowid IN (
-      SELECT rowid FROM notices_fts WHERE notices_fts = ?1
-    )
+    OR n.category = ?1
   )
   AND (
-    CAST(?2 AS TEXT) IS NULL
-    OR n.category = ?2
+    CAST(?2 AS BOOL) IS NULL
+    OR n.is_urgent = ?2
   )
   AND (
     CAST(?3 AS BOOL) IS NULL
-    OR n.is_urgent = ?3
+    OR COALESCE(s.is_pinned, 0) = ?3
   )
   AND (
     CAST(?4 AS BOOL) IS NULL
-    OR COALESCE(s.is_pinned, 0) = ?4
-  )
-  AND (
-    CAST(?5 AS BOOL) IS NULL
-    OR COALESCE(s.is_read, 0) != ?5
+    OR COALESCE(s.is_read, 0) != ?4
   )
 ORDER BY
   n.posted_date DESC,
   n.source_order DESC
 `
 
-type SearchNoticesWithStateParams struct {
-	Search   sql.NullString
+type ListNoticesWithStateParams struct {
 	Category sql.NullString
 	Urgent   sql.NullBool
 	Pinned   sql.NullBool
 	Unread   sql.NullBool
 }
 
-type SearchNoticesWithStateRow struct {
+type ListNoticesWithStateRow struct {
 	ID          string
 	Title       string
 	Summary     sql.NullString
@@ -234,15 +227,12 @@ type SearchNoticesWithStateRow struct {
 	IsCached    int64
 	IsUrgent    int64
 	SourceOrder int64
-	CreatedAt   string
-	UpdatedAt   string
 	IsPinned    int64
 	IsRead      int64
 }
 
-func (q *Queries) SearchNoticesWithState(ctx context.Context, arg SearchNoticesWithStateParams) ([]SearchNoticesWithStateRow, error) {
-	rows, err := q.db.QueryContext(ctx, searchNoticesWithState,
-		arg.Search,
+func (q *Queries) ListNoticesWithState(ctx context.Context, arg ListNoticesWithStateParams) ([]ListNoticesWithStateRow, error) {
+	rows, err := q.db.QueryContext(ctx, listNoticesWithState,
 		arg.Category,
 		arg.Urgent,
 		arg.Pinned,
@@ -252,9 +242,9 @@ func (q *Queries) SearchNoticesWithState(ctx context.Context, arg SearchNoticesW
 		return nil, err
 	}
 	defer rows.Close()
-	items := []SearchNoticesWithStateRow{}
+	items := []ListNoticesWithStateRow{}
 	for rows.Next() {
-		var i SearchNoticesWithStateRow
+		var i ListNoticesWithStateRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
@@ -266,8 +256,6 @@ func (q *Queries) SearchNoticesWithState(ctx context.Context, arg SearchNoticesW
 			&i.IsCached,
 			&i.IsUrgent,
 			&i.SourceOrder,
-			&i.CreatedAt,
-			&i.UpdatedAt,
 			&i.IsPinned,
 			&i.IsRead,
 		); err != nil {

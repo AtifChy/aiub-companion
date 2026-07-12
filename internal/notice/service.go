@@ -68,8 +68,6 @@ func (s *Service) SyncNotices(ctx context.Context, count int) (int64, error) {
 
 func (s *Service) GetNotices(ctx context.Context, filter Filter) ([]Notice, error) {
 	rawQuery := strings.TrimSpace(filter.Search)
-	// TODO: Remove searching from the database layer
-	filter.Search = ""
 
 	notices, err := s.repo.GetNotices(ctx, filter)
 	if err != nil {

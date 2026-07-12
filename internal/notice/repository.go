@@ -42,8 +42,7 @@ func (r *repository) WithTx(ctx context.Context, fn func(Repository) error) erro
 }
 
 func (r *repository) GetNotices(ctx context.Context, f Filter) ([]Notice, error) {
-	rows, err := r.queries.SearchNoticesWithState(ctx, db.SearchNoticesWithStateParams{
-		Search:   database.StringOrNull(f.Search),
+	rows, err := r.queries.ListNoticesWithState(ctx, db.ListNoticesWithStateParams{
 		Category: database.StringOrNull(f.Category),
 		Urgent:   database.BoolOrNull(f.Urgent),
 		Pinned:   database.BoolOrNull(f.Pinned),

@@ -11,9 +11,9 @@ WHERE
 LIMIT
   1;
 
--- name: SearchNoticesWithState :many
+-- name: ListNoticesWithState :many
 SELECT
-  n.id, n.title, n.summary, n.full_title, n.content, n.posted_date, n.category, n.is_cached, n.is_urgent, n.source_order, n.created_at, n.updated_at,
+  n.id, n.title, n.summary, n.full_title, n.content, n.posted_date, n.category, n.is_cached, n.is_urgent, n.source_order,
   COALESCE(s.is_pinned, 0) AS is_pinned,
   COALESCE(s.is_read, 0) AS is_read
 FROM
@@ -21,12 +21,6 @@ FROM
   LEFT JOIN user_states s ON n.id = s.notice_id
 WHERE
   (
-    CAST(sqlc.narg(search) AS TEXT) IS NULL
-    OR n.rowid IN (
-      SELECT rowid FROM notices_fts WHERE notices_fts = sqlc.narg(search)
-    )
-  )
-  AND (
     CAST(sqlc.narg(category) AS TEXT) IS NULL
     OR n.category = sqlc.narg(category)
   )

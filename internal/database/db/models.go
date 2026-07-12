@@ -38,13 +38,6 @@ type NoticeAttachment struct {
 	CreatedAt string
 }
 
-type NoticesFt struct {
-	Title     string
-	FullTitle string
-	Summary   string
-	Content   string
-}
-
 type OfferedCourse struct {
 	ClassID     string
 	CourseCode  sql.NullString
