@@ -1,3 +1,12 @@
+## [0.3.2] - 2026-07-12
+
+### 🚀 Features
+
+- *(updater)* Add asset matcher to exclude installers [`5b798d1`](https://github.com/AtifChy/aiub-companion/commit/5b798d110bc6614b82b7e2711f539180df9e2771)
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelog [skip ci] [`2131721`](https://github.com/AtifChy/aiub-companion/commit/21317217fd659ab4833a1ab7ec09069eb5a0a891)
 ## [0.3.0] - 2026-07-12
 
 ### 🚀 Features
