@@ -20,7 +20,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
 
   const [config, setConfig] = useMutative<Config | undefined>(undefined);
-  const skipNextSave = useRef(false);
+  const initialized = useRef(false);
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["config"],
@@ -33,42 +33,35 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (data) {
       setConfig(() => rawReturn(structuredClone(data)));
-      skipNextSave.current = true;
     } else if (error) {
       logger.error("Failed to fetch settings", error);
       toast.error("Error fetching settings");
     }
   }, [data, error, setConfig]);
 
-  const saveConfig = async (config: Config) => {
-    await ConfigService.SaveConfig(config);
-
-    queryClient.setQueryData(["config"], config);
-
-    logger.info("Settings saved successfully");
-    toast.success("Settings saved successfully");
-  };
-
   useEffect(() => {
     if (!config) return;
 
-    if (skipNextSave.current) {
-      skipNextSave.current = false;
+    if (!initialized.current) {
+      initialized.current = true;
       return;
     }
 
     const timer = setTimeout(() => {
-      saveConfig(config).catch((err) => {
-        logger.error("Failed to save settings: ", err);
-        toast.error("Failed to save settings", {
-          description: (err as Error).message,
+      ConfigService.SaveConfig(config)
+        .then(() => {
+          queryClient.setQueryData(["config"], config);
+          logger.info("Settings saved successfully");
+          toast.success("Settings saved successfully");
+        })
+        .catch((err) => {
+          logger.error("Failed to save settings", err);
+          toast.error("Error saving settings");
         });
-      });
     }, 500);
-    return () => clearTimeout(timer);
 
-    // oxlint-disable-next-line react-hooks/exhaustive-deps
-  }, [config, saveConfig]);
+    return () => clearTimeout(timer);
+  }, [config, queryClient]);
 
   const resetMutation = useMutation({
     mutationFn: ConfigService.ResetConfig,
