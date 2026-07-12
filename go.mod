@@ -3,6 +3,7 @@ module aiub-companion
 go 1.26.0
 
 require (
+	github.com/hbollon/go-edlib v1.7.0
 	github.com/lmittmann/tint v1.1.3
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2

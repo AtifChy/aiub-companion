@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"slices"
+	"strings"
 
 	"aiub-companion/internal/database"
 
@@ -64,8 +65,19 @@ func (s *Service) SyncNotices(ctx context.Context, count int) (int64, error) {
 }
 
 func (s *Service) GetNotices(ctx context.Context, filter Filter) ([]Notice, error) {
-	filter.Search = database.SanitizeQuery(filter.Search)
-	return s.repo.GetNotices(ctx, filter)
+	rawQuery := strings.TrimSpace(filter.Search)
+	filter.Search = ""
+
+	notices, err := s.repo.GetNotices(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	if rawQuery != "" {
+		notices = fuzzyFilter(notices, rawQuery)
+	}
+
+	return notices, nil
 }
 
 func (s *Service) GetNoticeDetails(ctx context.Context, id string) (*Notice, error) {
