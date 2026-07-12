@@ -80,11 +80,7 @@ func (s *Service) Init(app *application.App) error {
 	return nil
 }
 
-type Release struct {
-	Version string `json:"version"`
-	Notes   string `json:"notes"`
-	URL     string `json:"url"`
-}
+type Release = updater.Release
 
 func (s *Service) CheckForUpdates(ctx context.Context) (*Release, error) {
 	app := application.Get()
@@ -111,11 +107,7 @@ func (s *Service) CheckForUpdates(ctx context.Context) (*Release, error) {
 
 	slog.Info("Update available", "version", rel.Version, "url", url)
 
-	return &Release{
-		Version: rel.Version,
-		Notes:   rel.Notes,
-		URL:     url,
-	}, nil
+	return rel, nil
 }
 
 func (s *Service) DownloadUpdate(ctx context.Context) error {
@@ -144,5 +136,6 @@ func (s *Service) InstallUpdate(ctx context.Context) error {
 }
 
 func init() {
+	application.RegisterEvent[*updater.Release](updater.EventUpdateAvailable)
 	application.RegisterEvent[updater.Progress](updater.EventDownloadProgress)
 }
