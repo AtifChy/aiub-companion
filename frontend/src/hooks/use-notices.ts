@@ -18,13 +18,13 @@ export type Category =
   | "payment"
   | "holiday";
 
-export type NoticeFilters = {
+export interface NoticeFilters {
   search: string;
   category: Category | "all";
   urgent: boolean;
   pinned: boolean;
   unread: boolean;
-};
+}
 
 export function useNotices(filter: NoticeFilters, selectedId: string | null) {
   const queryClient = useQueryClient();

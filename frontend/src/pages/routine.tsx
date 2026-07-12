@@ -496,8 +496,8 @@ const parseTimeToMinutes = (timeStr: string | undefined): number => {
   if (!timeVal || !modifier) return 0;
 
   const [hoursStr, minutesStr] = timeVal.split(":");
-  let hours = parseInt(hoursStr || "0", 10);
-  const minutes = parseInt(minutesStr || "0", 10);
+  let hours = parseInt(hoursStr ?? "0", 10);
+  const minutes = parseInt(minutesStr ?? "0", 10);
 
   if (modifier === "PM" && hours < 12) hours += 12;
   if (modifier === "AM" && hours === 12) hours = 0;

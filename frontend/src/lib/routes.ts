@@ -21,12 +21,12 @@ const HelpPage = lazyWithPreload(() => import("@/pages/help"));
 
 export const AboutPage = lazyWithPreload(() => import("@/pages/about"));
 
-export type RouteItem = {
+export interface RouteItem {
   label: string;
   path: string;
   icon: LucideIcon;
   component: PreloadableComponent<ComponentType<unknown>>;
-};
+}
 
 type Section = "workspace" | "tools" | "others";
 

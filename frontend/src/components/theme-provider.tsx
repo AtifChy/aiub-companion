@@ -3,10 +3,10 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 export type Theme = "dark" | "light" | "system";
 
-type ThemeProviderProps = {
+interface ThemeProviderProps {
   children: React.ReactNode;
   defaultTheme?: Theme;
-};
+}
 
 export function ThemeProvider({ children, defaultTheme = "system" }: ThemeProviderProps) {
   const { config } = useSettings();

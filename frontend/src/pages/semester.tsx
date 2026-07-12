@@ -309,8 +309,8 @@ function EventItem({ event }: { event: AcademicEvent }) {
 }
 
 function formatEventDate(event: AcademicEvent): string {
-  const date = event.date ? event.date : null;
-  const endDate = event.endDate ? event.endDate : null;
+  const date = event.date ?? null;
+  const endDate = event.endDate ?? null;
 
   if (!date) return "TBD";
 

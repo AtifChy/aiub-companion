@@ -1,10 +1,10 @@
 import { cn } from "@/lib/utils";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-type ScrollState = {
+interface ScrollState {
   left: boolean;
   right: boolean;
-};
+}
 
 interface HorizontalFadeScrollProps {
   children: React.ReactNode;
