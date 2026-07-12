@@ -1,9 +1,11 @@
 import Layout from "@/Layout";
-import { SettingsProvider, useSettings } from "@/components/settings-provider";
-import { ThemeProvider } from "@/components/theme-provider";
+import { SettingsProvider, useSettings } from "@/components/providers/settings-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { UpdateDialog } from "@/components/update-dialog";
+import { UpdateProvider } from "@/components/providers/update-provider";
 import { AboutPage, routes } from "@/lib/routes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HashRouter, Navigate, Route, Routes } from "react-router";
@@ -21,10 +23,13 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <SettingsProvider>
-        <ShellProviders>
-          <AppRouter />
-          <Toaster position="top-center" richColors />
-        </ShellProviders>
+        <UpdateProvider>
+          <ShellProviders>
+            <AppRouter />
+            <Toaster position="top-center" richColors />
+            <UpdateDialog />
+          </ShellProviders>
+        </UpdateProvider>
       </SettingsProvider>
     </QueryClientProvider>
   );
