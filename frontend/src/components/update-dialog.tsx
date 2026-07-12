@@ -9,31 +9,21 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
-import type { Release } from "@bindings/updater";
 import { Events, Updater } from "@wailsio/runtime";
 import { DownloadIcon } from "lucide-react";
 import { marked } from "marked";
 import { useEffect, useState } from "react";
+import { useUpdate } from "@/components/providers/update-provider";
 
-interface UpdateDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  release: Release | null;
-  onClick: () => void;
-  downloading: boolean;
-}
+export function UpdateDialog() {
+  const { release, dialogOpen, setDialogOpen, check, install } = useUpdate();
 
-export function UpdateDialog({
-  open,
-  onOpenChange,
-  release,
-  onClick,
-  downloading,
-}: UpdateDialogProps) {
   if (!release) return null;
 
+  const downloading = install.isPending;
+
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
+    <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <AlertDialogContent size="sm" className="min-w-md">
         <AlertDialogHeader>
           <AlertDialogMedia className="bg-primary/10 text-primary">
@@ -57,7 +47,7 @@ export function UpdateDialog({
           <AlertDialogCancel disabled={downloading} variant="outline">
             Later
           </AlertDialogCancel>
-          <DownlaodAction downloading={downloading} onClick={onClick} />
+          <DownlaodAction downloading={downloading} onClick={() => check.mutate()} />
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
