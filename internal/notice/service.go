@@ -88,6 +88,10 @@ func (s *Service) GetNotices(ctx context.Context, filter Filter) ([]Notice, erro
 		)
 	}
 
+	if len(notices) > 50 {
+		notices = notices[:50]
+	}
+
 	return notices, nil
 }
 
