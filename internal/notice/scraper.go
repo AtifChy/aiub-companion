@@ -89,9 +89,9 @@ func parseDate(slug, raw string) string {
 	date, err := time.Parse("2 Jan 2006", text)
 	if err != nil {
 		application.Get().Logger.Warn("Failed to parse date, defaulting to current date", "slug", slug, "raw", raw, "error", err)
-		return time.Now().Format("2006-01-02")
+		return time.Now().Format(time.DateOnly)
 	}
-	return date.Format("2006-01-02")
+	return date.Format(time.DateOnly)
 }
 
 func isUrgent(title string) bool {
