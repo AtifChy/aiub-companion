@@ -119,6 +119,7 @@ function Markdown({ children }: { children: string }) {
         "prose prose-sm prose-custom select-text dark:prose-invert",
         "prose-a:no-underline prose-code:rounded-sm prose-code:bg-primary/10 prose-code:px-1 [&_code]:before:content-none [&_code]:after:content-none",
       )}
+      // react-doctor-disable-next-line react-doctor/dangerous-html-sink
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
