@@ -1,13 +1,12 @@
 import { AlertDialogDestructive } from "@/components/alert-dialog-destructive";
-import { useSettings } from "@/components/settings-provider";
+import { useSettings } from "@/components/providers/settings-provider";
+import { type Theme } from "@/components/providers/theme-provider";
+import { useUpdate } from "@/components/providers/update-provider";
 import { SettingsCard } from "@/components/settings/settings-card";
 import { SettingRow } from "@/components/settings/settings-row";
 import { SettingSelect } from "@/components/settings/settings-select";
-import { type Theme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { UpdateDialog } from "@/components/update-dialog";
-import { useUpdater } from "@/hooks/use-updater";
 import { parseWailsError } from "@/lib/error";
 import { logger } from "@/lib/logger";
 import { type Config } from "@bindings/config";
@@ -61,7 +60,7 @@ interface SettingsViewProps {
 
 function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) {
   const { setTheme } = useTheme();
-  const { release, dialogOpen, setDialogOpen, check, install } = useUpdater();
+  const { check } = useUpdate();
 
   return (
     <div className="flex h-full animate-in flex-col duration-200 fade-in-10">
@@ -300,14 +299,6 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
           </SettingsCard>
         </div>
       </div>
-
-      <UpdateDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        release={release}
-        onClick={() => install.mutate()}
-        downloading={install.isPending}
-      />
     </div>
   );
 }
