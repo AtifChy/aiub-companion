@@ -67,14 +67,14 @@ func (s *Service) SyncNotices(ctx context.Context, count int) (int64, error) {
 }
 
 func (s *Service) GetNotices(ctx context.Context, filter Filter) ([]Notice, error) {
-	rawQuery := strings.TrimSpace(filter.Search)
+	query := strings.TrimSpace(filter.Search)
 
 	notices, err := s.repo.GetNotices(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
 
-	if rawQuery != "" {
+	if query != "" {
 		fields := []search.FieldFunc[Notice]{
 			func(n Notice) string { return n.Title },
 			func(n Notice) string { return n.Summary },
@@ -82,7 +82,7 @@ func (s *Service) GetNotices(ctx context.Context, filter Filter) ([]Notice, erro
 
 		notices = search.FuzzySearch(
 			notices,
-			rawQuery,
+			query,
 			func(a, b Notice) int { return cmp.Compare(b.PostedDate, a.PostedDate) },
 			fields...,
 		)
