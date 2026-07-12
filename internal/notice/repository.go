@@ -23,25 +23,25 @@ type Repository interface {
 	ClearNotices(ctx context.Context) error
 }
 
-type sqliteRepository struct {
+type repository struct {
 	queries *db.Queries
 	dbConn  *sql.DB
 }
 
 func NewRepository(dbConn *sql.DB) Repository {
-	return &sqliteRepository{
+	return &repository{
 		queries: db.New(dbConn),
 		dbConn:  dbConn,
 	}
 }
 
-func (r *sqliteRepository) WithTx(ctx context.Context, fn func(Repository) error) error {
+func (r *repository) WithTx(ctx context.Context, fn func(Repository) error) error {
 	return database.RunInTx(ctx, r.dbConn, r.queries, func(qtx *db.Queries) error {
-		return fn(&sqliteRepository{queries: qtx, dbConn: r.dbConn})
+		return fn(&repository{queries: qtx, dbConn: r.dbConn})
 	})
 }
 
-func (r *sqliteRepository) GetNotices(ctx context.Context, f Filter) ([]Notice, error) {
+func (r *repository) GetNotices(ctx context.Context, f Filter) ([]Notice, error) {
 	rows, err := r.queries.SearchNoticesWithState(ctx, db.SearchNoticesWithStateParams{
 		Search:   database.StringOrNull(f.Search),
 		Category: database.StringOrNull(f.Category),
@@ -72,7 +72,7 @@ func (r *sqliteRepository) GetNotices(ctx context.Context, f Filter) ([]Notice, 
 	return notices, nil
 }
 
-func (r *sqliteRepository) GetNoticeByID(ctx context.Context, id string) (*Notice, error) {
+func (r *repository) GetNoticeByID(ctx context.Context, id string) (*Notice, error) {
 	row, err := r.queries.GetNoticeWithState(ctx, id)
 	if err != nil {
 		return nil, err
@@ -92,7 +92,7 @@ func (r *sqliteRepository) GetNoticeByID(ctx context.Context, id string) (*Notic
 	}, nil
 }
 
-func (r *sqliteRepository) GetNoticeAttachments(ctx context.Context, noticeID string) ([]Attachment, error) {
+func (r *repository) GetNoticeAttachments(ctx context.Context, noticeID string) ([]Attachment, error) {
 	rows, err := r.queries.GetNoticeAttachments(ctx, noticeID)
 	if err != nil {
 		return nil, err
@@ -110,7 +110,7 @@ func (r *sqliteRepository) GetNoticeAttachments(ctx context.Context, noticeID st
 	return attachments, nil
 }
 
-func (r *sqliteRepository) GetLatestNoticeSourceOrder(ctx context.Context) (int64, error) {
+func (r *repository) GetLatestNoticeSourceOrder(ctx context.Context) (int64, error) {
 	info, err := r.queries.GetLatestNoticeInfo(ctx)
 	if err != nil {
 		return 0, err
@@ -118,7 +118,7 @@ func (r *sqliteRepository) GetLatestNoticeSourceOrder(ctx context.Context) (int6
 	return info.SourceOrder, nil
 }
 
-func (r *sqliteRepository) InsertNotice(ctx context.Context, n Notice, sourceOrder int64) (int64, error) {
+func (r *repository) InsertNotice(ctx context.Context, n Notice, sourceOrder int64) (int64, error) {
 	return r.queries.InsertNotice(ctx, db.InsertNoticeParams{
 		ID:          n.ID,
 		Title:       n.Title,
@@ -130,7 +130,7 @@ func (r *sqliteRepository) InsertNotice(ctx context.Context, n Notice, sourceOrd
 	})
 }
 
-func (r *sqliteRepository) UpdateNotice(ctx context.Context, n Notice) error {
+func (r *repository) UpdateNotice(ctx context.Context, n Notice) error {
 	return r.queries.UpdateNotice(ctx, db.UpdateNoticeParams{
 		ID:         n.ID,
 		Title:      n.Title,
@@ -139,7 +139,7 @@ func (r *sqliteRepository) UpdateNotice(ctx context.Context, n Notice) error {
 	})
 }
 
-func (r *sqliteRepository) UpdateNoticeDetails(ctx context.Context, id string, fullTitle, content string) error {
+func (r *repository) UpdateNoticeDetails(ctx context.Context, id string, fullTitle, content string) error {
 	return r.queries.UpdateNoticeDetails(ctx, db.UpdateNoticeDetailsParams{
 		ID:        id,
 		FullTitle: database.StringOrNull(fullTitle),
@@ -147,7 +147,7 @@ func (r *sqliteRepository) UpdateNoticeDetails(ctx context.Context, id string, f
 	})
 }
 
-func (r *sqliteRepository) UpsertNoticeAttachment(ctx context.Context, noticeID string, att Attachment) error {
+func (r *repository) UpsertNoticeAttachment(ctx context.Context, noticeID string, att Attachment) error {
 	return r.queries.UpsertNoticeAttachment(ctx, db.UpsertNoticeAttachmentParams{
 		ID:       att.ID,
 		NoticeID: noticeID,
@@ -156,20 +156,20 @@ func (r *sqliteRepository) UpsertNoticeAttachment(ctx context.Context, noticeID 
 	})
 }
 
-func (r *sqliteRepository) SetPinState(ctx context.Context, id string, pinned bool) error {
+func (r *repository) SetPinState(ctx context.Context, id string, pinned bool) error {
 	return r.queries.SetPinState(ctx, db.SetPinStateParams{
 		NoticeID: id,
 		IsPinned: database.BoolToInt64(pinned),
 	})
 }
 
-func (r *sqliteRepository) SetReadState(ctx context.Context, id string, read bool) error {
+func (r *repository) SetReadState(ctx context.Context, id string, read bool) error {
 	return r.queries.SetReadState(ctx, db.SetReadStateParams{
 		NoticeID: id,
 		IsRead:   database.BoolToInt64(read),
 	})
 }
 
-func (r *sqliteRepository) ClearNotices(ctx context.Context) error {
+func (r *repository) ClearNotices(ctx context.Context) error {
 	return r.queries.ClearNotices(ctx)
 }
