@@ -1,10 +1,13 @@
 package routine
 
 import (
+	"cmp"
 	"context"
 	"fmt"
+	"strings"
 
 	"aiub-companion/internal/database"
+	"aiub-companion/internal/search"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
@@ -58,11 +61,27 @@ func (s *Service) GetUserRoutine(ctx context.Context) ([]Course, error) {
 }
 
 func (s *Service) SearchOfferedCourses(ctx context.Context, query string) ([]Course, error) {
-	input := database.SanitizeQuery(query)
-	if input == "" {
-		return []Course{}, nil
+	query = strings.TrimSpace(query)
+
+	courses, err := s.repo.ListOfferedCourses(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("list offered courses: %w", err)
 	}
-	return s.repo.SearchOfferedCourses(ctx, input)
+
+	if query != "" {
+		courses = search.FuzzySearch(
+			courses,
+			query,
+			func(a, b Course) int { return cmp.Compare(a.Section, b.Section) },
+			func(c Course) string { return c.CourseTitle },
+		)
+	}
+
+	if len(courses) > 50 {
+		courses = courses[:50]
+	}
+
+	return courses, nil
 }
 
 func (s *Service) AddToUserRoutine(ctx context.Context, classID string) error {

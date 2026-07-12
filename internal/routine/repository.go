@@ -11,7 +11,7 @@ import (
 type Repository interface {
 	WithTx(ctx context.Context, fn func(Repository) error) error
 	GetUserRoutine(ctx context.Context) ([]Course, error)
-	SearchOfferedCourses(ctx context.Context, query string) ([]Course, error)
+	ListOfferedCourses(ctx context.Context) ([]Course, error)
 	InsertOfferedCourse(ctx context.Context, c Course) error
 	AddToUserRoutine(ctx context.Context, classID string) error
 	RemoveFromUserRoutine(ctx context.Context, classID string) error
@@ -45,9 +45,8 @@ func (r *repository) GetUserRoutine(ctx context.Context) ([]Course, error) {
 	return courses, nil
 }
 
-func (r *repository) SearchOfferedCourses(ctx context.Context, query string) ([]Course, error) {
-	search := database.StringOrNull(query)
-	rows, err := r.queries.SearchOfferedCourses(ctx, search)
+func (r *repository) ListOfferedCourses(ctx context.Context) ([]Course, error) {
+	rows, err := r.queries.ListOfferedCourses(ctx)
 	if err != nil {
 		return nil, err
 	}
