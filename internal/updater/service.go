@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/wailsapp/wails/v3/pkg/application"
@@ -35,6 +36,25 @@ func (s *Service) Init(app *application.App) error {
 		Repository: s.githubRepo,
 		Prerelease: false,
 		Token:      token,
+		AssetMatcher: func(req updater.CheckRequest, assets []github.ReleaseAsset) int {
+			var filteredAssets []github.ReleaseAsset
+			originalIndices := make([]int, 0, len(assets))
+
+			for i, asset := range assets {
+				name := strings.ToLower(asset.Name)
+				if strings.Contains(name, "installer") {
+					continue
+				}
+				filteredAssets = append(filteredAssets, asset)
+				originalIndices = append(originalIndices, i)
+			}
+
+			idx := github.DefaultAssetMatcher(req, filteredAssets)
+			if idx == -1 {
+				return -1
+			}
+			return originalIndices[idx]
+		},
 	})
 	if err != nil {
 		return fmt.Errorf("github provider: %w", err)
