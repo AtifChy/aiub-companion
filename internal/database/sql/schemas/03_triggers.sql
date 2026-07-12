@@ -1,26 +1,3 @@
--- Trigger for inserts
-CREATE TRIGGER IF NOT EXISTS notices_ai AFTER INSERT ON notices BEGIN
-  INSERT INTO notices_fts (rowid, title, full_title, summary, content)
-  VALUES (new.rowid, new.title, new.full_title, new.summary, new.content);
-END;
-
--- Trigger for deletes
-CREATE TRIGGER IF NOT EXISTS notices_ad AFTER DELETE ON notices BEGIN
-  INSERT INTO notices_fts (notices_fts, rowid, title, full_title, summary, content)
-  VALUES ('delete', old.rowid, old.title, old.full_title, old.summary, old.content);
-END;
-
--- Trigger for updates
-CREATE TRIGGER IF NOT EXISTS notices_au AFTER UPDATE ON notices BEGIN
-  INSERT INTO notices_fts (notices_fts, rowid, title, full_title, summary, content)
-  VALUES ('delete', old.rowid, old.title, old.full_title, old.summary, old.content);
-  INSERT INTO notices_fts (rowid, title, full_title, summary, content)
-  VALUES (new.rowid, new.title, new.full_title, new.summary, new.content);
-END;
-
--- Rebuild FTS index from notices table on every startup
-INSERT INTO notices_fts (notices_fts) VALUES ('rebuild');
-
 -- Triggers for offered_courses
 CREATE TRIGGER IF NOT EXISTS offered_courses_ai AFTER INSERT ON offered_courses BEGIN
   INSERT INTO offered_courses_fts (rowid, course_title, section, faculty, class_type, day, start_time, end_time, room, department)
