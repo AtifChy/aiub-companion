@@ -1,3 +1,45 @@
+## [0.3.0] - 2026-07-12
+
+### 🚀 Features
+
+- *(updater)* Extract updater logic into a hook [`1458663`](https://github.com/AtifChy/aiub-companion/commit/1458663429ffb33b63619c06a11af5bb7a4dcd75)
+- *(updater)* Print message when using github token [`42fb8ac`](https://github.com/AtifChy/aiub-companion/commit/42fb8ace897e11932b14b18ad2e1bc43a28ade50)
+- *(notices)* Add fuzzy search [`da0afbf`](https://github.com/AtifChy/aiub-companion/commit/da0afbf51613f52851017b673be70a9e7d3ab78f)
+- *(search)* Implement generic fuzzy search [`33484c5`](https://github.com/AtifChy/aiub-companion/commit/33484c5debb76d589962ce4432d6a2e6521fc662)
+
+### 🚜 Refactor
+
+- *(updater)* Split update download and install methods [`4ad0050`](https://github.com/AtifChy/aiub-companion/commit/4ad005082215be25ac61e58387c3198f40778c5d)
+- *(settings)* Use tanstack query for settings provider [`fe268ac`](https://github.com/AtifChy/aiub-companion/commit/fe268ac1be9b27d30fcc0cbc79d1e9276049ddda)
+- *(help)* Remove redundant diagnostics card [`84b8f61`](https://github.com/AtifChy/aiub-companion/commit/84b8f6172344fe6bc74bfd778c194534e2bfdfc2)
+- *(settings)* Simplify settings initialization logic [`542ee75`](https://github.com/AtifChy/aiub-companion/commit/542ee75e99cb611a99fae895ae3d2c55ffaee637)
+- *(notice)* Rename sqlite repository to repository [`fa34b65`](https://github.com/AtifChy/aiub-companion/commit/fa34b65025d2a2cfb6dcd5d9a9accde99dcbbb04)
+- *(notice)* Use `time.DateOnly` constant [`cba37eb`](https://github.com/AtifChy/aiub-companion/commit/cba37ebf1bf6a1d3c9631fe06f694f7d6d9cc6ff)
+- *(db)* Remove notices fts tables and triggers [`5b32e81`](https://github.com/AtifChy/aiub-companion/commit/5b32e814dc5bf152f361e9af4d3dad1a4b69aa6c)
+- *(db)* Rename search to list notices [`39281fb`](https://github.com/AtifChy/aiub-companion/commit/39281fbe4301f9ca86649763d250fafbb3feb4cd)
+- *(routine)* Rename sqlite repository to repository [`ef23f85`](https://github.com/AtifChy/aiub-companion/commit/ef23f85ebf0b3007e8f1e4f1c64907468b9898ba)
+- *(db)* Remove fts schema and triggers [`e9279c0`](https://github.com/AtifChy/aiub-companion/commit/e9279c00b53a7eda6b79e88305e7cfa9f5eb9e23)
+- *(routine)* Rename search to list offered courses [`073593f`](https://github.com/AtifChy/aiub-companion/commit/073593f33aa25e09daa04f5366e8cb5d3dd2a50a)
+- *(routine)* Fuzzy search offered courses [`2f15a74`](https://github.com/AtifChy/aiub-companion/commit/2f15a74fcd2b1d59c69b49afc76997748c2f944e)
+- *(sql)* Rename index schema file [`8e9d66b`](https://github.com/AtifChy/aiub-companion/commit/8e9d66bba2e96d41d1bd52fb0ba3f6b8bc360b1a)
+- *(notice)* Rename rawQuery to query [`98ac7a3`](https://github.com/AtifChy/aiub-companion/commit/98ac7a34013983bc34919bc231d638dd314a2657)
+
+### ⚡ Performance
+
+- *(notice)* Limit search notices to 50 [`ea0461a`](https://github.com/AtifChy/aiub-companion/commit/ea0461a5d28401a06628d192e3aca19311dfd48c)
+
+### 🎨 Styling
+
+- *(updater)* Update markdown prose styles [`8219858`](https://github.com/AtifChy/aiub-companion/commit/8219858b9f9cb95cea05de83e060f74c97b98204)
+- Adjust margin on scrollable containers [`7931219`](https://github.com/AtifChy/aiub-companion/commit/79312196634bb57c19a7ab6dcc9812d14d9906b3)
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelog [skip ci] [`543d4c3`](https://github.com/AtifChy/aiub-companion/commit/543d4c31662c1fbbb69c63411c0d03cdc44a37af)
+- *(gitignore)* Add `bin/` [`388ed20`](https://github.com/AtifChy/aiub-companion/commit/388ed20f61e2c729777038e58a55f637f1b4a289)
+- *(lint)* Switch back to `eslint` [`76462fc`](https://github.com/AtifChy/aiub-companion/commit/76462fc854aef1b0e88c6bb5ca0edf6cf6a07774)
+- *(lint)* Fix linting issues in frontend components and hooks [`944ba3d`](https://github.com/AtifChy/aiub-companion/commit/944ba3d77b0c64e503ef3525be37daba300d2c54)
+- *(lint)* Suppress `react-doctor/dangerous-html-sink` warning [`18f1cb0`](https://github.com/AtifChy/aiub-companion/commit/18f1cb0a384c64983daca3bb6683b5ef7d665a61)
 ## [0.2.75] - 2026-07-11
 
 ### 🚀 Features
