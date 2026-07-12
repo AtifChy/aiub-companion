@@ -18,25 +18,25 @@ type Repository interface {
 	ClearOfferedCourses(ctx context.Context) error
 }
 
-type sqliteRepository struct {
+type repository struct {
 	queries *db.Queries
 	dbConn  *sql.DB
 }
 
 func NewRepository(dbConn *sql.DB) Repository {
-	return &sqliteRepository{
+	return &repository{
 		queries: db.New(dbConn),
 		dbConn:  dbConn,
 	}
 }
 
-func (r *sqliteRepository) WithTx(ctx context.Context, fn func(Repository) error) error {
+func (r *repository) WithTx(ctx context.Context, fn func(Repository) error) error {
 	return database.RunInTx(ctx, r.dbConn, r.queries, func(qtx *db.Queries) error {
-		return fn(&sqliteRepository{queries: qtx, dbConn: r.dbConn})
+		return fn(&repository{queries: qtx, dbConn: r.dbConn})
 	})
 }
 
-func (r *sqliteRepository) GetUserRoutine(ctx context.Context) ([]Course, error) {
+func (r *repository) GetUserRoutine(ctx context.Context) ([]Course, error) {
 	rows, err := r.queries.GetUserRoutine(ctx)
 	if err != nil {
 		return nil, err
@@ -45,7 +45,7 @@ func (r *sqliteRepository) GetUserRoutine(ctx context.Context) ([]Course, error)
 	return courses, nil
 }
 
-func (r *sqliteRepository) SearchOfferedCourses(ctx context.Context, query string) ([]Course, error) {
+func (r *repository) SearchOfferedCourses(ctx context.Context, query string) ([]Course, error) {
 	search := database.StringOrNull(query)
 	rows, err := r.queries.SearchOfferedCourses(ctx, search)
 	if err != nil {
@@ -54,7 +54,7 @@ func (r *sqliteRepository) SearchOfferedCourses(ctx context.Context, query strin
 	return toCourses(rows), nil
 }
 
-func (r *sqliteRepository) InsertOfferedCourse(ctx context.Context, c Course) error {
+func (r *repository) InsertOfferedCourse(ctx context.Context, c Course) error {
 	return r.queries.InsertOfferedCourse(ctx, db.InsertOfferedCourseParams{
 		ClassID:     c.ClassID,
 		CourseCode:  database.StringOrNull(c.CourseCode),
@@ -70,15 +70,15 @@ func (r *sqliteRepository) InsertOfferedCourse(ctx context.Context, c Course) er
 	})
 }
 
-func (r *sqliteRepository) AddToUserRoutine(ctx context.Context, classID string) error {
+func (r *repository) AddToUserRoutine(ctx context.Context, classID string) error {
 	return r.queries.AddToUserRoutine(ctx, classID)
 }
 
-func (r *sqliteRepository) RemoveFromUserRoutine(ctx context.Context, classID string) error {
+func (r *repository) RemoveFromUserRoutine(ctx context.Context, classID string) error {
 	return r.queries.RemoveFromUserRoutine(ctx, classID)
 }
 
-func (r *sqliteRepository) ClearOfferedCourses(ctx context.Context) error {
+func (r *repository) ClearOfferedCourses(ctx context.Context) error {
 	return r.queries.ClearOfferedCourses(ctx)
 }
 
