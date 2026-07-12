@@ -52,18 +52,6 @@ type OfferedCourse struct {
 	Department  sql.NullString
 }
 
-type OfferedCoursesFt struct {
-	CourseTitle string
-	Section     string
-	Faculty     string
-	ClassType   string
-	Day         string
-	StartTime   string
-	EndTime     string
-	Room        string
-	Department  string
-}
-
 type UserRoutine struct {
 	ClassID string
 	AddedAt string
