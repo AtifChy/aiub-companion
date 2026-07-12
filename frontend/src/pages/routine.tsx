@@ -1,10 +1,3 @@
-import { SearchInput } from "@/components/search-input";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useDebounce } from "@/hooks/use-debounce";
-import { logger } from "@/lib/logger";
-import { cn } from "@/lib/utils";
 import { Course, Service as RoutineService } from "@bindings/routine";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Dialogs } from "@wailsio/runtime";
@@ -19,6 +12,14 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+
+import { SearchInput } from "@/components/search-input";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useDebounce } from "@/hooks/use-debounce";
+import { logger } from "@/lib/logger";
+import { cn } from "@/lib/utils";
 
 type CourseStatus = "ongoing" | "upcoming" | "inactive";
 

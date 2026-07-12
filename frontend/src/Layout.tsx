@@ -1,3 +1,7 @@
+import { Window } from "@wailsio/runtime";
+import { Suspense, useEffect, useState } from "react";
+import { matchPath, Outlet, useLocation } from "react-router";
+
 import { AppSidebar } from "@/components/app-sidebar";
 import Loading from "@/components/loading";
 import {
@@ -12,9 +16,6 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { WindowControls } from "@/components/window-controls";
 import { sections } from "@/lib/routes";
-import { Window } from "@wailsio/runtime";
-import { Suspense, useEffect, useState } from "react";
-import { matchPath, Outlet, useLocation } from "react-router";
 
 export default function Layout() {
   const location = useLocation();

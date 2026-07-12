@@ -1,5 +1,6 @@
-import { useSettings } from "@/components/providers/settings-provider";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
+
+import { useSettings } from "@/components/providers/settings-provider";
 
 export type Theme = "dark" | "light" | "system";
 

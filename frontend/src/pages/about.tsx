@@ -1,12 +1,13 @@
-import appicon from "@/assets/appicon.png";
-import { Separator } from "@/components/ui/separator";
-import { WindowControls } from "@/components/window-controls";
-import { logger } from "@/lib/logger";
 import { type BuildInfo, Service as ConfigService } from "@bindings/config";
 import { Window } from "@wailsio/runtime";
 import { CopyrightIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+
+import appicon from "@/assets/appicon.png";
+import { Separator } from "@/components/ui/separator";
+import { WindowControls } from "@/components/window-controls";
+import { logger } from "@/lib/logger";
 
 export default function AboutPage() {
   const [appInfo, setAppInfo] = useState<BuildInfo | null>(null);

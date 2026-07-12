@@ -1,3 +1,10 @@
+import { type Config } from "@bindings/config";
+import { Service as LogService } from "@bindings/log";
+import { System } from "@wailsio/runtime";
+import { useTheme } from "next-themes";
+import { toast } from "sonner";
+import { type Updater } from "use-mutative";
+
 import { AlertDialogDestructive } from "@/components/alert-dialog-destructive";
 import { useSettings } from "@/components/providers/settings-provider";
 import { type Theme } from "@/components/providers/theme-provider";
@@ -9,12 +16,6 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { parseWailsError } from "@/lib/error";
 import { logger } from "@/lib/logger";
-import { type Config } from "@bindings/config";
-import { Service as LogService } from "@bindings/log";
-import { System } from "@wailsio/runtime";
-import { useTheme } from "next-themes";
-import { toast } from "sonner";
-import { type Updater } from "use-mutative";
 
 type Items<T extends string | number> = { value: T; label: string }[];
 

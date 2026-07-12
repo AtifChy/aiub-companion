@@ -1,4 +1,3 @@
-import { lazyWithPreload, type PreloadableComponent } from "@/lib/lazy-with-preload";
 import {
   Bell,
   Calculator,
@@ -10,6 +9,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type { ComponentType } from "react";
+
+import { lazyWithPreload, type PreloadableComponent } from "@/lib/lazy-with-preload";
 
 const NoticesPage = lazyWithPreload(() => import("@/pages/notices"));
 const CGPAPage = lazyWithPreload(() => import("@/pages/cgpa"));

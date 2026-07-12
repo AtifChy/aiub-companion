@@ -1,11 +1,12 @@
-import { useSettings } from "@/components/providers/settings-provider";
-import { useDebounce } from "@/hooks/use-debounce";
-import { logger } from "@/lib/logger";
 import { Notice, Service as NoticeService } from "@bindings/notice";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Events } from "@wailsio/runtime";
 import { useEffect } from "react";
 import { toast } from "sonner";
+
+import { useSettings } from "@/components/providers/settings-provider";
+import { useDebounce } from "@/hooks/use-debounce";
+import { logger } from "@/lib/logger";
 
 export type Category =
   | "all"

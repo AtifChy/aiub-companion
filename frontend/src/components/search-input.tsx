@@ -1,8 +1,9 @@
+import { Loader2Icon, SearchIcon, SlashIcon, XIcon } from "lucide-react";
+import React, { useEffect, useImperativeHandle, useRef } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { Loader2Icon, SearchIcon, SlashIcon, XIcon } from "lucide-react";
-import React, { useEffect, useImperativeHandle, useRef } from "react";
 
 interface SearchInputProps extends React.ComponentPropsWithoutRef<"div"> {
   ref?: React.Ref<HTMLInputElement>;

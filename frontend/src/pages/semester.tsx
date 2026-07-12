@@ -1,17 +1,3 @@
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useDelayedLoading } from "@/hooks/use-delayed-loading";
-import { logger } from "@/lib/logger";
-import { cn } from "@/lib/utils";
 import { Service as CalendarService, CalendarType, type AcademicEvent } from "@bindings/calendar";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -26,6 +12,21 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useDelayedLoading } from "@/hooks/use-delayed-loading";
+import { logger } from "@/lib/logger";
+import { cn } from "@/lib/utils";
 
 const CALENDAR_TYPES = [
   { value: CalendarType.CalendarStandard, label: "Standard" },

@@ -1,3 +1,5 @@
+import { Link, useLocation } from "react-router";
+
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -6,7 +8,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import type { RouteItem } from "@/lib/routes";
-import { Link, useLocation } from "react-router";
 
 interface NavGroupProps {
   title: string;

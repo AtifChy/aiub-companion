@@ -1,9 +1,10 @@
-import { logger } from "@/lib/logger";
 import { Release, Service as UpdaterService } from "@bindings/updater";
 import { useMutation } from "@tanstack/react-query";
 import { Events, Updater } from "@wailsio/runtime";
 import { createContext, useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
+
+import { logger } from "@/lib/logger";
 
 interface UpdateContextType {
   release: Release | null;

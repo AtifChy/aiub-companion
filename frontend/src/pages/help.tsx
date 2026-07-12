@@ -1,7 +1,3 @@
-import { SearchInput } from "@/components/search-input";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Browser } from "@wailsio/runtime";
 import {
   ChevronDownIcon,
@@ -12,6 +8,11 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+
+import { SearchInput } from "@/components/search-input";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 interface FAQItem {
   question: string;

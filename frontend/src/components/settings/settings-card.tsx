@@ -1,6 +1,7 @@
+import { cva, type VariantProps } from "class-variance-authority";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { cva, type VariantProps } from "class-variance-authority";
 
 const cardVariants = cva("", {
   variants: {

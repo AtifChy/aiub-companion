@@ -1,3 +1,6 @@
+import { Redo2Icon } from "lucide-react";
+import { useState } from "react";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,8 +14,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Redo2Icon } from "lucide-react";
-import { useState } from "react";
 
 interface AlertDialogDestructiveProps {
   label: string;

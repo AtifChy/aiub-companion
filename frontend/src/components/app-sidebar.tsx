@@ -1,3 +1,8 @@
+import { Service as ConfigService, type BuildInfo } from "@bindings/config";
+import { Service as DesktopService } from "@bindings/desktop";
+import { ChevronsUpDownIcon, CommandIcon, CopyrightIcon } from "lucide-react";
+import React, { useEffect, useState } from "react";
+
 import { NavGroup } from "@/components/nav-group";
 import {
   Sidebar,
@@ -7,10 +12,6 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import { AboutPage, sections } from "@/lib/routes";
-import { Service as ConfigService, type BuildInfo } from "@bindings/config";
-import { Service as DesktopService } from "@bindings/desktop";
-import { ChevronsUpDownIcon, CommandIcon, CopyrightIcon } from "lucide-react";
-import React, { useEffect, useState } from "react";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [appInfo, setAppInfo] = useState<BuildInfo | null>(null);

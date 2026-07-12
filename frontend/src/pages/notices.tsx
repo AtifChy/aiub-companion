@@ -1,3 +1,24 @@
+import type { Notice } from "@bindings/notice";
+import { Browser } from "@wailsio/runtime";
+import {
+  CircleCheckBigIcon,
+  CircleIcon,
+  DotIcon,
+  DownloadIcon,
+  ExternalLinkIcon,
+  FileTextIcon,
+  FilterIcon,
+  FilterXIcon,
+  InboxIcon,
+  Loader2Icon,
+  PaperclipIcon,
+  PinIcon,
+  PinOffIcon,
+  RefreshCwIcon,
+} from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+
 import { AppTooltip } from "@/components/app-tooltip";
 import { HorizontalFadeScroll } from "@/components/horizontal-fade-scroll";
 import { SearchInput } from "@/components/search-input";
@@ -20,26 +41,6 @@ import { useDelayedLoading } from "@/hooks/use-delayed-loading";
 import { useNotices, useSync, type Category, type NoticeFilters } from "@/hooks/use-notices";
 import { logger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
-import type { Notice } from "@bindings/notice";
-import { Browser } from "@wailsio/runtime";
-import {
-  CircleCheckBigIcon,
-  CircleIcon,
-  DotIcon,
-  DownloadIcon,
-  ExternalLinkIcon,
-  FileTextIcon,
-  FilterIcon,
-  FilterXIcon,
-  InboxIcon,
-  Loader2Icon,
-  PaperclipIcon,
-  PinIcon,
-  PinOffIcon,
-  RefreshCwIcon,
-} from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 
 const CATEGORIES: Category[] = [
   "all",

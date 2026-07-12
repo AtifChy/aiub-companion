@@ -1,3 +1,9 @@
+import { Events, Updater } from "@wailsio/runtime";
+import { DownloadIcon } from "lucide-react";
+import { marked } from "marked";
+import { useEffect, useState } from "react";
+
+import { useUpdate } from "@/components/providers/update-provider";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,11 +15,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
-import { Events, Updater } from "@wailsio/runtime";
-import { DownloadIcon } from "lucide-react";
-import { marked } from "marked";
-import { useEffect, useState } from "react";
-import { useUpdate } from "@/components/providers/update-provider";
 
 export function UpdateDialog() {
   const { release, dialogOpen, setDialogOpen, check, install } = useUpdate();
