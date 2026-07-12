@@ -8,24 +8,11 @@ VALUES
   (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON CONFLICT DO NOTHING;
 
--- name: SearchOfferedCourses :many
+-- name: ListOfferedCourses :many
 SELECT
   o.*
 FROM
-  offered_courses o
-WHERE
-  (
-    CAST(sqlc.narg(search) AS TEXT) IS NULL
-    OR o.rowid IN (
-      SELECT
-        rowid
-      FROM
-        offered_courses_fts
-      WHERE
-        offered_courses_fts MATCH sqlc.narg(search)
-    )
-  )
-LIMIT 50;
+  offered_courses o;
 
 -- name: AddToUserRoutine :exec
 INSERT INTO

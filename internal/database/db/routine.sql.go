@@ -116,40 +116,15 @@ func (q *Queries) InsertOfferedCourse(ctx context.Context, arg InsertOfferedCour
 	return err
 }
 
-const removeFromUserRoutine = `-- name: RemoveFromUserRoutine :exec
-DELETE FROM
-  user_routine
-WHERE
-  class_id = ?
-`
-
-func (q *Queries) RemoveFromUserRoutine(ctx context.Context, classID string) error {
-	_, err := q.db.ExecContext(ctx, removeFromUserRoutine, classID)
-	return err
-}
-
-const searchOfferedCourses = `-- name: SearchOfferedCourses :many
+const listOfferedCourses = `-- name: ListOfferedCourses :many
 SELECT
   o.class_id, o.course_code, o.course_title, o.section, o.faculty, o.class_type, o.day, o.start_time, o.end_time, o.room, o.department
 FROM
   offered_courses o
-WHERE
-  (
-    CAST(?1 AS TEXT) IS NULL
-    OR o.rowid IN (
-      SELECT
-        rowid
-      FROM
-        offered_courses_fts
-      WHERE
-        offered_courses_fts MATCH ?1
-    )
-  )
-LIMIT 50
 `
 
-func (q *Queries) SearchOfferedCourses(ctx context.Context, search sql.NullString) ([]OfferedCourse, error) {
-	rows, err := q.db.QueryContext(ctx, searchOfferedCourses, search)
+func (q *Queries) ListOfferedCourses(ctx context.Context) ([]OfferedCourse, error) {
+	rows, err := q.db.QueryContext(ctx, listOfferedCourses)
 	if err != nil {
 		return nil, err
 	}
@@ -181,4 +156,16 @@ func (q *Queries) SearchOfferedCourses(ctx context.Context, search sql.NullStrin
 		return nil, err
 	}
 	return items, nil
+}
+
+const removeFromUserRoutine = `-- name: RemoveFromUserRoutine :exec
+DELETE FROM
+  user_routine
+WHERE
+  class_id = ?
+`
+
+func (q *Queries) RemoveFromUserRoutine(ctx context.Context, classID string) error {
+	_, err := q.db.ExecContext(ctx, removeFromUserRoutine, classID)
+	return err
 }
