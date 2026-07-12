@@ -1,4 +1,4 @@
-import { useSettings } from "@/components/settings-provider";
+import { useSettings } from "@/components/providers/settings-provider";
 import { useDebounce } from "@/hooks/use-debounce";
 import { logger } from "@/lib/logger";
 import { Notice, Service as NoticeService } from "@bindings/notice";
