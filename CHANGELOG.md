@@ -1,3 +1,26 @@
+## [0.3.20] - 2026-07-13
+
+### 🚜 Refactor
+
+- *(routine)* Extract search result item component [`167562d`](https://github.com/AtifChy/aiub-companion/commit/167562dc9bbdd6163feeb77caa6646729c010ea7)
+- *(routine)* Destructure useMutation return values [`6839bad`](https://github.com/AtifChy/aiub-companion/commit/6839bad062b58fabf5445481ace9ea31a17cb23c)
+- *(help)* Extract faq section into component [`9666a66`](https://github.com/AtifChy/aiub-companion/commit/9666a6632caa0aa3cabea7ef477777029a1d48c6)
+
+### ⚡ Performance
+
+- *(routine)* Move search logic to component [`3c0b4a9`](https://github.com/AtifChy/aiub-companion/commit/3c0b4a9b639807c64728f7cbd3304327e55e326e)
+- *(notices)* Split notice hooks and components [`8a8e90b`](https://github.com/AtifChy/aiub-companion/commit/8a8e90b0bfbdf744b3bf83fe65f5b12d61cc3125)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(ci)* Update cliff config [`65f3f4e`](https://github.com/AtifChy/aiub-companion/commit/65f3f4e160181b4f92882481b4062c3da9f7c8c2)
+- *(changelog)* Add new contributors and full changelog [`f8655d8`](https://github.com/AtifChy/aiub-companion/commit/f8655d893264ee5e3a1f312e96a86346b4136f49)
+- *(scripts)* Rename pre-commit hook script [`a2130e9`](https://github.com/AtifChy/aiub-companion/commit/a2130e9090bb4d4e98ff94db968dbc509c611e93)
+- *(lint)* Add eslint cache and concurrency flags [`13e4f20`](https://github.com/AtifChy/aiub-companion/commit/13e4f20c066ed780b80735a08bc3da816372c2a7)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.3.15...v0.3.20
+
 ## [0.3.15] - 2026-07-13
 
 ### 🚀 Features
