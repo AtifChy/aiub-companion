@@ -27,11 +27,11 @@ export interface NoticeFilters {
   unread: boolean;
 }
 
-export function useNotices(filter: NoticeFilters, selectedId: string | null) {
+export function useNoticeList(filter: NoticeFilters) {
   const queryClient = useQueryClient();
   const debouncedSearch = useDebounce(filter.search, 300);
 
-  const listQuery = useQuery({
+  const query = useQuery({
     queryKey: ["notices", { ...filter, search: debouncedSearch }],
     queryFn: () =>
       NoticeService.GetNotices({
@@ -43,16 +43,6 @@ export function useNotices(filter: NoticeFilters, selectedId: string | null) {
       }),
   });
 
-  const detailOptions = (id: string) => ({
-    queryKey: ["noticeDetails", id],
-    queryFn: () => NoticeService.GetNoticeDetails(id),
-  });
-
-  const detailQuery = useQuery({
-    ...detailOptions(selectedId ?? ""),
-    enabled: !!selectedId,
-  });
-
   useEffect(() => {
     const unsubscribe = Events.On("notices:synced", (count) => {
       void queryClient.invalidateQueries({ queryKey: ["notices"] });
@@ -61,25 +51,38 @@ export function useNotices(filter: NoticeFilters, selectedId: string | null) {
     return unsubscribe;
   }, [queryClient]);
 
-  const toggleRead = useToggleField("isRead", NoticeService.ToggleNoticeRead);
-  const togglePin = useToggleField("isPinned", NoticeService.ToggleNoticePinned);
+  return { query };
+}
+
+export function useNoticeDetail(selectedId: string | null, readOnOpen: (id: string) => void) {
+  const options = (id: string) => ({
+    queryKey: ["noticeDetails", id],
+    queryFn: () => NoticeService.GetNoticeDetails(id),
+  });
+
+  const query = useQuery({
+    ...options(selectedId ?? ""),
+    enabled: !!selectedId,
+  });
+
+  const queryClient = useQueryClient();
 
   const readNotice = (id: string) => {
-    void queryClient.fetchQuery(detailOptions(id)).then((detail) => {
+    void queryClient.fetchQuery(options(id)).then((detail) => {
       if (!detail?.isRead) {
-        toggleRead.mutate({ id, next: true });
+        readOnOpen(id);
       }
       return detail;
     });
   };
 
-  return {
-    listQuery,
-    detailQuery,
-    toggleRead,
-    togglePin,
-    readNotice,
-  };
+  return { query, readNotice };
+}
+
+export function useNoticeMutations() {
+  const { mutate: toggleRead } = useToggleField("isRead", NoticeService.ToggleNoticeRead);
+  const { mutate: togglePin } = useToggleField("isPinned", NoticeService.ToggleNoticePinned);
+  return { toggleRead, togglePin };
 }
 
 function useToggleField(
@@ -156,5 +159,5 @@ export function useSync() {
     },
   });
 
-  return { syncing: syncMutation.isPending, sync: () => syncMutation.mutate() };
+  return { syncing: syncMutation.isPending, sync: syncMutation.mutate };
 }

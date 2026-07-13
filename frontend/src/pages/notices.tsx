@@ -38,7 +38,14 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 import { Separator } from "@/components/ui/separator";
 import { Toggle } from "@/components/ui/toggle";
 import { useDelayedLoading } from "@/hooks/use-delayed-loading";
-import { useNotices, useSync, type Category, type NoticeFilters } from "@/hooks/use-notices";
+import {
+  useNoticeDetail,
+  useNoticeList,
+  useNoticeMutations,
+  useSync,
+  type Category,
+  type NoticeFilters,
+} from "@/hooks/use-notices";
 import { logger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
 
@@ -76,17 +83,12 @@ const INITIAL_FILTERS: NoticeFilters = {
 };
 
 export default function NoticesPage() {
-  const [filters, setFilters] = useState<NoticeFilters>(INITIAL_FILTERS);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-
-  const { listQuery, detailQuery, toggleRead, togglePin, readNotice } = useNotices(
-    filters,
-    selectedId,
+  const { toggleRead, togglePin } = useNoticeMutations();
+  const { query: detailQuery, readNotice } = useNoticeDetail(selectedId, (id) =>
+    toggleRead({ id, next: true }),
   );
   const { syncing, sync } = useSync();
-
-  const notices = listQuery.data ?? [];
-  const unreadCount = notices.filter((notice) => !notice.isRead).length;
 
   const detail = detailQuery.data ?? null;
 
@@ -99,48 +101,76 @@ export default function NoticesPage() {
   return (
     <ResizablePanelGroup orientation="horizontal" className="flex h-full">
       <ResizablePanel defaultSize="40%" minSize="35%" className="flex flex-col bg-card">
-        <NoticeListToolbar
-          filters={filters}
-          onFilterChange={setFilters}
-          onFilterClear={() =>
-            setFilters({
-              ...filters,
-              urgent: false,
-              pinned: false,
-              unread: false,
-            })
-          }
-          syncing={syncing}
-          onSync={sync}
-          noticeCount={notices.length}
-          unreadCount={unreadCount}
-          loading={listQuery.isLoading}
-        />
-
-        <NoticeList
-          notices={notices}
-          loading={listQuery.isLoading}
-          error={listQuery.error}
+        <NoticeListPanel
           selectedId={selectedId}
           onSelect={handleSelect}
-          onTogglePin={(id, next) => togglePin.mutate({ id, next })}
-          onRetry={() => void listQuery.refetch()}
-          onClearFilters={() => setFilters(INITIAL_FILTERS)}
-          hasActiveFilters={filters.urgent || filters.pinned || filters.unread}
+          onTogglePin={(id, next) => togglePin({ id, next })}
+          syncing={syncing}
+          onSync={sync}
         />
       </ResizablePanel>
 
       <ResizableHandle withHandle />
 
       <ResizablePanel defaultSize="60%" minSize="30%" className="min-w-0">
-        <DetailView
+        <DetailPanel
           notice={detail}
           loading={detailQuery.isLoading}
-          onTogglePin={() => detail && togglePin.mutate({ id: detail.id, next: !detail.isPinned })}
-          onToggleRead={() => detail && toggleRead.mutate({ id: detail.id, next: !detail.isRead })}
+          onTogglePin={() => detail && togglePin({ id: detail.id, next: !detail.isPinned })}
+          onToggleRead={() => detail && toggleRead({ id: detail.id, next: !detail.isRead })}
         />
       </ResizablePanel>
     </ResizablePanelGroup>
+  );
+}
+
+interface NoticeListPanelProps {
+  selectedId: string | null;
+  onSelect: (notice: Notice) => void;
+  onTogglePin: (id: string, next: boolean) => void;
+  syncing: boolean;
+  onSync: () => void;
+}
+
+function NoticeListPanel({
+  selectedId,
+  onSelect,
+  onTogglePin,
+  syncing,
+  onSync,
+}: NoticeListPanelProps) {
+  const [filters, setFilters] = useState<NoticeFilters>(INITIAL_FILTERS);
+  const { query } = useNoticeList(filters);
+
+  const notices = query.data ?? [];
+  const unreadCount = notices.filter((notice) => !notice.isRead).length;
+
+  return (
+    <>
+      <NoticeListToolbar
+        filters={filters}
+        onFilterChange={setFilters}
+        onFilterClear={() =>
+          setFilters({ ...filters, urgent: false, pinned: false, unread: false })
+        }
+        syncing={syncing}
+        onSync={onSync}
+        noticeCount={notices.length}
+        unreadCount={unreadCount}
+        loading={query.isLoading}
+      />
+      <NoticeList
+        notices={notices}
+        loading={query.isLoading}
+        error={query.error}
+        selectedId={selectedId}
+        onSelect={onSelect}
+        onTogglePin={onTogglePin}
+        onRetry={() => void query.refetch()}
+        onClearFilters={() => setFilters(INITIAL_FILTERS)}
+        hasActiveFilters={filters.urgent || filters.pinned || filters.unread}
+      />
+    </>
   );
 }
 
@@ -440,7 +470,7 @@ interface DetailViewProps {
   onToggleRead: () => void;
 }
 
-function DetailView({ notice, loading, onTogglePin, onToggleRead }: DetailViewProps) {
+function DetailPanel({ notice, loading, onTogglePin, onToggleRead }: DetailViewProps) {
   const showLoader = useDelayedLoading(loading);
 
   if (loading) {
