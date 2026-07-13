@@ -41,30 +41,6 @@ export default function RoutinePage() {
     queryFn: () => RoutineService.GetUserRoutine(),
   });
 
-  const [search, setSearch] = useState("");
-  const searchDebounced = useDebounce(search, 300);
-
-  const { data: searchResults, isLoading: isSearching } = useQuery({
-    queryKey: ["courses", searchDebounced],
-    queryFn: () => RoutineService.SearchOfferedCourses(searchDebounced),
-    enabled: searchDebounced.trim().length > 0,
-  });
-
-  const addCourseMutation = useMutation({
-    mutationFn: (classId: string) => RoutineService.AddToUserRoutine(classId),
-    onSuccess: () => {
-      setSearch("");
-      void queryClient.invalidateQueries({ queryKey: ["routine"] });
-      toast.success("Course added to routine");
-    },
-    onError: (err) => {
-      logger.error("Failed to add course", err);
-      toast.error("Failed to add course", {
-        description: err.message,
-      });
-    },
-  });
-
   const removeCourseMutation = useMutation({
     mutationFn: (classId: string) => RoutineService.RemoveFromUserRoutine(classId),
     onSuccess: () => {
@@ -140,13 +116,7 @@ export default function RoutinePage() {
 
       {routine && routine.length > 0 && !loading && <RoutineStats stats={stats} />}
 
-      <CourseSearch
-        search={search}
-        setSearch={setSearch}
-        searchResults={searchResults ?? []}
-        isSearching={isSearching}
-        onAddCourse={(classId) => addCourseMutation.mutate(classId)}
-      />
+      <CourseSearch />
 
       {loading ? (
         <div className="flex min-h-[300px] flex-1 items-center justify-center">
@@ -242,21 +212,32 @@ function RoutineStats({ stats }: RoutineStatsProps) {
   );
 }
 
-interface CourseSearchProps {
-  search: string;
-  setSearch: (s: string) => void;
-  searchResults: Course[];
-  isSearching: boolean;
-  onAddCourse: (classId: string) => void;
-}
+function CourseSearch() {
+  const queryClient = useQueryClient();
+  const [search, setSearch] = useState("");
+  const searchDebounced = useDebounce(search, 300);
 
-function CourseSearch({
-  search,
-  setSearch,
-  searchResults,
-  isSearching,
-  onAddCourse,
-}: CourseSearchProps) {
+  const { data: searchResults, isLoading: isSearching } = useQuery({
+    queryKey: ["courses", searchDebounced],
+    queryFn: () => RoutineService.SearchOfferedCourses(searchDebounced),
+    enabled: searchDebounced.trim().length > 0,
+  });
+
+  const { mutate: addCourse } = useMutation({
+    mutationFn: (classId: string) => RoutineService.AddToUserRoutine(classId),
+    onSuccess: () => {
+      setSearch("");
+      void queryClient.invalidateQueries({ queryKey: ["routine"] });
+      toast.success("Course added to routine");
+    },
+    onError: (err) => {
+      logger.error("Failed to add course", err);
+      toast.error("Failed to add course", {
+        description: err.message,
+      });
+    },
+  });
+
   return (
     <div className="relative z-50">
       <SearchInput
@@ -268,7 +249,7 @@ function CourseSearch({
         className="[&>div:last-child]:right-3 [&>input]:h-10 [&>input]:pl-9 [&>input]:text-sm [&>input]:shadow-sm [&>svg]:size-4 [&>svg:first-child]:left-3 [&>svg:last-child]:right-3 [&>svg:last-child]:size-5"
       />
 
-      {search !== "" && searchResults.length > 0 && (
+      {search !== "" && searchResults && searchResults.length > 0 && (
         <Card className="absolute mt-2 max-h-80 w-full animate-in scrollbar-thin scrollbar-thumb-accent overflow-y-auto rounded-lg border border-muted/40 bg-popover/95 pt-0 pb-0 shadow-xl backdrop-blur-md duration-200 fade-in-10">
           <div className="flex flex-col">
             {searchResults.map((course) => (
@@ -276,11 +257,11 @@ function CourseSearch({
                 type="button"
                 key={course.classID}
                 tabIndex={0}
-                onClick={() => onAddCourse(course.classID)}
+                onClick={() => addCourse(course.classID)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
-                    onAddCourse(course.classID);
+                    addCourse(course.classID);
                   }
                 }}
                 className={cn(
@@ -318,7 +299,7 @@ function CourseSearch({
         </Card>
       )}
 
-      {search !== "" && !isSearching && searchResults.length === 0 && (
+      {search !== "" && !isSearching && searchResults?.length === 0 && (
         <Card className="absolute mt-2 w-full animate-in rounded-lg border border-muted/40 p-4 text-center text-xs text-muted-foreground shadow-lg duration-200 fade-in-10">
           No matching offered courses found in the database.
         </Card>
