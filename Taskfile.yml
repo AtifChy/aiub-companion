@@ -49,6 +49,12 @@ tasks:
     cmds:
       - task: common:setup:docker
 
+  setup:hooks:
+    summary: Sets up Git pre-commit hooks
+    desc: Installs the pre-commit hook that runs checks for Go and frontend
+    cmds:
+      - go run scripts/hooks.go
+
   build:server:
     summary: Builds the application in server mode (no GUI, HTTP server only)
     cmds:
