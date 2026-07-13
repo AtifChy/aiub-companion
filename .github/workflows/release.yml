@@ -45,7 +45,7 @@ jobs:
       - name: Install PNPM
         uses: pnpm/action-setup@v6
         with:
-          version: latest
+          version: 11.10.0
 
       - name: Install NSIS on Windows
         if: matrix.os == 'windows'
