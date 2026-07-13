@@ -1,4 +1,5 @@
 import { Events, Updater } from "@wailsio/runtime";
+import DOMPurify from "dompurify";
 import { DownloadIcon } from "lucide-react";
 import { marked } from "marked";
 import { useEffect, useState } from "react";
@@ -102,15 +103,15 @@ function useDownloadProgress() {
 }
 
 function Markdown({ children }: { children: string }) {
-  const html = marked.parse(children, { async: false });
+  const html = DOMPurify.sanitize(marked.parse(children, { async: false }));
 
   return (
     <div
       className={cn(
         "prose prose-sm prose-custom select-text dark:prose-invert",
         "prose-a:no-underline prose-code:rounded-sm prose-code:bg-primary/10 prose-code:px-1 [&_code]:before:content-none [&_code]:after:content-none",
+        "prose-blockquote:text-muted-foreground",
       )}
-      // react-doctor-disable-next-line react-doctor/dangerous-html-sink
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
