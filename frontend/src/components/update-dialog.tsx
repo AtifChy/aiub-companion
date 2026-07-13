@@ -17,7 +17,7 @@ import {
 import { cn } from "@/lib/utils";
 
 export function UpdateDialog() {
-  const { release, dialogOpen, setDialogOpen, check, install } = useUpdate();
+  const { release, dialogOpen, setDialogOpen, install } = useUpdate();
 
   if (!release) return null;
 
@@ -48,7 +48,7 @@ export function UpdateDialog() {
           <AlertDialogCancel disabled={downloading} variant="outline">
             Later
           </AlertDialogCancel>
-          <DownlaodAction downloading={downloading} onClick={() => check.mutate()} />
+          <DownlaodAction downloading={downloading} onClick={() => install.mutate()} />
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
