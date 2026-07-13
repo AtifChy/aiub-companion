@@ -253,47 +253,7 @@ function CourseSearch() {
         <Card className="absolute mt-2 max-h-80 w-full animate-in scrollbar-thin scrollbar-thumb-accent overflow-y-auto rounded-lg border border-muted/40 bg-popover/95 pt-0 pb-0 shadow-xl backdrop-blur-md duration-200 fade-in-10">
           <div className="flex flex-col">
             {searchResults.map((course) => (
-              <button
-                type="button"
-                key={course.classID}
-                tabIndex={0}
-                onClick={() => addCourse(course.classID)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    addCourse(course.classID);
-                  }
-                }}
-                className={cn(
-                  "flex cursor-pointer items-center justify-between border-b px-4 py-3 transition-colors last:border-0 hover:bg-accent/60",
-                  "outline-none focus-visible:rounded focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-inset",
-                )}
-              >
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-2 text-sm font-semibold">
-                    {course.courseCode && (
-                      <Badge variant="secondary" className="px-1.5 py-0.5 font-mono text-[9px]">
-                        {course.courseCode}
-                      </Badge>
-                    )}
-                    <span>{course.courseTitle}</span>
-                    <span className="text-xs font-normal text-muted-foreground">
-                      [{course.section}]
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-4 text-[11px] text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <UserIcon className="size-3" /> {course.faculty}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <CalendarIcon className="size-3" /> {course.day}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <ClockIcon className="size-3" /> {course.startTime} - {course.endTime}
-                    </span>
-                  </div>
-                </div>
-              </button>
+              <SearchResultItem key={course.classID} course={course} onAdd={addCourse} />
             ))}
           </div>
         </Card>
@@ -305,6 +265,50 @@ function CourseSearch() {
         </Card>
       )}
     </div>
+  );
+}
+
+function SearchResultItem({ course, onAdd }: { course: Course; onAdd: (classId: string) => void }) {
+  return (
+    <button
+      type="button"
+      key={course.classID}
+      tabIndex={0}
+      onClick={() => onAdd(course.classID)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          onAdd(course.classID);
+        }
+      }}
+      className={cn(
+        "flex cursor-pointer items-center justify-between border-b px-4 py-3 transition-colors last:border-0 hover:bg-accent/60",
+        "outline-none focus-visible:rounded focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-inset",
+      )}
+    >
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-2 text-sm font-semibold">
+          {course.courseCode && (
+            <Badge variant="secondary" className="px-1.5 py-0.5 font-mono text-[9px]">
+              {course.courseCode}
+            </Badge>
+          )}
+          <span>{course.courseTitle}</span>
+          <span className="text-xs font-normal text-muted-foreground">[{course.section}]</span>
+        </div>
+        <div className="flex items-center gap-4 text-[11px] text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <UserIcon className="size-3" /> {course.faculty}
+          </span>
+          <span className="flex items-center gap-1">
+            <CalendarIcon className="size-3" /> {course.day}
+          </span>
+          <span className="flex items-center gap-1">
+            <ClockIcon className="size-3" /> {course.startTime} - {course.endTime}
+          </span>
+        </div>
+      </div>
+    </button>
   );
 }
 
