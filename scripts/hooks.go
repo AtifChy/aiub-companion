@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	hookSrc := filepath.Join("scripts", "pre-commit")
+	hookSrc := filepath.Join("scripts", "pre-commit.sh")
 	hookDst := filepath.Join(".git", "hooks", "pre-commit")
 
 	// Ensure .git/hooks directory exists
