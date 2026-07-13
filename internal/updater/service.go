@@ -7,7 +7,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/microcosm-cc/bluemonday"
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/updater"
 	"github.com/wailsapp/wails/v3/pkg/updater/providers/github"
@@ -102,13 +101,11 @@ func (s *Service) CheckForUpdates(ctx context.Context) (*Release, error) {
 		return nil, nil
 	}
 
-	notes := bluemonday.UGCPolicy().Sanitize(rel.Notes)
-
 	slog.Info("Update available", "version", rel.Version)
 
 	return &Release{
 		Version: rel.Version,
-		Notes:   notes,
+		Notes:   rel.Notes,
 	}, nil
 }
 
