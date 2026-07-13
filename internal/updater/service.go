@@ -80,7 +80,10 @@ func (s *Service) Init(app *application.App) error {
 	return nil
 }
 
-type Release = updater.Release
+type Release struct {
+	Version string `json:"version"`
+	Notes   string `json:"notes"`
+}
 
 func (s *Service) CheckForUpdates(ctx context.Context) (*Release, error) {
 	app := application.Get()
@@ -99,15 +102,14 @@ func (s *Service) CheckForUpdates(ctx context.Context) (*Release, error) {
 		return nil, nil
 	}
 
-	url, ok := rel.Metadata["github.release.htmlURL"].(string)
-	if !ok {
-		slog.Error("Failed to get release URL from metadata")
-	}
-	url = bluemonday.UGCPolicy().Sanitize(url)
+	notes := bluemonday.UGCPolicy().Sanitize(rel.Notes)
 
-	slog.Info("Update available", "version", rel.Version, "url", url)
+	slog.Info("Update available", "version", rel.Version)
 
-	return rel, nil
+	return &Release{
+		Version: rel.Version,
+		Notes:   notes,
+	}, nil
 }
 
 func (s *Service) DownloadUpdate(ctx context.Context) error {

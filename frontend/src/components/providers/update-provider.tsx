@@ -60,7 +60,12 @@ export function UpdateProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = Events.On(Updater.Events.UpdateAvailable, (event) => {
-      setRelease(event.data);
+      const release = event.data;
+      if (!release) return;
+      setRelease({
+        version: release.version,
+        notes: release.notes ?? "",
+      });
       setDialogOpen(true);
     });
     return unsubscribe;
