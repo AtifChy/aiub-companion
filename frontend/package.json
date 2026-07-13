@@ -9,8 +9,8 @@
     "build": "tsc && vite build --mode production",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "eslint . --cache --concurrency=auto",
+    "lint:fix": "eslint . --cache --concurrency=auto --fix",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
     "doctor": "react-doctor --yes"
