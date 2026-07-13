@@ -60,32 +60,10 @@ const faqs: FAQItem[] = [
 ] as const;
 
 export default function HelpPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-
   return (
     <div className="mr-0.5 h-full animate-in scrollbar-thin scrollbar-thumb-accent scrollbar-gutter-both space-y-8 overflow-y-auto bg-background p-6 duration-200 fade-in-10 lg:p-10">
       <Header />
-
-      {/* FAQ Section */}
-      <div className="space-y-4">
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-          <h2 className="flex items-center gap-2 text-xl font-bold">
-            <HelpCircleIcon className="h-5 w-5 text-muted-foreground" />
-            Frequently Asked Questions
-          </h2>
-
-          {/* Search Box */}
-          <SearchInput
-            value={searchQuery}
-            onValueChange={setSearchQuery}
-            placeholder="Search help topics..."
-            className="w-full sm:w-80"
-          />
-        </div>
-
-        <FAQList searchQuery={searchQuery} />
-      </div>
-
+      <FAQ />
       <Separator />
       <Footer />
     </div>
@@ -99,6 +77,29 @@ function Header() {
       <p className="text-sm text-muted-foreground">
         Find answers, view quick guides, and get the most out of your AIUB Companion.
       </p>
+    </div>
+  );
+}
+
+function FAQ() {
+  const [search, setSearch] = useState("");
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <h2 className="flex items-center gap-2 text-xl font-bold">
+          <HelpCircleIcon className="h-5 w-5 text-muted-foreground" />
+          Frequently Asked Questions
+        </h2>
+
+        <SearchInput
+          value={search}
+          onValueChange={setSearch}
+          placeholder="Search help topics..."
+          className="w-full sm:w-80"
+        />
+      </div>
+
+      <FAQList searchQuery={search} />
     </div>
   );
 }
