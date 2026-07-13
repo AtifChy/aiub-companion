@@ -41,7 +41,7 @@ export default function RoutinePage() {
     queryFn: () => RoutineService.GetUserRoutine(),
   });
 
-  const removeCourseMutation = useMutation({
+  const { mutate: removeCourse } = useMutation({
     mutationFn: (classId: string) => RoutineService.RemoveFromUserRoutine(classId),
     onSuccess: () => {
       toast.success("Course removed from routine");
@@ -55,7 +55,7 @@ export default function RoutinePage() {
     },
   });
 
-  const importCoursesMutation = useMutation({
+  const { mutate: importCourses } = useMutation({
     mutationFn: (path: string) => RoutineService.ImportOfferedCourses(path),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["courses"] });
@@ -79,7 +79,7 @@ export default function RoutinePage() {
     })
       .then((path) => {
         if (!path) return;
-        importCoursesMutation.mutate(path);
+        importCourses(path);
       })
       .catch((err) => {
         logger.error("Failed to open file dialog", err);
@@ -127,7 +127,7 @@ export default function RoutinePage() {
       ) : (
         <DayScheduleTimeline
           routineByDay={routineByDay}
-          onRemoveCourse={(classId) => removeCourseMutation.mutate(classId)}
+          onRemoveCourse={(classId) => removeCourse(classId)}
         />
       )}
     </div>
