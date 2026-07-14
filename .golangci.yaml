@@ -1,0 +1,23 @@
+version: "2"
+
+run:
+  go: "1.26"
+
+linters:
+  default: standard
+
+  enable:
+    - copyloopvar
+    - perfsprint
+    - prealloc
+    - staticcheck
+    - usestdlibvars
+
+  settings:
+    staticcheck:
+      checks:
+        - all
+
+  exclusions:
+    paths:
+      - "build/*"
