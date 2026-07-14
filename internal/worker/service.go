@@ -44,7 +44,7 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 
 	application.Get().Event.On(event.EventConfigChanged, func(ev *application.CustomEvent) {
 		if cfg, ok := ev.Data.(config.Config); ok {
-			s.intervalCh <- time.Duration(cfg.Sync.IntervalMinutes) * time.Minute
+			s.intervalCh <- time.Duration(cfg.Sync.Interval) * time.Minute
 		}
 	})
 
@@ -62,7 +62,7 @@ func (s *Service) ServiceShutdown() error {
 
 func (s *Service) run(ctx context.Context) {
 	cfg := s.config.GetConfig()
-	interval := time.Duration(cfg.Sync.IntervalMinutes) * time.Minute
+	interval := time.Duration(cfg.Sync.Interval) * time.Minute
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 

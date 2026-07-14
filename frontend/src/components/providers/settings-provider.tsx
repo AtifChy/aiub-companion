@@ -63,7 +63,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(timer);
   }, [config, queryClient]);
 
-  const resetMutation = useMutation({
+  const { mutateAsync: resetConfig } = useMutation({
     mutationFn: ConfigService.ResetConfig,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["config"] });
@@ -93,7 +93,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <SettingsContext.Provider value={{ config, setConfig, resetConfig: resetMutation.mutateAsync }}>
+    <SettingsContext.Provider value={{ config, setConfig, resetConfig }}>
       {children}
     </SettingsContext.Provider>
   );

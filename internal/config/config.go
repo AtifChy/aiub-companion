@@ -13,20 +13,16 @@ import (
 )
 
 type Config struct {
-	// Appearance
-	Theme string `json:"theme" jsonschema:"enum=light,enum=dark,enum=system"`
-
-	// Advanced
-	LogLevel string `json:"log_level" jsonschema:"enum=DEBUG,enum=INFO,enum=WARN,enum=ERROR"`
-
-	// Sync
-	Sync synchronization `json:"sync"`
-
-	// Launch
-	Launch launch `json:"launch"`
-
-	// Notifications
+	Appearance    appearance   `json:"appearance"`
+	Sync          sync_        `json:"sync"`
+	Launch        launch       `json:"launch"`
+	Updates       updates      `json:"updates"`
 	Notifications notification `json:"notifications"`
+	Logging       logging      `json:"logging"`
+}
+
+type appearance struct {
+	Theme string `json:"theme" jsonschema:"enum=light,enum=dark,enum=system"`
 }
 
 type notification struct {
@@ -41,14 +37,25 @@ type launch struct {
 	SidebarOpen    bool `json:"sidebar_open"`
 }
 
-type synchronization struct {
-	IntervalMinutes int  `json:"interval_minutes"`
-	FetchCount      int  `json:"fetch_count"`
-	OnStartup       bool `json:"on_startup"`
+type sync_ struct {
+	Interval   int  `json:"interval"`
+	FetchCount int  `json:"fetch_count"`
+	OnStartup  bool `json:"on_startup"`
+}
+
+type updates struct {
+	Interval string `json:"interval" jsonschema:"enum=never,enum=daily,enum=weekly,enum=monthly"`
+}
+
+type logging struct {
+	Level string `json:"level" jsonschema:"enum=DEBUG,enum=INFO,enum=WARN,enum=ERROR"`
 }
 
 func defaultConfig() *Config {
 	return &Config{
+		Appearance: appearance{
+			Theme: "system",
+		},
 		Notifications: notification{
 			Enabled: true,
 		},
@@ -59,13 +66,17 @@ func defaultConfig() *Config {
 			RestoreWindow:  false,
 			SidebarOpen:    true,
 		},
-		Sync: synchronization{
-			IntervalMinutes: 30,
-			FetchCount:      20,
-			OnStartup:       false,
+		Sync: sync_{
+			Interval:   30,
+			FetchCount: 20,
+			OnStartup:  false,
 		},
-		Theme:    "system",
-		LogLevel: "INFO",
+		Updates: updates{
+			Interval: "weekly",
+		},
+		Logging: logging{
+			Level: "INFO",
+		},
 	}
 }
 

@@ -34,6 +34,11 @@ const syncIntervalItems: Items<number> = [30, 60, 120, 180, 360].map((v) => ({
   label: v >= 60 ? `${v / 60} hour${v === 60 ? "" : "s"}` : `${v} minutes`,
 }));
 
+const updateIntervalItems: Items<string> = ["daily", "weekly", "monthly", "never"].map((v) => ({
+  value: v,
+  label: v.charAt(0).toUpperCase() + v.slice(1),
+}));
+
 const fetchCountItems: Items<number> = [10, 20, 30, 50].map((v) => ({
   value: v,
   label: `${v} notices`,
@@ -79,11 +84,11 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
             <SettingRow label="Theme" description="Select your prefered color theme">
               <SettingSelect
                 items={themeItems}
-                value={config.theme}
+                value={config.appearance.theme}
                 onValueChange={(v) => {
                   updateConfig((draft) => {
                     if (draft) {
-                      draft.theme = v;
+                      draft.appearance.theme = v;
                       setTheme(v);
                     }
                   });
@@ -115,10 +120,10 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
             >
               <SettingSelect
                 items={syncIntervalItems}
-                value={config.sync.interval_minutes}
+                value={config.sync.interval}
                 onValueChange={(v) => {
                   updateConfig((draft) => {
-                    if (draft) draft.sync.interval_minutes = v;
+                    if (draft) draft.sync.interval = v;
                   });
                 }}
               />
@@ -233,11 +238,16 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
 
           {System.IsWindows() && (
             <SettingsCard title="Updates">
-              <SettingRow
-                label="Auto Check for Updates"
-                description="Automatically check for updates"
-              >
-                <Switch className="cursor-pointer" />
+              <SettingRow label="Update Interval" description="How often to check for updates">
+                <SettingSelect
+                  items={updateIntervalItems}
+                  value={config.updates.interval}
+                  onValueChange={(v) => {
+                    updateConfig((draft) => {
+                      if (draft) draft.updates.interval = v;
+                    });
+                  }}
+                />
               </SettingRow>
 
               <SettingRow label="Check for Updates" description="Manually check for updates">
@@ -256,10 +266,10 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
             >
               <SettingSelect
                 items={logLevelItems}
-                value={config.log_level}
+                value={config.logging.level}
                 onValueChange={(v) => {
                   updateConfig((draft) => {
-                    if (draft) draft.log_level = v;
+                    if (draft) draft.logging.level = v;
                   });
                 }}
               />

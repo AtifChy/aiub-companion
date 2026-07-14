@@ -22,7 +22,7 @@ func NewService(logger *logger.Logger) *Service {
 func (s *Service) ServiceStartup(ctx context.Context, _ application.ServerOptions) error {
 	application.Get().Event.On(event.EventConfigChanged, func(ev *application.CustomEvent) {
 		if cfg, ok := ev.Data.(config.Config); ok {
-			if level, err := config.ParseLogLevel(cfg.LogLevel); err == nil {
+			if level, err := config.ParseLogLevel(cfg.Logging.Level); err == nil {
 				s.logger.SetLevel(level)
 			} else {
 				s.logger.L().Warn("invalid log level in config", "error", err)

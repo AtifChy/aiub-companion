@@ -4,6 +4,38 @@
   "$defs": {
     "Config": {
       "properties": {
+        "appearance": {
+          "$ref": "#/$defs/appearance"
+        },
+        "sync": {
+          "$ref": "#/$defs/sync_"
+        },
+        "launch": {
+          "$ref": "#/$defs/launch"
+        },
+        "updates": {
+          "$ref": "#/$defs/updates"
+        },
+        "notifications": {
+          "$ref": "#/$defs/notification"
+        },
+        "logging": {
+          "$ref": "#/$defs/logging"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "appearance",
+        "sync",
+        "launch",
+        "updates",
+        "notifications",
+        "logging"
+      ]
+    },
+    "appearance": {
+      "properties": {
         "theme": {
           "type": "string",
           "enum": [
@@ -11,34 +43,12 @@
             "dark",
             "system"
           ]
-        },
-        "log_level": {
-          "type": "string",
-          "enum": [
-            "DEBUG",
-            "INFO",
-            "WARN",
-            "ERROR"
-          ]
-        },
-        "sync": {
-          "$ref": "#/$defs/synchronization"
-        },
-        "launch": {
-          "$ref": "#/$defs/launch"
-        },
-        "notifications": {
-          "$ref": "#/$defs/notification"
         }
       },
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "theme",
-        "log_level",
-        "sync",
-        "launch",
-        "notifications"
+        "theme"
       ]
     },
     "launch": {
@@ -69,6 +79,24 @@
         "sidebar_open"
       ]
     },
+    "logging": {
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": [
+            "DEBUG",
+            "INFO",
+            "WARN",
+            "ERROR"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "level"
+      ]
+    },
     "notification": {
       "properties": {
         "enabled": {
@@ -81,9 +109,9 @@
         "enabled"
       ]
     },
-    "synchronization": {
+    "sync_": {
       "properties": {
-        "interval_minutes": {
+        "interval": {
           "type": "integer"
         },
         "fetch_count": {
@@ -96,9 +124,27 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "interval_minutes",
+        "interval",
         "fetch_count",
         "on_startup"
+      ]
+    },
+    "updates": {
+      "properties": {
+        "interval": {
+          "type": "string",
+          "enum": [
+            "never",
+            "daily",
+            "weekly",
+            "monthly"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "interval"
       ]
     }
   }
