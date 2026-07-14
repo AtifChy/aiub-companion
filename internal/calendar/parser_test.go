@@ -305,6 +305,12 @@ func TestAcademicCalendar_GetNextExam(t *testing.T) {
 }
 
 func TestParser_RealWorldHTML_DebugExams(t *testing.T) {
+	oldTimeNow := timeNow
+	defer func() { timeNow = oldTimeNow }()
+	timeNow = func() time.Time {
+		return time.Date(2026, 7, 10, 0, 0, 0, 0, time.Local)
+	}
+
 	html := `
 <table>
 <tbody>
@@ -395,6 +401,12 @@ func TestParser_RealWorldHTML_DebugExams(t *testing.T) {
 }
 
 func TestParser_AIUBExamFormat(t *testing.T) {
+	oldTimeNow := timeNow
+	defer func() { timeNow = oldTimeNow }()
+	timeNow = func() time.Time {
+		return time.Date(2026, 7, 10, 0, 0, 0, 0, time.Local)
+	}
+
 	// Test with actual AIUB calendar exam format
 	html := `
 <table>
