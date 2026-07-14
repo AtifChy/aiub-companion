@@ -24,34 +24,11 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <SettingsProvider>
-        <UpdateProvider>
-          <ShellProviders>
-            <AppRouter />
-            <Toaster position="top-center" richColors />
-            <UpdateDialog />
-          </ShellProviders>
-        </UpdateProvider>
+        <ThemeProvider>
+          <AppRouter />
+        </ThemeProvider>
       </SettingsProvider>
     </QueryClientProvider>
-  );
-}
-
-function ShellProviders({ children }: { children: React.ReactNode }) {
-  const { config } = useSettings();
-  return (
-    <ThemeProvider>
-      <SidebarProvider
-        defaultOpen={config.launch.sidebar_open}
-        style={
-          {
-            "--sidebar-width": "14rem",
-            "--sidebar-width-mobile": "14rem",
-          } as React.CSSProperties
-        }
-      >
-        <TooltipProvider>{children}</TooltipProvider>
-      </SidebarProvider>
-    </ThemeProvider>
   );
 }
 
@@ -60,15 +37,37 @@ function AppRouter() {
   return (
     <HashRouter>
       <Routes>
-        <Route element={<Layout />}>
+        <Route element={<AppLayout />}>
           <Route index element={<Navigate to={initialRoute.path} />} />
           {routes.map((route) => (
             <Route key={route.path} path={route.path} element={<route.component />} />
           ))}
         </Route>
-
         <Route path="/about" element={<AboutPage />} />
       </Routes>
     </HashRouter>
+  );
+}
+
+function AppLayout() {
+  const { config } = useSettings();
+  return (
+    <SidebarProvider
+      defaultOpen={config.launch.sidebar_open}
+      style={
+        {
+          "--sidebar-width": "14rem",
+          "--sidebar-width-mobile": "14rem",
+        } as React.CSSProperties
+      }
+    >
+      <TooltipProvider>
+        <UpdateProvider>
+          <Layout />
+          <UpdateDialog />
+          <Toaster position="top-center" richColors />
+        </UpdateProvider>
+      </TooltipProvider>
+    </SidebarProvider>
   );
 }
