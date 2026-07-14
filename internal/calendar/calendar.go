@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+var timeNow = time.Now
+
 type CalendarType string
 
 const (
@@ -35,7 +37,7 @@ type AcademicEvent struct {
 }
 
 func (e *AcademicEvent) IsPast() bool {
-	return isBeforeDay(e.Date, time.Now())
+	return isBeforeDay(e.Date, timeNow())
 }
 
 func (e *AcademicEvent) IsInRange(t time.Time) bool {
@@ -46,7 +48,7 @@ func (e *AcademicEvent) IsInRange(t time.Time) bool {
 }
 
 func (e *AcademicEvent) DaysUntil() int {
-	now := time.Now()
+	now := timeNow()
 	if isBeforeDay(e.Date, now) {
 		return 0
 	}
@@ -70,7 +72,7 @@ type AcademicCalendar struct {
 }
 
 func (c *AcademicCalendar) GetCurrentWeek() int {
-	now := time.Now()
+	now := timeNow()
 	for _, w := range c.Weeks {
 		if !isBeforeDay(now, w.Start) && !isAfterDay(now, w.End) {
 			return w.Number
@@ -95,7 +97,7 @@ func (c *AcademicCalendar) GetProgressPercentage() float64 {
 
 func (c *AcademicCalendar) GetUpcomingEvents(limit int) []AcademicEvent {
 	var upcoming []AcademicEvent
-	now := time.Now()
+	now := timeNow()
 
 	sorted := make([]AcademicEvent, len(c.Events))
 	copy(sorted, c.Events)
@@ -125,7 +127,7 @@ func (c *AcademicCalendar) GetEventsByCategory(category EventCategory) []Academi
 }
 
 func (c *AcademicCalendar) GetNextExam() *AcademicEvent {
-	now := time.Now()
+	now := timeNow()
 
 	sorted := make([]AcademicEvent, len(c.Events))
 	copy(sorted, c.Events)
