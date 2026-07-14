@@ -14,11 +14,11 @@ import (
 
 type Config struct {
 	Appearance    appearance   `json:"appearance"`
+	Updates       updates      `json:"updates"`
+	Logging       logging      `json:"logging"`
 	Sync          sync_        `json:"sync"`
 	Launch        launch       `json:"launch"`
-	Updates       updates      `json:"updates"`
 	Notifications notification `json:"notifications"`
-	Logging       logging      `json:"logging"`
 }
 
 type appearance struct {
