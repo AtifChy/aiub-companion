@@ -3,7 +3,7 @@
 //   sqlc v1.31.1
 // source: calendar.sql
 
-package db
+package sqlc
 
 import (
 	"context"

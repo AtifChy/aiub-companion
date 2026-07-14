@@ -5,8 +5,8 @@ sql:
     queries: internal/database/sql/queries
     gen:
       go:
-        package: db
-        out: internal/database/db
+        package: sqlc
+        out: internal/database/sqlc
         sql_package: database/sql
         # emit_interface: true
         emit_empty_slices: true
