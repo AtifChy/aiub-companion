@@ -3,30 +3,25 @@ package database
 import (
 	"context"
 	"database/sql"
-	"fmt"
-
-	"aiub-companion/internal/database/db"
+	"errors"
+	"log/slog"
 )
 
-func RunInTx(ctx context.Context, conn *sql.DB, queries *db.Queries, fn func(*db.Queries) error) error {
-	tx, err := conn.BeginTx(ctx, nil)
+func RunInTx(ctx context.Context, db *sql.DB, fn func(*sql.Tx) error) error {
+	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
 
 	defer func() {
-		if p := recover(); p != nil {
-			_ = tx.Rollback()
-			panic(p) // re-throw panic after Rollback
+		if err := tx.Rollback(); err != nil && !errors.Is(err, sql.ErrTxDone) {
+			slog.Error("Failed to rollback transaction", "error", err)
 		}
 	}()
 
-	qtx := queries.WithTx(tx)
-	if err := fn(qtx); err != nil {
-		if rbErr := tx.Rollback(); rbErr != nil {
-			return fmt.Errorf("rollback failed: %v, original error: %w", rbErr, err)
-		}
+	if err := fn(tx); err != nil {
 		return err
 	}
+
 	return tx.Commit()
 }
