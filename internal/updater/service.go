@@ -2,6 +2,7 @@ package updater
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -114,7 +115,7 @@ type Release struct {
 func (s *Service) CheckForUpdates(ctx context.Context) (*Release, error) {
 	app := application.Get()
 	if app == nil || app.Updater == nil {
-		return nil, fmt.Errorf("updater not initialized")
+		return nil, errors.New("updater not initialized")
 	}
 
 	rel, err := app.Updater.Check(ctx)
@@ -143,7 +144,7 @@ func (s *Service) DownloadUpdate(ctx context.Context) error {
 	app := application.Get()
 
 	if app == nil || app.Updater == nil {
-		return fmt.Errorf("updater not initialized")
+		return errors.New("updater not initialized")
 	}
 
 	err := app.Updater.DownloadAndInstall(ctx)
@@ -158,7 +159,7 @@ func (s *Service) InstallUpdate(ctx context.Context) error {
 	app := application.Get()
 
 	if app == nil || app.Updater == nil {
-		return fmt.Errorf("updater not initialized")
+		return errors.New("updater not initialized")
 	}
 
 	return app.Updater.Restart(ctx)

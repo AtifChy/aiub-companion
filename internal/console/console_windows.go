@@ -7,6 +7,7 @@ import (
 	"golang.org/x/sys/windows"
 )
 
+//nolint:staticcheck
 const ATTACH_PARENT_PROCESS = ^uint32(0) // (DWORD)-1
 
 var (

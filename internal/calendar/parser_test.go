@@ -1,6 +1,7 @@
 package calendar
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"testing"
@@ -18,7 +19,7 @@ func parseHTML(p *Parser, content string) (*AcademicCalendar, error) {
 
 	table := findNode(doc, "table")
 	if table == nil {
-		return nil, fmt.Errorf("no table found in HTML")
+		return nil, errors.New("no table found in HTML")
 	}
 
 	return p.Parse(table, "")
@@ -372,7 +373,7 @@ func TestParser_RealWorldHTML_DebugExams(t *testing.T) {
 	midtermExam := findEventByTitle(calendar.Events, "Midterm Exam")
 	if midtermExam == nil {
 		// List all titles for debugging
-		var titles []string
+		titles := make([]string, 0, len(calendar.Events))
 		for _, e := range calendar.Events {
 			titles = append(titles, e.Title)
 		}

@@ -1,6 +1,7 @@
 package calendar
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"sort"
@@ -78,7 +79,7 @@ type rowspanState struct {
 func (p *Parser) parseTable(doc *html.Node) (events []AcademicEvent, weeks []Week, totalWeek int, err error) {
 	table := findNode(doc, "table")
 	if table == nil {
-		return nil, nil, 0, fmt.Errorf("no table found in HTML")
+		return nil, nil, 0, errors.New("no table found in HTML")
 	}
 
 	tbody := findNode(table, "tbody")

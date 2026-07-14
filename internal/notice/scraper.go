@@ -128,7 +128,7 @@ func (s *scraper) ScrapeNoticeDetails(ctx context.Context, slug string) (NoticeD
 
 	contents := findNodesByClass(doc, "div", "question-column")
 	if len(contents) < 2 {
-		return NoticeDetails{}, fmt.Errorf("fetch notice details: invalid page structure")
+		return NoticeDetails{}, errors.New("invalid page structure")
 	}
 
 	title := getInnerText(contents[0])

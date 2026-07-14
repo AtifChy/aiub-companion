@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -37,7 +38,7 @@ func (r *repository) GetCalendarCache(ctx context.Context, calType CalendarType)
 	if err != nil {
 		return nil, fmt.Errorf("parse scraped_at: %w", err)
 	} else if time.Since(scrapedAt) > r.cacheTTL {
-		return nil, fmt.Errorf("cache expired")
+		return nil, errors.New("cache expired")
 	}
 
 	var calendar AcademicCalendar

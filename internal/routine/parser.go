@@ -1,6 +1,7 @@
 package routine
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -49,7 +50,7 @@ func parseCourses(rows [][]string) ([]Course, error) {
 	}
 
 	if !headerFound {
-		return nil, fmt.Errorf("header row not found")
+		return nil, errors.New("header row not found")
 	}
 
 	return courses, nil
