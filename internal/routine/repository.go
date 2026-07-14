@@ -5,7 +5,7 @@ import (
 	"database/sql"
 
 	"aiub-companion/internal/database"
-	"aiub-companion/internal/database/db"
+	"aiub-companion/internal/database/sqlc"
 )
 
 type Repository interface {
@@ -19,20 +19,20 @@ type Repository interface {
 }
 
 type repository struct {
-	queries *db.Queries
-	dbConn  *sql.DB
+	db      *sql.DB
+	queries *sqlc.Queries
 }
 
-func NewRepository(dbConn *sql.DB) Repository {
+func NewRepository(db *sql.DB) Repository {
 	return &repository{
-		queries: db.New(dbConn),
-		dbConn:  dbConn,
+		db:      db,
+		queries: sqlc.New(db),
 	}
 }
 
 func (r *repository) WithTx(ctx context.Context, fn func(Repository) error) error {
-	return database.RunInTx(ctx, r.dbConn, r.queries, func(qtx *db.Queries) error {
-		return fn(&repository{queries: qtx, dbConn: r.dbConn})
+	return database.RunInTx(ctx, r.db, func(tx *sql.Tx) error {
+		return fn(&repository{queries: r.queries.WithTx(tx), db: r.db})
 	})
 }
 
@@ -54,7 +54,7 @@ func (r *repository) ListOfferedCourses(ctx context.Context) ([]Course, error) {
 }
 
 func (r *repository) InsertOfferedCourse(ctx context.Context, c Course) error {
-	return r.queries.InsertOfferedCourse(ctx, db.InsertOfferedCourseParams{
+	return r.queries.InsertOfferedCourse(ctx, sqlc.InsertOfferedCourseParams{
 		ClassID:     c.ClassID,
 		CourseCode:  database.StringOrNull(c.CourseCode),
 		CourseTitle: c.CourseTitle,
@@ -81,7 +81,7 @@ func (r *repository) ClearOfferedCourses(ctx context.Context) error {
 	return r.queries.ClearOfferedCourses(ctx)
 }
 
-func toCourses(rows []db.OfferedCourse) []Course {
+func toCourses(rows []sqlc.OfferedCourse) []Course {
 	courses := make([]Course, len(rows))
 	for i := range rows {
 		courses[i] = Course{

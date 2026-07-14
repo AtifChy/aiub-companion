@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"aiub-companion/internal/database/db"
+	"aiub-companion/internal/database/sqlc"
 )
 
 type Repository interface {
@@ -16,13 +16,13 @@ type Repository interface {
 }
 
 type repository struct {
-	queries  *db.Queries
+	queries  *sqlc.Queries
 	cacheTTL time.Duration
 }
 
 func NewRepository(dbConn *sql.DB, cacheTTL time.Duration) Repository {
 	return &repository{
-		queries:  db.New(dbConn),
+		queries:  sqlc.New(dbConn),
 		cacheTTL: cacheTTL,
 	}
 }
@@ -54,7 +54,7 @@ func (r *repository) UpsertCalendarCache(ctx context.Context, calType CalendarTy
 		return fmt.Errorf("marshal calendar: %w", err)
 	}
 
-	return r.queries.UpsertCalendarCache(ctx, db.UpsertCalendarCacheParams{
+	return r.queries.UpsertCalendarCache(ctx, sqlc.UpsertCalendarCacheParams{
 		CalendarType: string(calType),
 		Data:         string(data),
 	})

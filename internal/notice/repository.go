@@ -5,7 +5,7 @@ import (
 	"database/sql"
 
 	"aiub-companion/internal/database"
-	"aiub-companion/internal/database/db"
+	"aiub-companion/internal/database/sqlc"
 )
 
 type Repository interface {
@@ -24,25 +24,25 @@ type Repository interface {
 }
 
 type repository struct {
-	queries *db.Queries
-	dbConn  *sql.DB
+	db      *sql.DB
+	queries *sqlc.Queries
 }
 
-func NewRepository(dbConn *sql.DB) Repository {
+func NewRepository(db *sql.DB) Repository {
 	return &repository{
-		queries: db.New(dbConn),
-		dbConn:  dbConn,
+		db:      db,
+		queries: sqlc.New(db),
 	}
 }
 
 func (r *repository) WithTx(ctx context.Context, fn func(Repository) error) error {
-	return database.RunInTx(ctx, r.dbConn, r.queries, func(qtx *db.Queries) error {
-		return fn(&repository{queries: qtx, dbConn: r.dbConn})
+	return database.RunInTx(ctx, r.db, func(tx *sql.Tx) error {
+		return fn(&repository{queries: r.queries.WithTx(tx), db: r.db})
 	})
 }
 
 func (r *repository) GetNotices(ctx context.Context, f Filter) ([]Notice, error) {
-	rows, err := r.queries.ListNoticesWithState(ctx, db.ListNoticesWithStateParams{
+	rows, err := r.queries.ListNoticesWithState(ctx, sqlc.ListNoticesWithStateParams{
 		Category: database.StringOrNull(f.Category),
 		Urgent:   database.BoolOrNull(f.Urgent),
 		Pinned:   database.BoolOrNull(f.Pinned),
@@ -118,7 +118,7 @@ func (r *repository) GetLatestNoticeSourceOrder(ctx context.Context) (int64, err
 }
 
 func (r *repository) InsertNotice(ctx context.Context, n Notice, sourceOrder int64) (int64, error) {
-	return r.queries.InsertNotice(ctx, db.InsertNoticeParams{
+	return r.queries.InsertNotice(ctx, sqlc.InsertNoticeParams{
 		ID:          n.ID,
 		Title:       n.Title,
 		Summary:     database.StringOrNull(n.Summary),
@@ -130,7 +130,7 @@ func (r *repository) InsertNotice(ctx context.Context, n Notice, sourceOrder int
 }
 
 func (r *repository) UpdateNotice(ctx context.Context, n Notice) error {
-	return r.queries.UpdateNotice(ctx, db.UpdateNoticeParams{
+	return r.queries.UpdateNotice(ctx, sqlc.UpdateNoticeParams{
 		ID:         n.ID,
 		Title:      n.Title,
 		Summary:    database.StringOrNull(n.Summary),
@@ -139,7 +139,7 @@ func (r *repository) UpdateNotice(ctx context.Context, n Notice) error {
 }
 
 func (r *repository) UpdateNoticeDetails(ctx context.Context, id string, fullTitle, content string) error {
-	return r.queries.UpdateNoticeDetails(ctx, db.UpdateNoticeDetailsParams{
+	return r.queries.UpdateNoticeDetails(ctx, sqlc.UpdateNoticeDetailsParams{
 		ID:        id,
 		FullTitle: database.StringOrNull(fullTitle),
 		Content:   database.StringOrNull(content),
@@ -147,7 +147,7 @@ func (r *repository) UpdateNoticeDetails(ctx context.Context, id string, fullTit
 }
 
 func (r *repository) UpsertNoticeAttachment(ctx context.Context, noticeID string, att Attachment) error {
-	return r.queries.UpsertNoticeAttachment(ctx, db.UpsertNoticeAttachmentParams{
+	return r.queries.UpsertNoticeAttachment(ctx, sqlc.UpsertNoticeAttachmentParams{
 		ID:       att.ID,
 		NoticeID: noticeID,
 		Url:      att.URL,
@@ -156,14 +156,14 @@ func (r *repository) UpsertNoticeAttachment(ctx context.Context, noticeID string
 }
 
 func (r *repository) SetPinState(ctx context.Context, id string, pinned bool) error {
-	return r.queries.SetPinState(ctx, db.SetPinStateParams{
+	return r.queries.SetPinState(ctx, sqlc.SetPinStateParams{
 		NoticeID: id,
 		IsPinned: database.BoolToInt64(pinned),
 	})
 }
 
 func (r *repository) SetReadState(ctx context.Context, id string, read bool) error {
-	return r.queries.SetReadState(ctx, db.SetReadStateParams{
+	return r.queries.SetReadState(ctx, sqlc.SetReadStateParams{
 		NoticeID: id,
 		IsRead:   database.BoolToInt64(read),
 	})
