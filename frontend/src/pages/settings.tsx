@@ -55,16 +55,16 @@ export default function SettingsPage() {
     );
   }
 
-  return <SettingsView config={config} updateConfig={setConfig} resetConfig={resetConfig} />;
+  return <SettingsView config={config} setConfig={setConfig} resetConfig={resetConfig} />;
 }
 
 interface SettingsViewProps {
   config: Config;
-  updateConfig: Updater<Config | undefined>;
+  setConfig: Updater<Config | undefined>;
   resetConfig: () => Promise<void>;
 }
 
-function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) {
+function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
   const { setTheme } = useTheme();
   const { check } = useUpdate();
 
@@ -86,7 +86,7 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
                 items={themeItems}
                 value={config.appearance.theme}
                 onValueChange={(v) => {
-                  updateConfig((draft) => {
+                  setConfig((draft) => {
                     if (draft) {
                       draft.appearance.theme = v;
                       setTheme(v);
@@ -103,7 +103,7 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
               <Switch
                 checked={config.notifications.enabled}
                 onCheckedChange={(v) =>
-                  updateConfig((draft) => {
+                  setConfig((draft) => {
                     if (draft) draft.notifications.enabled = v;
                   })
                 }
@@ -122,7 +122,7 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
                 items={syncIntervalItems}
                 value={config.sync.interval}
                 onValueChange={(v) => {
-                  updateConfig((draft) => {
+                  setConfig((draft) => {
                     if (draft) draft.sync.interval = v;
                   });
                 }}
@@ -137,7 +137,7 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
                 items={fetchCountItems}
                 value={config.sync.fetch_count}
                 onValueChange={(v) => {
-                  updateConfig((draft) => {
+                  setConfig((draft) => {
                     if (draft) draft.sync.fetch_count = v;
                   });
                 }}
@@ -151,7 +151,7 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
               <Switch
                 checked={config.sync.on_startup}
                 onCheckedChange={(v) =>
-                  updateConfig((draft) => {
+                  setConfig((draft) => {
                     if (draft) draft.sync.on_startup = v;
                   })
                 }
@@ -169,7 +169,7 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
               <Switch
                 checked={config.launch.start_minimized}
                 onCheckedChange={(v) =>
-                  updateConfig((draft) => {
+                  setConfig((draft) => {
                     if (draft) draft.launch.start_minimized = v;
                   })
                 }
@@ -184,7 +184,7 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
               <Switch
                 checked={config.launch.close_to_tray}
                 onCheckedChange={(v) =>
-                  updateConfig((draft) => {
+                  setConfig((draft) => {
                     if (draft) draft.launch.close_to_tray = v;
                   })
                 }
@@ -200,7 +200,7 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
                 disabled={!config.launch.close_to_tray}
                 checked={config.launch.keep_alive}
                 onCheckedChange={(v) =>
-                  updateConfig((draft) => {
+                  setConfig((draft) => {
                     if (draft) draft.launch.keep_alive = v;
                   })
                 }
@@ -215,7 +215,7 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
               <Switch
                 checked={config.launch.restore_window}
                 onCheckedChange={(v) =>
-                  updateConfig((draft) => {
+                  setConfig((draft) => {
                     if (draft) draft.launch.restore_window = v;
                   })
                 }
@@ -227,7 +227,7 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
               <Switch
                 checked={config.launch.sidebar_open}
                 onCheckedChange={(v) =>
-                  updateConfig((draft) => {
+                  setConfig((draft) => {
                     if (draft) draft.launch.sidebar_open = v;
                   })
                 }
@@ -243,7 +243,7 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
                   items={updateIntervalItems}
                   value={config.updates.interval}
                   onValueChange={(v) => {
-                    updateConfig((draft) => {
+                    setConfig((draft) => {
                       if (draft) draft.updates.interval = v;
                     });
                   }}
@@ -268,7 +268,7 @@ function SettingsView({ config, updateConfig, resetConfig }: SettingsViewProps) 
                 items={logLevelItems}
                 value={config.logging.level}
                 onValueChange={(v) => {
-                  updateConfig((draft) => {
+                  setConfig((draft) => {
                     if (draft) draft.logging.level = v;
                   });
                 }}
