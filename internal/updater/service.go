@@ -6,6 +6,10 @@ import (
 	"log/slog"
 	"os"
 	"strings"
+	"time"
+
+	"aiub-companion/internal/config"
+	"aiub-companion/internal/event"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/updater"
@@ -13,15 +17,33 @@ import (
 )
 
 type Service struct {
+	config *config.Service
+
+	stopCh   chan struct{}
+	reloadCh chan struct{}
+
 	currentVersion string
 	githubRepo     string
 }
 
-func NewService(currentVersion, githubRepo string) *Service {
+func NewService(cfg *config.Service) *Service {
 	return &Service{
-		currentVersion: currentVersion,
-		githubRepo:     githubRepo,
+		currentVersion: config.Version(),
+		githubRepo:     config.Repo,
+		config:         cfg,
+		stopCh:         make(chan struct{}),
+		reloadCh:       make(chan struct{}, 1),
 	}
+}
+
+func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptions) error {
+	go s.scheduleLoop(ctx)
+	return nil
+}
+
+func (s *Service) ServiceShutdown(ctx context.Context) error {
+	close(s.stopCh)
+	return nil
 }
 
 //wails:ignore
@@ -63,6 +85,7 @@ func (s *Service) Init(app *application.App) error {
 		CurrentVersion: s.currentVersion,
 		Providers:      []updater.Provider{gh},
 		Window:         updater.WindowNone,
+		CheckInterval:  0,
 	})
 	if err != nil {
 		return fmt.Errorf("updater init: %w", err)
@@ -76,6 +99,10 @@ func (s *Service) Init(app *application.App) error {
 		slog.Info(fmt.Sprintf("Download progress: %d/%d bytes (%.0f KB/s)", progress.Written, progress.Total, progress.Rate/1024))
 	})
 
+	app.Event.On(event.EventConfigChanged, func(_ *application.CustomEvent) {
+		s.reloadCh <- struct{}{}
+	})
+
 	return nil
 }
 
@@ -86,7 +113,6 @@ type Release struct {
 
 func (s *Service) CheckForUpdates(ctx context.Context) (*Release, error) {
 	app := application.Get()
-
 	if app == nil || app.Updater == nil {
 		return nil, fmt.Errorf("updater not initialized")
 	}
@@ -94,6 +120,10 @@ func (s *Service) CheckForUpdates(ctx context.Context) (*Release, error) {
 	rel, err := app.Updater.Check(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("check for updates: %w", err)
+	}
+
+	if err = saveState(state{LastCheckedAt: time.Now()}); err != nil {
+		slog.Error("Failed to save updater state", "error", err)
 	}
 
 	if rel == nil {
@@ -132,6 +162,74 @@ func (s *Service) InstallUpdate(ctx context.Context) error {
 	}
 
 	return app.Updater.Restart(ctx)
+}
+
+func (s *Service) scheduleLoop(ctx context.Context) {
+	for {
+		interval := s.checkInterval()
+		if interval == 0 {
+			select {
+			case <-s.stopCh:
+				return
+			case <-s.reloadCh:
+				continue
+			}
+		}
+
+		state, err := loadState()
+		if err != nil {
+			slog.Error("Failed to load updater state", "error", err)
+		}
+
+		elapsed := time.Since(state.LastCheckedAt)
+		wait := max(interval-elapsed, 0)
+
+		timer := time.NewTimer(wait)
+		select {
+		case <-s.stopCh:
+			timer.Stop()
+			return
+		case <-s.reloadCh:
+			timer.Stop()
+			continue
+		case <-timer.C:
+			s.runBackgroundCheck(ctx)
+		}
+	}
+}
+
+func (s *Service) checkInterval() time.Duration {
+	cfg := s.config.GetConfig()
+	switch cfg.Updates.Interval {
+	case "daily":
+		return 24 * time.Hour
+	case "weekly":
+		return 7 * 24 * time.Hour
+	case "monthly":
+		return 30 * 24 * time.Hour
+	default:
+		return 0
+	}
+}
+
+func (s *Service) runBackgroundCheck(ctx context.Context) {
+	slog.Info("Running scheduled update check")
+
+	if err := saveState(state{LastCheckedAt: time.Now()}); err != nil {
+		slog.Error("Failed to save updater state", "error", err)
+	}
+
+	rel, err := s.CheckForUpdates(ctx)
+	if err != nil {
+		slog.Error("Scheduled update check failed", "error", err)
+		return
+	}
+	if rel == nil {
+		slog.Info("No update found during scheduled check")
+		return
+	}
+
+	slog.Info("Update found during scheduled check", "version", rel.Version)
 }
 
 func init() {

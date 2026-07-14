@@ -39,7 +39,6 @@ func main() {
 
 	// Initialize Services
 	notificationService := notifications.New()
-	updaterService := updater.NewService(config.Version(), config.Repo)
 
 	databaseService := database.NewService()
 	configService := config.NewService()
@@ -49,6 +48,7 @@ func main() {
 	calendarService := calendar.NewService(databaseService)
 
 	desktopService := desktop.NewService(configService)
+	updaterService := updater.NewService(configService)
 	workerService := worker.NewService(noticeService, configService, notificationService)
 
 	loggerService := log.NewService(logger)
