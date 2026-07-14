@@ -11,10 +11,11 @@ func TestValidateSchema(t *testing.T) {
 		{
 			name: "Valid config",
 			json: `{
-				"theme": "dark",
-				"log_level": "DEBUG",
+				"appearance": { "theme": "dark" },
+				"updates": { "interval": "weekly" },
+				"logging": { "level": "DEBUG" },
 				"sync": {
-					"interval_minutes": 15,
+					"interval": 15,
 					"fetch_count": 10,
 					"on_startup": true
 				},
@@ -34,10 +35,11 @@ func TestValidateSchema(t *testing.T) {
 		{
 			name: "Invalid theme value",
 			json: `{
-				"theme": "invalid-theme-value",
-				"log_level": "DEBUG",
-				"sync": { "interval_minutes": 15, "fetch_count": 10, "on_startup": true },
-				"launch": { "start_minimized": true, "close_to_tray": false, "restore_window": false, "sidebar_open": true },
+				"appearance": { "theme": "invalid-theme-value" },
+				"updates": { "interval": "weekly" },
+				"logging": { "level": "DEBUG" },
+				"sync": { "interval": 15, "fetch_count": 10, "on_startup": true },
+				"launch": { "start_minimized": true, "close_to_tray": false, "keep_alive": false, "restore_window": false, "sidebar_open": true },
 				"notifications": { "enabled": true }
 			}`,
 			wantErr: true,
@@ -45,10 +47,11 @@ func TestValidateSchema(t *testing.T) {
 		{
 			name: "Invalid log level",
 			json: `{
-				"theme": "dark",
-				"log_level": "TRACE",
-				"sync": { "interval_minutes": 15, "fetch_count": 10, "on_startup": true },
-				"launch": { "start_minimized": true, "close_to_tray": false, "restore_window": false, "sidebar_open": true },
+				"appearance": { "theme": "dark" },
+				"updates": { "interval": "weekly" },
+				"logging": { "level": "TRACE" },
+				"sync": { "interval": 15, "fetch_count": 10, "on_startup": true },
+				"launch": { "start_minimized": true, "close_to_tray": false, "keep_alive": false, "restore_window": false, "sidebar_open": true },
 				"notifications": { "enabled": true }
 			}`,
 			wantErr: true,
@@ -56,7 +59,7 @@ func TestValidateSchema(t *testing.T) {
 		{
 			name: "Malformed JSON syntax",
 			json: `{
-				"theme": "dark",
+				"appearance": { "theme": "dark" },
 			}`,
 			wantErr: true,
 		},
