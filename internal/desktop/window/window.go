@@ -26,7 +26,7 @@ type Window struct {
 	handle *application.WebviewWindow
 	timer  *time.Timer
 	opts   WindowOptions
-	state  WindowState
+	state  windowState
 }
 
 // NewWindow creates a Window descriptor. No OS window is created until Show is called.
@@ -105,7 +105,12 @@ func (w *Window) restoreState() {
 		return
 	}
 
-	w.state = loadState(w.opts.Name)
+	state, err := loadState(w.opts.Name)
+	if err != nil {
+		slog.Error("Failed to load window state", "error", err)
+	}
+
+	w.state = state
 
 	w.handle.SetSize(w.state.Width, w.state.Height)
 

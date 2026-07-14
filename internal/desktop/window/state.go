@@ -2,6 +2,7 @@ package window
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -9,8 +10,8 @@ import (
 	"aiub-companion/internal/config"
 )
 
-// WindowState holds the last known state of a window.
-type WindowState struct {
+// windowState holds the last known state of a window.
+type windowState struct {
 	Width     int  `json:"width"`
 	Height    int  `json:"height"`
 	X         int  `json:"x"`
@@ -19,11 +20,11 @@ type WindowState struct {
 }
 
 type AppState struct {
-	Window map[string]WindowState `json:"window"`
+	Window map[string]windowState `json:"window"`
 }
 
-func defaultState() WindowState {
-	return WindowState{
+func defaultState() windowState {
+	return windowState{
 		Width:     1024,
 		Height:    768,
 		X:         -1,
@@ -32,26 +33,33 @@ func defaultState() WindowState {
 	}
 }
 
-func loadState(name string) WindowState {
+func loadState(name string) (windowState, error) {
 	path, err := statePath()
 	if err != nil {
-		return defaultState()
+		return windowState{}, fmt.Errorf("determine state path: %w", err)
 	}
+
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return defaultState()
+		if errors.Is(err, os.ErrNotExist) {
+			return defaultState(), nil // first run
+		}
+		return windowState{}, fmt.Errorf("read window state: %w", err)
 	}
+
 	var appState AppState
 	if err := json.Unmarshal(data, &appState); err != nil {
-		return defaultState()
+		return windowState{}, fmt.Errorf("unmarshal state: %w", err)
 	}
+
 	if state, ok := appState.Window[name]; ok {
-		return state
+		return state, nil
 	}
-	return defaultState()
+
+	return windowState{}, nil
 }
 
-func saveState(name string, state WindowState) error {
+func saveState(name string, state windowState) error {
 	path, err := statePath()
 	if err != nil {
 		return fmt.Errorf("determine state path: %w", err)
@@ -63,7 +71,7 @@ func saveState(name string, state WindowState) error {
 		_ = json.Unmarshal(data, &appState)
 	}
 	if appState.Window == nil {
-		appState.Window = make(map[string]WindowState)
+		appState.Window = make(map[string]windowState)
 	}
 
 	appState.Window[name] = state
@@ -84,5 +92,5 @@ func statePath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(path, config.AppName, "state.json"), nil
+	return filepath.Join(path, config.AppName, "state", "window.json"), nil
 }
