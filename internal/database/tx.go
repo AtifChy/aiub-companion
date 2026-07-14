@@ -13,6 +13,14 @@ func RunInTx(ctx context.Context, conn *sql.DB, queries *db.Queries, fn func(*db
 	if err != nil {
 		return err
 	}
+
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p) // re-throw panic after Rollback
+		}
+	}()
+
 	qtx := queries.WithTx(tx)
 	if err := fn(qtx); err != nil {
 		if rbErr := tx.Rollback(); rbErr != nil {
