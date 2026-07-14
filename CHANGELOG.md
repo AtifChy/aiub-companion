@@ -1,3 +1,56 @@
+## [0.3.30] - 2026-07-14
+
+### 🚀 Features
+
+- *(updater)* Add scheduled update checks [`3ec3c39`](https://github.com/AtifChy/aiub-companion/commit/3ec3c39c66c5da24ba8670b5c564bb3ee9e08c6d)
+
+### 🐛 Bug Fixes
+
+- *(database)* Add panic recovery to transactions [`30d4d98`](https://github.com/AtifChy/aiub-companion/commit/30d4d98ea45c42822697ff3e1848c42c9672a64c)
+- *(theme)* Theme not applied globally [`1b71ba4`](https://github.com/AtifChy/aiub-companion/commit/1b71ba4ee50c4a99b4dacd145a1d232dbd685fb0)
+
+### 🚜 Refactor
+
+- *(desktop/window)* Improve window state management [`3a09286`](https://github.com/AtifChy/aiub-companion/commit/3a09286b231dfbe2319cbcdb40294673362e81b2)
+- *(database)* Remove fts query sanitization [`41c7f0e`](https://github.com/AtifChy/aiub-companion/commit/41c7f0ea061d488cdc692701cedeb791e7fe9758)
+- *(config)* Restructure config for clarity and consistency [`cb660b9`](https://github.com/AtifChy/aiub-companion/commit/cb660b949df762513f3a86783f3c9bde79add154)
+- *(config)* Better align fields [`2a24995`](https://github.com/AtifChy/aiub-companion/commit/2a24995143bfbba9f7d3dc5d65949563c34c9507)
+- *(database)* Rename sqlc generated package to sqlc [`a0fe7db`](https://github.com/AtifChy/aiub-companion/commit/a0fe7db30564706d76f489458b32ff0e853a35da)
+- *(database)* Simplify transaction handling [`cb4c976`](https://github.com/AtifChy/aiub-companion/commit/cb4c9763d9a1826a40d5e2758ca0b517cc277f53)
+- Rename db package to sqlc [`4c1ddfc`](https://github.com/AtifChy/aiub-companion/commit/4c1ddfc97bc81d2f4e6382e0b574c3ca30edc453)
+- *(calendar)* Use testable time.now() [`29a0b10`](https://github.com/AtifChy/aiub-companion/commit/29a0b10743a41e91325db72d8fe4d49b1440498d)
+- *(app)* Move layout and providers into app layout component [`d722352`](https://github.com/AtifChy/aiub-companion/commit/d722352f5a8c01c54d7c544f28f7b92dfe3c7231)
+
+### 🎨 Styling
+
+- *(routine)* Remove blank line at EOF [`82476f4`](https://github.com/AtifChy/aiub-companion/commit/82476f42efb30c8569240d9a468fa8d3d355877f)
+
+### 🧪 Testing
+
+- *(config)* Update config schema tests [`9b40cd1`](https://github.com/AtifChy/aiub-companion/commit/9b40cd13a956eed62c897817e715acf329727e2d)
+- *(calendar)* Mock time for real world html tests [`e5550f1`](https://github.com/AtifChy/aiub-companion/commit/e5550f156659eb982d50bb25778f852a8239cfcd)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(fmt)* Apply formatter [`e15be51`](https://github.com/AtifChy/aiub-companion/commit/e15be5190b1ad1b8d374087e35d0752f440ad7c5)
+- *(settings)* Rename updateConfig to setConfig [`d46294f`](https://github.com/AtifChy/aiub-companion/commit/d46294f294cf299d3b2d273d8647aa88f09b398f)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.3.21...v0.3.30
+
+## [0.3.21] - 2026-07-13
+
+### 🚀 Features
+
+- *(update/dialog)* Add dompurify to sanitize markdown output [`77262b0`](https://github.com/AtifChy/aiub-companion/commit/77262b06a57aabb7d09fc1b3b0453c5b1af8685b)
+
+### 🐛 Bug Fixes
+
+- *(updater)* Sanitizing markdown [`67baf64`](https://github.com/AtifChy/aiub-companion/commit/67baf64a230d09b62ef88c7381da29551920eb5e)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.3.20...v0.3.21
+
 ## [0.3.20] - 2026-07-13
 
 ### 🚜 Refactor
