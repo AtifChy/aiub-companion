@@ -88,11 +88,10 @@ func (s *Service) run(ctx context.Context) {
 			return
 		}
 
-		title := fmt.Sprintf("%d new notice(s)", count)
 		err = s.notification.SendNotification(notifications.NotificationOptions{
 			ID:    fmt.Sprintf("sync-%d", time.Now().Local().UnixMilli()),
 			Title: config.DisplayName,
-			Body:  title + " available",
+			Body:  fmt.Sprintf("%d new notice(s) available", count),
 		})
 		if err != nil {
 			slog.Error("Failed to send notification", "error", err)
