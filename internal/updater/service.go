@@ -17,6 +17,8 @@ import (
 	"github.com/wailsapp/wails/v3/pkg/updater/providers/github"
 )
 
+var ErrUpdaterNotInitialized = errors.New("updater not initialized")
+
 type Service struct {
 	config *config.Service
 
@@ -115,7 +117,7 @@ type Release struct {
 func (s *Service) CheckForUpdates(ctx context.Context) (*Release, error) {
 	app := application.Get()
 	if app == nil || app.Updater == nil {
-		return nil, errors.New("updater not initialized")
+		return nil, ErrUpdaterNotInitialized
 	}
 
 	rel, err := app.Updater.Check(ctx)
@@ -144,7 +146,7 @@ func (s *Service) DownloadUpdate(ctx context.Context) error {
 	app := application.Get()
 
 	if app == nil || app.Updater == nil {
-		return errors.New("updater not initialized")
+		return ErrUpdaterNotInitialized
 	}
 
 	err := app.Updater.DownloadAndInstall(ctx)
@@ -159,7 +161,7 @@ func (s *Service) InstallUpdate(ctx context.Context) error {
 	app := application.Get()
 
 	if app == nil || app.Updater == nil {
-		return errors.New("updater not initialized")
+		return ErrUpdaterNotInitialized
 	}
 
 	return app.Updater.Restart(ctx)
