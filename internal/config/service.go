@@ -7,6 +7,7 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"aiub-companion/internal/autostart"
 	"aiub-companion/internal/event"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
@@ -36,6 +37,14 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 	config, err := load(path)
 	if err != nil {
 		slog.Error("Failed to load config on startup, using defaults", "error", err)
+	}
+
+	if enabled, err := autostart.IsEnabled(); err != nil {
+		slog.Error("Failed to check autostart status", "error", err)
+	} else if config.Launch.AutoStart != enabled {
+		if err := autostart.Set(config.Launch.AutoStart); err != nil {
+			slog.Error("Failed to set autostart", "error", err)
+		}
 	}
 
 	s.path = path

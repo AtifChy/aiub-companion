@@ -32,6 +32,7 @@ type notification struct {
 }
 
 type launch struct {
+	AutoStart      bool `json:"auto_start"`
 	StartMinimized bool `json:"start_minimized"`
 	CloseToTray    bool `json:"close_to_tray"`
 	KeepAlive      bool `json:"keep_alive"`
@@ -62,6 +63,7 @@ func defaultConfig() *Config {
 			Enabled: true,
 		},
 		Launch: launch{
+			AutoStart:      false,
 			StartMinimized: false,
 			CloseToTray:    true,
 			KeepAlive:      false,
