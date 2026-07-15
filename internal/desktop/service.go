@@ -14,6 +14,11 @@ import (
 	"github.com/wailsapp/wails/v3/pkg/events"
 )
 
+const (
+	mainWindowName  = "main-window"
+	aboutWindowName = "about-window"
+)
+
 type Service struct {
 	app    *application.App
 	config *config.Service
@@ -43,6 +48,10 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 		}
 	})
 
+	app.Event.On(event.EventShowMainWindow, func(_ *application.CustomEvent) {
+		s.main.Show()
+	})
+
 	app.Event.OnApplicationEvent(events.Common.ApplicationStarted, s.onApplicationStarted)
 
 	s.app = app
@@ -60,7 +69,7 @@ func (s *Service) onApplicationStarted(_ *application.ApplicationEvent) {
 		HideOnClose:   cfg.Launch.CloseToTray && cfg.Launch.KeepAlive,
 		RestoreWindow: cfg.Launch.RestoreWindow,
 		WebviewWindowOptions: application.WebviewWindowOptions{
-			Name:             "main-window",
+			Name:             mainWindowName,
 			Title:            config.DisplayName,
 			Frameless:        true,
 			BackgroundColour: application.NewRGBA(0, 0, 0, 255),
@@ -77,7 +86,7 @@ func (s *Service) onApplicationStarted(_ *application.ApplicationEvent) {
 	s.about = window.NewWindow(s.app, window.WindowOptions{
 		HideOnClose: true,
 		WebviewWindowOptions: application.WebviewWindowOptions{
-			Name:                "about-window",
+			Name:                aboutWindowName,
 			Title:               "About " + config.DisplayName,
 			Width:               400,
 			Height:              350,

@@ -2,6 +2,7 @@
 package event
 
 const (
-	EventConfigChanged = "config:changed"
-	EventNoticesSynced = "notices:synced"
+	EventConfigChanged  = "config:changed"
+	EventNoticesSynced  = "notices:synced"
+	EventShowMainWindow = "main-window:show"
 )

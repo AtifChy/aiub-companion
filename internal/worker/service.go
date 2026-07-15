@@ -42,10 +42,20 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 	ctx, cancel := context.WithCancel(ctx)
 	s.cancel = cancel
 
-	application.Get().Event.On(event.EventConfigChanged, func(ev *application.CustomEvent) {
+	app := application.Get()
+
+	app.Event.On(event.EventConfigChanged, func(ev *application.CustomEvent) {
 		if cfg, ok := ev.Data.(config.Config); ok {
 			s.intervalCh <- time.Duration(cfg.Sync.Interval) * time.Minute
 		}
+	})
+
+	s.notification.OnNotificationResponse(func(result notifications.NotificationResult) {
+		if result.Error != nil {
+			slog.Error("Failed to send notification", "error", result.Error)
+			return
+		}
+		app.Event.Emit(event.EventShowMainWindow)
 	})
 
 	go s.run(ctx)
@@ -61,6 +71,7 @@ func (s *Service) ServiceShutdown() error {
 }
 
 func (s *Service) run(ctx context.Context) {
+	app := application.Get()
 	cfg := s.config.GetConfig()
 	interval := time.Duration(cfg.Sync.Interval) * time.Minute
 	ticker := time.NewTicker(interval)
@@ -87,7 +98,7 @@ func (s *Service) run(ctx context.Context) {
 			slog.Error("Failed to send notification", "error", err)
 		}
 
-		application.Get().Event.Emit(event.EventNoticesSynced, int(count))
+		app.Event.Emit(event.EventNoticesSynced, int(count))
 
 		slog.Info("Synced notices", "count", count)
 	}
