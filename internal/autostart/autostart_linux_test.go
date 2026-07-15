@@ -18,8 +18,7 @@ func setupTextConfigDir(t *testing.T) string {
 func TestIsEnabled_InitiallyDisabled(t *testing.T) {
 	setupTextConfigDir(t)
 
-	s := NewService()
-	enabled, err := s.IsEnabled()
+	enabled, err := IsEnabled()
 	if err != nil {
 		t.Fatalf("IsEnabled: %v", err)
 	}
@@ -31,8 +30,7 @@ func TestIsEnabled_InitiallyDisabled(t *testing.T) {
 func TestSet_Enable_CreatesDesktopFile(t *testing.T) {
 	configDir := setupTextConfigDir(t)
 
-	s := NewService()
-	if err := s.Set(true); err != nil {
+	if err := Set(true); err != nil {
 		t.Fatalf("Set(true) returned error: %v", err)
 	}
 
@@ -59,12 +57,11 @@ func TestSet_Enable_CreatesDesktopFile(t *testing.T) {
 func TestSet_Enable_ExecPathMatchesExecutable(t *testing.T) {
 	setupTextConfigDir(t)
 
-	s := NewService()
-	if err := s.Set(true); err != nil {
+	if err := Set(true); err != nil {
 		t.Fatalf("Set(true) returned error: %v", err)
 	}
 
-	enabled, err := s.IsEnabled()
+	enabled, err := IsEnabled()
 	if err != nil {
 		t.Fatalf("IsEnabled returned error: %v", err)
 	}
@@ -90,15 +87,14 @@ func TestSet_Enable_ExecPathMatchesExecutable(t *testing.T) {
 func TestSet_enable_Idempotent(t *testing.T) {
 	setupTextConfigDir(t)
 
-	s := NewService()
-	if err := s.Set(true); err != nil {
+	if err := Set(true); err != nil {
 		t.Fatalf("Set(true) returned error: %v", err)
 	}
-	if err := s.Set(true); err != nil {
+	if err := Set(true); err != nil {
 		t.Fatalf("Set(true) called again returned error: %v", err)
 	}
 
-	enabled, err := s.IsEnabled()
+	enabled, err := IsEnabled()
 	if err != nil {
 		t.Fatalf("IsEnabled returned error: %v", err)
 	}
@@ -110,15 +106,14 @@ func TestSet_enable_Idempotent(t *testing.T) {
 func TestSet_Disable_RemovesDesktopFile(t *testing.T) {
 	setupTextConfigDir(t)
 
-	s := NewService()
-	if err := s.Set(true); err != nil {
+	if err := Set(true); err != nil {
 		t.Fatalf("Set(true) returned error: %v", err)
 	}
-	if err := s.Set(false); err != nil {
+	if err := Set(false); err != nil {
 		t.Fatalf("Set(false) returned error: %v", err)
 	}
 
-	enabled, err := s.IsEnabled()
+	enabled, err := IsEnabled()
 	if err != nil {
 		t.Fatalf("IsEnabled returned error: %v", err)
 	}
@@ -130,8 +125,7 @@ func TestSet_Disable_RemovesDesktopFile(t *testing.T) {
 func TestSet_Disable_NoOpWhenNotEnabled(t *testing.T) {
 	setupTextConfigDir(t)
 
-	s := NewService()
-	if err := s.Set(false); err != nil {
+	if err := Set(false); err != nil {
 		t.Fatalf("Set(false) returned error: %v", err)
 	}
 }
@@ -144,8 +138,7 @@ func TestSet_Enable_CreatesAutostartDirIfNotExists(t *testing.T) {
 		t.Fatalf("unexpected error checking autostart dir: %v", err)
 	}
 
-	s := NewService()
-	if err := s.Set(true); err != nil {
+	if err := Set(true); err != nil {
 		t.Fatalf("Set(true) returned error: %v", err)
 	}
 

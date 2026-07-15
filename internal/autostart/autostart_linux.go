@@ -12,7 +12,7 @@ import (
 const shortcutName = config.AppName + ".desktop"
 
 // Set set the application to start on login in linux
-func (s *Service) Set(enable bool) error {
+func Set(enable bool) error {
 	dir, err := autostartPath()
 	if err != nil {
 		return fmt.Errorf("getting autostart path: %w", err)
@@ -36,7 +36,7 @@ func (s *Service) Set(enable bool) error {
 		return fmt.Errorf("getting executable path: %w", err)
 	}
 
-	content := fmt.Sprintf(`[Desktop Entry]
+	content := fmt.Sprint(`[Desktop Entry]
 Type=Application
 Name=%s
 Exec=%s
@@ -47,7 +47,7 @@ X-GNOME-Autostart-enabled=true
 	return os.WriteFile(shortcutPath, []byte(content), 0o644)
 }
 
-func (s *Service) IsEnabled() (bool, error) {
+func IsEnabled() (bool, error) {
 	dir, err := autostartPath()
 	if err != nil {
 		return false, fmt.Errorf("getting autostart path: %w", err)

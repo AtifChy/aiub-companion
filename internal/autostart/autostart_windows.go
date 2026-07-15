@@ -15,7 +15,7 @@ import (
 
 const shortcutName = config.AppName + ".lnk"
 
-func (s *Service) Set(enable bool) error {
+func Set(enable bool) error {
 	dir, err := startupPath()
 	if err != nil {
 		return fmt.Errorf("getting startup path: %w", err)
@@ -42,7 +42,7 @@ func (s *Service) Set(enable bool) error {
 	return createShortcut(exePath, shortcutPath)
 }
 
-func (s *Service) IsEnabled() (bool, error) {
+func IsEnabled() (bool, error) {
 	dir, err := startupPath()
 	if err != nil {
 		return false, fmt.Errorf("getting startup path: %w", err)
