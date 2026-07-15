@@ -1,4 +1,4 @@
-import { type BuildInfo, Service as ConfigService } from "@bindings/config";
+import { BuildInfo, Service as MetaService } from "@bindings/meta";
 import { Window } from "@wailsio/runtime";
 import { CopyrightIcon } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -14,7 +14,7 @@ export default function AboutPage() {
   const year = new Date().getFullYear();
 
   useEffect(() => {
-    ConfigService.GetBuildInfo()
+    MetaService.GetBuildInfo()
       .then(setAppInfo)
       .catch((err) => {
         logger.error("Failed to fetch build info:", err);

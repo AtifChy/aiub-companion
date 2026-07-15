@@ -1,5 +1,5 @@
-import { Service as ConfigService, type BuildInfo } from "@bindings/config";
 import { Service as DesktopService } from "@bindings/desktop";
+import { BuildInfo, Service as MetaService } from "@bindings/meta";
 import { ChevronsUpDownIcon, CommandIcon, CopyrightIcon } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
@@ -18,7 +18,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const year = new Date().getFullYear();
 
   useEffect(() => {
-    ConfigService.GetBuildInfo()
+    MetaService.GetBuildInfo()
       .then(setAppInfo)
       .catch((err) => console.error("Failed to get app info: ", err));
   }, []);

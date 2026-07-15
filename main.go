@@ -41,6 +41,7 @@ func main() {
 	// Initialize Services
 	notificationService := notifications.New()
 
+	metaService := meta.NewService()
 	databaseService := database.NewService()
 	configService := config.NewService()
 
@@ -66,6 +67,7 @@ func main() {
 			application.NewService(configService),
 
 			// Independent
+			application.NewService(metaService),
 			application.NewService(notificationService),
 			application.NewService(updaterService),
 
