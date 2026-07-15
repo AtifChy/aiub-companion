@@ -57,28 +57,10 @@ func (s *Service) Init(app *application.App) error {
 	}
 
 	gh, err := github.New(github.Config{
-		Repository: s.githubRepo,
-		Prerelease: false,
-		Token:      token,
-		AssetMatcher: func(req updater.CheckRequest, assets []github.ReleaseAsset) int {
-			var filteredAssets []github.ReleaseAsset
-			originalIndices := make([]int, 0, len(assets))
-
-			for i, asset := range assets {
-				name := strings.ToLower(asset.Name)
-				if strings.Contains(name, "installer") {
-					continue
-				}
-				filteredAssets = append(filteredAssets, asset)
-				originalIndices = append(originalIndices, i)
-			}
-
-			idx := github.DefaultAssetMatcher(req, filteredAssets)
-			if idx == -1 {
-				return -1
-			}
-			return originalIndices[idx]
-		},
+		Repository:   s.githubRepo,
+		Prerelease:   false,
+		Token:        token,
+		AssetMatcher: assetMatcher,
 	})
 	if err != nil {
 		return fmt.Errorf("github provider: %w", err)
@@ -107,6 +89,26 @@ func (s *Service) Init(app *application.App) error {
 	})
 
 	return nil
+}
+
+func assetMatcher(req updater.CheckRequest, assets []github.ReleaseAsset) int {
+	var filteredAssets []github.ReleaseAsset
+	originalIndices := make([]int, 0, len(assets))
+
+	for i, asset := range assets {
+		name := strings.ToLower(asset.Name)
+		if strings.Contains(name, "installer") {
+			continue
+		}
+		filteredAssets = append(filteredAssets, asset)
+		originalIndices = append(originalIndices, i)
+	}
+
+	idx := github.DefaultAssetMatcher(req, filteredAssets)
+	if idx == -1 {
+		return -1
+	}
+	return originalIndices[idx]
 }
 
 type Release struct {
