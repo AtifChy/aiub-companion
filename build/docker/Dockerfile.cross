@@ -13,7 +13,7 @@
 #   docker run --rm -v $(pwd):/app wails-cross windows amd64
 #   docker run --rm -v $(pwd):/app wails-cross windows arm64
 
-FROM golang:1.26-bookworm
+FROM golang:1.26-trixie
 
 ARG TARGETARCH
 ARG GARBLE_VERSION=v0.16.0
@@ -35,8 +35,8 @@ RUN ZIG_ARCH=$(case "${TARGETARCH}" in arm64) echo "aarch64" ;; *) echo "x86_64"
     ZIG_FILE="zig-linux-${ZIG_ARCH}-${ZIG_VERSION}.tar.xz" && \
     curl -fSL "https://ziglang.org/download/${ZIG_VERSION}/${ZIG_FILE}" -o "/tmp/${ZIG_FILE}" && \
     EXPECTED=$(curl -fsSL "https://ziglang.org/download/index.json" | \
-        python3 -c "import json,sys; d=json.load(sys.stdin); print(d[sys.argv[1]][sys.argv[2]+'-linux']['shasum'])" \
-        "${ZIG_VERSION}" "${ZIG_ARCH}") && \
+    python3 -c "import json,sys; d=json.load(sys.stdin); print(d[sys.argv[1]][sys.argv[2]+'-linux']['shasum'])" \
+    "${ZIG_VERSION}" "${ZIG_ARCH}") && \
     echo "${EXPECTED}  /tmp/${ZIG_FILE}" | sha256sum -c - && \
     tar -xJ -f "/tmp/${ZIG_FILE}" -C /opt && \
     rm "/tmp/${ZIG_FILE}" && \
@@ -71,6 +71,7 @@ for arg in "$@"; do
 done
 exec zig cc -fno-sanitize=all -target aarch64-macos-none -isysroot /opt/macos-sdk -I/opt/macos-sdk/usr/include -L/opt/macos-sdk/usr/lib -F/opt/macos-sdk/System/Library/Frameworks -w $ARGS
 ZIGWRAP
+
 RUN chmod +x /usr/local/bin/zcc-darwin-arm64
 
 # Darwin amd64
@@ -91,6 +92,7 @@ for arg in "$@"; do
 done
 exec zig cc -fno-sanitize=all -target x86_64-macos-none -isysroot /opt/macos-sdk -I/opt/macos-sdk/usr/include -L/opt/macos-sdk/usr/lib -F/opt/macos-sdk/System/Library/Frameworks -w $ARGS
 ZIGWRAP
+
 RUN chmod +x /usr/local/bin/zcc-darwin-amd64
 
 # Windows amd64 - uses Zig's bundled mingw
@@ -111,6 +113,7 @@ for arg in "$@"; do
 done
 exec zig cc -target x86_64-windows-gnu $ARGS
 ZIGWRAP
+
 RUN chmod +x /usr/local/bin/zcc-windows-amd64
 
 # Windows arm64 - uses Zig's bundled mingw
@@ -131,6 +134,7 @@ for arg in "$@"; do
 done
 exec zig cc -target aarch64-windows-gnu $ARGS
 ZIGWRAP
+
 RUN chmod +x /usr/local/bin/zcc-windows-arm64
 
 # Build script
@@ -213,6 +217,7 @@ fi
 ${COMPILER} -tags "$TAGS" -trimpath -buildvcs=false -ldflags="$LDFLAGS" -o bin/${APP}-${GOOS}-${GOARCH}${EXT} .
 echo "Built: bin/${APP}-${GOOS}-${GOARCH}${EXT}"
 SCRIPT
+
 RUN chmod +x /usr/local/bin/build.sh
 
 WORKDIR /app
