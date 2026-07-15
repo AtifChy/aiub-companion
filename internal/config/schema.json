@@ -7,31 +7,31 @@
         "appearance": {
           "$ref": "#/$defs/appearance"
         },
+        "updates": {
+          "$ref": "#/$defs/updates"
+        },
+        "logging": {
+          "$ref": "#/$defs/logging"
+        },
         "sync": {
           "$ref": "#/$defs/sync_"
         },
         "launch": {
           "$ref": "#/$defs/launch"
         },
-        "updates": {
-          "$ref": "#/$defs/updates"
-        },
         "notifications": {
           "$ref": "#/$defs/notification"
-        },
-        "logging": {
-          "$ref": "#/$defs/logging"
         }
       },
       "additionalProperties": false,
       "type": "object",
       "required": [
         "appearance",
+        "updates",
+        "logging",
         "sync",
         "launch",
-        "updates",
-        "notifications",
-        "logging"
+        "notifications"
       ]
     },
     "appearance": {
@@ -53,6 +53,9 @@
     },
     "launch": {
       "properties": {
+        "auto_start": {
+          "type": "boolean"
+        },
         "start_minimized": {
           "type": "boolean"
         },
@@ -72,6 +75,7 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
+        "auto_start",
         "start_minimized",
         "close_to_tray",
         "keep_alive",
