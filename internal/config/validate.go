@@ -44,8 +44,8 @@ func validate(data []byte) error {
 
 	if err := compiledSchema.Validate(v); err != nil {
 		if validationErr, ok := errors.AsType[*jsonschema.ValidationError](err); ok {
-			b, _ := json.MarshalIndent(validationErr.BasicOutput(), "", "  ")
-			return fmt.Errorf("invalid config:\n%s", string(b))
+			b, _ := json.Marshal(validationErr)
+			return fmt.Errorf("invalid config: %s", string(b))
 		}
 		return fmt.Errorf("validation error: %w", err)
 	}
