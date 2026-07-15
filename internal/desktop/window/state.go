@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"aiub-companion/internal/config"
+	"aiub-companion/internal/meta"
 )
 
 // windowState holds the last known state of a window.
@@ -92,5 +92,5 @@ func statePath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(path, config.AppName, "state", "window.json"), nil
+	return filepath.Join(path, meta.AppName, "state", "window.json"), nil
 }

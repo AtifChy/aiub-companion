@@ -6,10 +6,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"aiub-companion/internal/config"
+	"aiub-companion/internal/meta"
 )
 
-const shortcutName = config.AppName + ".desktop"
+const shortcutName = meta.AppName + ".desktop"
 
 // Set set the application to start on login in linux
 func Set(enable bool) error {
@@ -36,13 +36,13 @@ func Set(enable bool) error {
 		return fmt.Errorf("getting executable path: %w", err)
 	}
 
-	content := fmt.Sprint(`[Desktop Entry]
+	content := fmt.Sprintf(`[Desktop Entry]
 Type=Application
 Name=%s
 Exec=%s
 Terminal=false
 X-GNOME-Autostart-enabled=true
-`, config.DisplayName, exePath)
+`, meta.DisplayName, exePath)
 
 	return os.WriteFile(shortcutPath, []byte(content), 0o644)
 }

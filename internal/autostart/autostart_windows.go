@@ -7,13 +7,13 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"aiub-companion/internal/config"
+	"aiub-companion/internal/meta"
 
 	"github.com/go-ole/go-ole"
 	"github.com/go-ole/go-ole/oleutil"
 )
 
-const shortcutName = config.AppName + ".lnk"
+const shortcutName = meta.AppName + ".lnk"
 
 func Set(enable bool) error {
 	dir, err := startupPath()

@@ -12,6 +12,7 @@ import (
 	"aiub-companion/internal/database"
 	"aiub-companion/internal/desktop"
 	"aiub-companion/internal/log"
+	"aiub-companion/internal/meta"
 	"aiub-companion/internal/notice"
 	"aiub-companion/internal/routine"
 	"aiub-companion/internal/updater"
@@ -55,8 +56,8 @@ func main() {
 
 	// Create a new Wails application by providing the necessary options.
 	app := application.New(application.Options{
-		Name:        config.DisplayName,
-		Description: config.Description,
+		Name:        meta.DisplayName,
+		Description: meta.Description,
 		Icon:        appIcon,
 		Services: []application.Service{
 			// Core
@@ -90,7 +91,7 @@ func main() {
 			ApplicationShouldTerminateAfterLastWindowClosed: false,
 		},
 		SingleInstance: &application.SingleInstanceOptions{
-			UniqueID: config.ID,
+			UniqueID: meta.ID,
 			AdditionalData: map[string]string{
 				"launchTime": time.Now().Format(time.DateTime),
 			},

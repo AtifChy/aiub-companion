@@ -40,6 +40,7 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 
 	s.path = path
 	s.config.Store(config)
+
 	return nil
 }
 

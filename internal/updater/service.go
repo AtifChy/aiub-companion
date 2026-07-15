@@ -11,6 +11,7 @@ import (
 
 	"aiub-companion/internal/config"
 	"aiub-companion/internal/event"
+	"aiub-companion/internal/meta"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/updater"
@@ -31,8 +32,8 @@ type Service struct {
 
 func NewService(cfg *config.Service) *Service {
 	return &Service{
-		currentVersion: config.Version(),
-		githubRepo:     config.Repo,
+		currentVersion: meta.Version(),
+		githubRepo:     meta.Repo,
 		config:         cfg,
 		stopCh:         make(chan struct{}),
 		reloadCh:       make(chan struct{}, 1),

@@ -10,6 +10,8 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+
+	"aiub-companion/internal/meta"
 )
 
 type Config struct {
@@ -151,5 +153,5 @@ func configPath() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("get user config dir: %w", err)
 	}
-	return filepath.Join(configDir, AppName, "config.json"), nil
+	return filepath.Join(configDir, meta.AppName, "config.json"), nil
 }

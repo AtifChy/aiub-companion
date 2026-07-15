@@ -9,6 +9,7 @@ import (
 	"aiub-companion/internal/config"
 	"aiub-companion/internal/desktop/window"
 	"aiub-companion/internal/event"
+	"aiub-companion/internal/meta"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
@@ -70,7 +71,7 @@ func (s *Service) onApplicationStarted(_ *application.ApplicationEvent) {
 		RestoreWindow: cfg.Launch.RestoreWindow,
 		WebviewWindowOptions: application.WebviewWindowOptions{
 			Name:             mainWindowName,
-			Title:            config.DisplayName,
+			Title:            meta.DisplayName,
 			Frameless:        true,
 			BackgroundColour: application.NewRGBA(0, 0, 0, 255),
 			URL:              "/",
@@ -87,7 +88,7 @@ func (s *Service) onApplicationStarted(_ *application.ApplicationEvent) {
 		HideOnClose: true,
 		WebviewWindowOptions: application.WebviewWindowOptions{
 			Name:                aboutWindowName,
-			Title:               "About " + config.DisplayName,
+			Title:               "About " + meta.DisplayName,
 			Width:               400,
 			Height:              350,
 			Frameless:           true,
@@ -121,8 +122,8 @@ func (s *Service) handleClose() {
 func (s *Service) setupTray() {
 	systray := s.app.SystemTray.New()
 	systray.SetIcon(s.app.Config().Icon)
-	systray.SetLabel(config.DisplayName)
-	systray.SetTooltip(config.DisplayName)
+	systray.SetLabel(meta.DisplayName)
+	systray.SetTooltip(meta.DisplayName)
 
 	systray.OnDoubleClick(s.main.Show)
 

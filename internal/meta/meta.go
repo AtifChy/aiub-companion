@@ -1,4 +1,5 @@
-package config
+// Package meta contains metadata about the application, such as its name, version, and description.
+package meta
 
 const (
 	ID          = "io.github.atifchy.aiub-companion"
@@ -15,18 +16,4 @@ var (
 
 func Version() string {
 	return version
-}
-
-type BuildInfo struct {
-	Name      string `json:"name"`
-	Version   string `json:"version"`
-	BuildTime string `json:"build_time"`
-}
-
-func (s *Service) GetBuildInfo() BuildInfo {
-	return BuildInfo{
-		Name:      DisplayName,
-		Version:   version,
-		BuildTime: buildTime,
-	}
 }

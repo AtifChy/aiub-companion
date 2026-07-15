@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"aiub-companion/internal/config"
+	"aiub-companion/internal/meta"
 )
 
 type state struct {
@@ -59,5 +59,5 @@ func statePath() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("get user config dir: %w", err)
 	}
-	return filepath.Join(configDir, config.AppName, "state", "updater.json"), nil
+	return filepath.Join(configDir, meta.AppName, "state", "updater.json"), nil
 }

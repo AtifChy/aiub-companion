@@ -9,6 +9,7 @@ import (
 
 	"aiub-companion/internal/config"
 	"aiub-companion/internal/event"
+	"aiub-companion/internal/meta"
 	"aiub-companion/internal/notice"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
@@ -90,7 +91,7 @@ func (s *Service) run(ctx context.Context) {
 
 		err = s.notification.SendNotification(notifications.NotificationOptions{
 			ID:    fmt.Sprintf("sync-%d", time.Now().Local().UnixMilli()),
-			Title: config.DisplayName,
+			Title: meta.DisplayName,
 			Body:  fmt.Sprintf("%d new notice(s) available", count),
 		})
 		if err != nil {
