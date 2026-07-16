@@ -20,17 +20,24 @@ func NewService(logger *logger.Logger) *Service {
 }
 
 func (s *Service) ServiceStartup(ctx context.Context, _ application.ServerOptions) error {
-	application.Get().Event.On(event.EventConfigChanged, func(ev *application.CustomEvent) {
-		if cfg, ok := ev.Data.(config.Config); ok {
-			if level, err := config.ParseLogLevel(cfg.Logging.Level); err == nil {
-				s.logger.SetLevel(level)
-			} else {
-				s.logger.L().Warn("invalid log level in config", "error", err)
-			}
-		}
-	})
-
+	application.Get().Event.On(event.EventConfigChanged, s.onConfigChanged)
 	return nil
+}
+
+func (s *Service) onConfigChanged(ev *application.CustomEvent) {
+	cfg, ok := ev.Data.(config.Config)
+	if !ok {
+		return
+	}
+
+	level, err := config.ParseLogLevel(cfg.Logging.Level)
+	if err != nil {
+		s.logger.L().Warn("Failed to parse log level", "error", err)
+		return
+	}
+
+	s.logger.SetLevel(level)
+	s.logger.L().Info("Log level changed", "level", level.String())
 }
 
 func (s *Service) Debug(message string) {
