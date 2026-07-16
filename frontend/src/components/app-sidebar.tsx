@@ -45,7 +45,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavGroup title="workspace" items={sections.workspace} />
-        <NavGroup title="tools" items={sections.tools} />
         <NavGroup title="others" items={sections.others} />
       </SidebarContent>
       <SidebarFooter className="flex items-center truncate group-data-[collapsible=icon]:hidden">

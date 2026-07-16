@@ -25,7 +25,7 @@ export interface RouteItem {
   component: PreloadableComponent<ComponentType<unknown>>;
 }
 
-type Section = "workspace" | "tools" | "others";
+type Section = "workspace" | "others";
 
 export const sections: Record<Section, RouteItem[]> = {
   workspace: [
@@ -41,8 +41,6 @@ export const sections: Record<Section, RouteItem[]> = {
       icon: GraduationCapIcon,
       component: SemesterPage,
     },
-  ],
-  tools: [
     {
       label: "Routine",
       path: "/routine",
