@@ -1,11 +1,9 @@
 import {
-  Bell,
-  Calculator,
-  Calendar,
-  GraduationCap,
-  HelpCircle,
-  LineChart,
-  Settings,
+  BellIcon,
+  CalendarIcon,
+  GraduationCapIcon,
+  HelpCircleIcon,
+  SettingsIcon,
   type LucideIcon,
 } from "lucide-react";
 import type { ComponentType } from "react";
@@ -13,8 +11,6 @@ import type { ComponentType } from "react";
 import { lazyWithPreload, type PreloadableComponent } from "@/lib/lazy-with-preload";
 
 const NoticesPage = lazyWithPreload(() => import("@/pages/notices"));
-const CGPAPage = lazyWithPreload(() => import("@/pages/cgpa"));
-const GPATrendPage = lazyWithPreload(() => import("@/pages/gpa-trend"));
 const RoutinePage = lazyWithPreload(() => import("@/pages/routine"));
 const SemesterPage = lazyWithPreload(() => import("@/pages/semester"));
 const SettingsPage = lazyWithPreload(() => import("@/pages/settings"));
@@ -36,47 +32,35 @@ export const sections: Record<Section, RouteItem[]> = {
     {
       label: "Notices",
       path: "/notices",
-      icon: Bell,
+      icon: BellIcon,
       component: NoticesPage,
     },
     {
-      label: "CGPA Calculator",
-      path: "/cgpa",
-      icon: Calculator,
-      component: CGPAPage,
-    },
-    {
-      label: "GPA Trend",
-      path: "/gpa-trend",
-      icon: LineChart,
-      component: GPATrendPage,
+      label: "Semester",
+      path: "/semester",
+      icon: GraduationCapIcon,
+      component: SemesterPage,
     },
   ],
   tools: [
     {
       label: "Routine",
       path: "/routine",
-      icon: Calendar,
+      icon: CalendarIcon,
       component: RoutinePage,
-    },
-    {
-      label: "Semester",
-      path: "/semester",
-      icon: GraduationCap,
-      component: SemesterPage,
     },
   ],
   others: [
     {
       label: "Settings",
       path: "/settings",
-      icon: Settings,
+      icon: SettingsIcon,
       component: SettingsPage,
     },
     {
       label: "Help",
       path: "/help",
-      icon: HelpCircle,
+      icon: HelpCircleIcon,
       component: HelpPage,
     },
   ],
