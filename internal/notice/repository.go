@@ -3,6 +3,7 @@ package notice
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"aiub-companion/internal/database"
 	"aiub-companion/internal/database/sqlc"
@@ -14,7 +15,7 @@ type Repository interface {
 	GetNoticeByID(ctx context.Context, id string) (*Notice, error)
 	GetNoticeAttachments(ctx context.Context, noticeID string) ([]Attachment, error)
 	GetLatestNoticeSourceOrder(ctx context.Context) (int64, error)
-	InsertNotice(ctx context.Context, n Notice, sourceOrder int64) (int64, error)
+	UpsertNotice(ctx context.Context, n Notice, sourceOrder int64) (bool, error)
 	UpdateNotice(ctx context.Context, n Notice) error
 	UpdateNoticeDetails(ctx context.Context, id string, fullTitle, content string) error
 	UpsertNoticeAttachment(ctx context.Context, noticeID string, att Attachment) error
@@ -117,8 +118,8 @@ func (r *repository) GetLatestNoticeSourceOrder(ctx context.Context) (int64, err
 	return info.SourceOrder, nil
 }
 
-func (r *repository) InsertNotice(ctx context.Context, n Notice, sourceOrder int64) (int64, error) {
-	return r.queries.InsertNotice(ctx, sqlc.InsertNoticeParams{
+func (r *repository) UpsertNotice(ctx context.Context, n Notice, sourceOrder int64) (bool, error) {
+	isNew, err := r.queries.UpsertNotice(ctx, sqlc.UpsertNoticeParams{
 		ID:          n.ID,
 		Title:       n.Title,
 		Summary:     database.StringOrNull(n.Summary),
@@ -127,6 +128,13 @@ func (r *repository) InsertNotice(ctx context.Context, n Notice, sourceOrder int
 		IsUrgent:    database.BoolToInt64(n.IsUrgent),
 		SourceOrder: sourceOrder,
 	})
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, nil
+		}
+		return false, err
+	}
+	return isNew, nil
 }
 
 func (r *repository) UpdateNotice(ctx context.Context, n Notice) error {

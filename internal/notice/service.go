@@ -29,13 +29,13 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 	return nil
 }
 
-func (s *Service) SyncNotices(ctx context.Context, count int) (int64, error) {
+func (s *Service) SyncNotices(ctx context.Context, count int) ([]Notice, error) {
 	notices, err := s.client.ScrapeNotices(ctx, count)
 	if err != nil {
-		return 0, fmt.Errorf("scrape notices: %w", err)
+		return nil, fmt.Errorf("scrape notices: %w", err)
 	}
 
-	var newCount int64
+	var newNotices []Notice
 
 	err = s.repo.WithTx(ctx, func(txRepo Repository) error {
 		latestOrder, err := txRepo.GetLatestNoticeSourceOrder(ctx)
@@ -46,14 +46,14 @@ func (s *Service) SyncNotices(ctx context.Context, count int) (int64, error) {
 
 		for i := range slices.Backward(notices) {
 			orderOffset := int64(len(notices) - 1 - i)
-			n, err := txRepo.InsertNotice(ctx, notices[i], base+orderOffset)
+			isNew, err := txRepo.UpsertNotice(ctx, notices[i], base+orderOffset)
 			if err != nil {
-				return fmt.Errorf("insert notice %s: %w", notices[i].ID, err)
+				return fmt.Errorf("upsert notice %s: %w", notices[i].ID, err)
 			}
 
-			newCount += n
-
-			if n == 0 {
+			if isNew {
+				newNotices = append(newNotices, notices[i])
+			} else {
 				err = txRepo.UpdateNotice(ctx, notices[i])
 				if err != nil {
 					return fmt.Errorf("update notice %s: %w", notices[i].ID, err)
@@ -63,7 +63,7 @@ func (s *Service) SyncNotices(ctx context.Context, count int) (int64, error) {
 		return nil
 	})
 
-	return newCount, err
+	return newNotices, err
 }
 
 func (s *Service) GetNotices(ctx context.Context, filter Filter) ([]Notice, error) {
