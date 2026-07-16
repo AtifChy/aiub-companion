@@ -64,8 +64,7 @@ func createShortcut(target, shortcutPath string) error {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 
-	err := ole.CoInitializeEx(0, ole.COINIT_APARTMENTTHREADED|ole.COINIT_SPEED_OVER_MEMORY)
-	if err != nil {
+	if err := ole.CoInitializeEx(0, ole.COINIT_APARTMENTTHREADED|ole.COINIT_SPEED_OVER_MEMORY); err != nil {
 		return fmt.Errorf("CoInitializeEx: %w", err)
 	}
 	defer ole.CoUninitialize()

@@ -39,16 +39,22 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 		slog.Error("Failed to load config on startup, using defaults", "error", err)
 	}
 
-	if enabled, err := autostart.IsEnabled(); err != nil {
-		slog.Error("Failed to check autostart status", "error", err)
-	} else if config.Launch.AutoStart != enabled {
-		if err := autostart.Set(config.Launch.AutoStart); err != nil {
-			slog.Error("Failed to set autostart", "error", err)
-		}
-	}
-
 	s.path = path
 	s.config.Store(config)
+
+	application.Get().Event.On(event.EventConfigChanged, func(ev *application.CustomEvent) {
+		cfg, ok := ev.Data.(Config)
+		if !ok {
+			return
+		}
+		if enabled, err := autostart.IsEnabled(); err != nil {
+			slog.Error("Failed to check autostart status", "error", err)
+		} else if cfg.Launch.AutoStart != enabled {
+			if err := autostart.Set(cfg.Launch.AutoStart); err != nil {
+				slog.Error("Failed to set autostart", "error", err)
+			}
+		}
+	})
 
 	return nil
 }

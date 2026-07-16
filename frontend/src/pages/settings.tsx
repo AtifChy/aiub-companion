@@ -162,6 +162,18 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
 
           {/*Launch & Systray*/}
           <SettingsCard title="Launch & Systray">
+            <SettingRow label="Auto Start" description="Launch the application on system startup">
+              <Switch
+                checked={config.launch.auto_start}
+                onCheckedChange={(v) => {
+                  setConfig((draft) => {
+                    if (draft) draft.launch.auto_start = v;
+                  });
+                }}
+                className="cursor-pointer"
+              />
+            </SettingRow>
+
             <SettingRow
               label="Start Minimized"
               description="Launch the application directly to the system tray"
