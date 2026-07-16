@@ -11,7 +11,7 @@ import {
   SidebarHeader,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
-import { AboutPage, sections } from "@/lib/routes";
+import { AboutPage, SECTIONS } from "@/lib/routes";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [appInfo, setAppInfo] = useState<BuildInfo | null>(null);
@@ -44,8 +44,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenuButton>
       </SidebarHeader>
       <SidebarContent>
-        <NavGroup title="workspace" items={sections.workspace} />
-        <NavGroup title="others" items={sections.others} />
+        <NavGroup title="workspace" items={SECTIONS.workspace} />
+        <NavGroup title="others" items={SECTIONS.others} />
       </SidebarContent>
       <SidebarFooter className="flex items-center truncate group-data-[collapsible=icon]:hidden">
         <div className="flex items-center gap-1 text-xs text-muted-foreground">

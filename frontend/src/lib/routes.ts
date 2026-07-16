@@ -27,7 +27,7 @@ export interface RouteItem {
 
 type Section = "workspace" | "others";
 
-export const sections: Record<Section, RouteItem[]> = {
+export const SECTIONS: Record<Section, RouteItem[]> = {
   workspace: [
     {
       label: "Notices",
@@ -66,6 +66,6 @@ export const sections: Record<Section, RouteItem[]> = {
 
 type AppRoute = RouteItem & { section: Section };
 
-export const routes = Object.entries(sections).flatMap(([section, items]) =>
+export const routes = Object.entries(SECTIONS).flatMap(([section, items]) =>
   items.map((item) => ({ ...item, section })),
 ) as [AppRoute, ...AppRoute[]];
