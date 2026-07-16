@@ -135,30 +135,3 @@ jobs:
           files: artifacts/**/*
           draft: false
           prerelease: false
-
-  changelog:
-    name: Generate Changelog
-    runs-on: ubuntu-latest
-    steps:
-      - name: Changelog
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0 # fetch all history for automated release notes
-
-      - name: Generate Changelog
-        uses: orhun/git-cliff-action@v4
-        id: git-cliff
-        with:
-          config: .cliff.toml
-          args: --verbose
-        env:
-          OUTPUT: CHANGELOG.md
-          GITHUB_REPO: ${{ github.repository }}
-
-      - name: Commit Changelog
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add CHANGELOG.md
-          git commit -m "chore: update changelog [skip ci]" || echo "No changes to commit"
-          git push origin HEAD:main
