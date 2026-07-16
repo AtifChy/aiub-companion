@@ -145,12 +145,14 @@ func (q *Queries) GetNoticeWithState(ctx context.Context, id string) (GetNoticeW
 	return i, err
 }
 
-const insertNotice = `-- name: InsertNotice :execrows
+const insertNotice = `-- name: InsertNotice :one
 INSERT INTO
   notices (id, title, summary, posted_date, category, is_urgent, source_order)
 VALUES
   (?, ?, ?, ?, ?, ?, ?)
 ON CONFLICT(id) DO NOTHING
+RETURNING
+  CAST(created_at = updated_at AS BOOL) AS is_new
 `
 
 type InsertNoticeParams struct {
@@ -163,8 +165,8 @@ type InsertNoticeParams struct {
 	SourceOrder int64
 }
 
-func (q *Queries) InsertNotice(ctx context.Context, arg InsertNoticeParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, insertNotice,
+func (q *Queries) InsertNotice(ctx context.Context, arg InsertNoticeParams) (bool, error) {
+	row := q.db.QueryRowContext(ctx, insertNotice,
 		arg.ID,
 		arg.Title,
 		arg.Summary,
@@ -173,10 +175,9 @@ func (q *Queries) InsertNotice(ctx context.Context, arg InsertNoticeParams) (int
 		arg.IsUrgent,
 		arg.SourceOrder,
 	)
-	if err != nil {
-		return 0, err
-	}
-	return result.RowsAffected()
+	var column_1 bool
+	err := row.Scan(&column_1)
+	return column_1, err
 }
 
 const listNoticesWithState = `-- name: ListNoticesWithState :many
@@ -382,7 +383,7 @@ func (q *Queries) UpdateNoticeDetails(ctx context.Context, arg UpdateNoticeDetai
 	return err
 }
 
-const upsertNotice = `-- name: UpsertNotice :exec
+const upsertNotice = `-- name: UpsertNotice :one
 INSERT INTO
   notices (id, title, summary, posted_date, category, is_urgent, source_order)
 VALUES
@@ -397,6 +398,9 @@ ON CONFLICT(id) DO UPDATE
     source_order = EXCLUDED.source_order
   WHERE
     COALESCE(notices.title, '') != COALESCE(EXCLUDED.title, '')
+    OR COALESCE(notices.posted_date, '') != COALESCE(EXCLUDED.posted_date, '')
+RETURNING
+  CAST(created_at = updated_at AS BOOL) AS is_new
 `
 
 type UpsertNoticeParams struct {
@@ -409,8 +413,8 @@ type UpsertNoticeParams struct {
 	SourceOrder int64
 }
 
-func (q *Queries) UpsertNotice(ctx context.Context, arg UpsertNoticeParams) error {
-	_, err := q.db.ExecContext(ctx, upsertNotice,
+func (q *Queries) UpsertNotice(ctx context.Context, arg UpsertNoticeParams) (bool, error) {
+	row := q.db.QueryRowContext(ctx, upsertNotice,
 		arg.ID,
 		arg.Title,
 		arg.Summary,
@@ -419,7 +423,9 @@ func (q *Queries) UpsertNotice(ctx context.Context, arg UpsertNoticeParams) erro
 		arg.IsUrgent,
 		arg.SourceOrder,
 	)
-	return err
+	var column_1 bool
+	err := row.Scan(&column_1)
+	return column_1, err
 }
 
 const upsertNoticeAttachment = `-- name: UpsertNoticeAttachment :exec

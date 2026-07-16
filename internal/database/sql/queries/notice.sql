@@ -53,7 +53,7 @@ SELECT
 FROM
   notices;
 
--- name: UpsertNotice :exec
+-- name: UpsertNotice :one
 INSERT INTO
   notices (id, title, summary, posted_date, category, is_urgent, source_order)
 VALUES
@@ -67,14 +67,19 @@ ON CONFLICT(id) DO UPDATE
     is_urgent = EXCLUDED.is_urgent,
     source_order = EXCLUDED.source_order
   WHERE
-    COALESCE(notices.title, '') != COALESCE(EXCLUDED.title, '');
+    COALESCE(notices.title, '') != COALESCE(EXCLUDED.title, '')
+    OR COALESCE(notices.posted_date, '') != COALESCE(EXCLUDED.posted_date, '')
+RETURNING
+  CAST(created_at = updated_at AS BOOL) AS is_new;
 
--- name: InsertNotice :execrows
+-- name: InsertNotice :one
 INSERT INTO
   notices (id, title, summary, posted_date, category, is_urgent, source_order)
 VALUES
   (?, ?, ?, ?, ?, ?, ?)
-ON CONFLICT(id) DO NOTHING;
+ON CONFLICT(id) DO NOTHING
+RETURNING
+  CAST(created_at = updated_at AS BOOL) AS is_new;
 
 -- name: UpdateNotice :exec
 UPDATE notices
