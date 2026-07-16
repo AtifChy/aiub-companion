@@ -1,5 +1,5 @@
 import type { Notice } from "@bindings/notice";
-import { Browser } from "@wailsio/runtime";
+import { Browser, Events } from "@wailsio/runtime";
 import {
   CircleCheckBigIcon,
   CircleIcon,
@@ -16,7 +16,7 @@ import {
   PinOffIcon,
   RefreshCwIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { AppTooltip } from "@/components/app-tooltip";
@@ -92,11 +92,19 @@ export default function NoticesPage() {
 
   const detail = detailQuery.data ?? null;
 
-  const handleSelect = (notice: Notice) => {
-    if (notice.id === selectedId) return;
-    setSelectedId(notice.id);
-    readNotice(notice.id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleSelect = (id: string) => {
+    if (selectedId === id) return;
+    setSelectedId(id);
+    readNotice(id);
   };
+
+  useEffect(() => {
+    const unsubscribe = Events.On("notice:open", (event) => {
+      handleSelect(event.data);
+    });
+    return unsubscribe;
+  }, [handleSelect]);
 
   return (
     <ResizablePanelGroup orientation="horizontal" className="flex h-full">
@@ -126,7 +134,7 @@ export default function NoticesPage() {
 
 interface NoticeListPanelProps {
   selectedId: string | null;
-  onSelect: (notice: Notice) => void;
+  onSelect: (id: string) => void;
   onTogglePin: (id: string, next: boolean) => void;
   syncing: boolean;
   onSync: () => void;
@@ -296,7 +304,7 @@ interface NoticeListProps {
   loading: boolean;
   error: Error | null;
   selectedId: string | null;
-  onSelect: (notice: Notice) => void;
+  onSelect: (id: string) => void;
   onTogglePin: (id: string, next: boolean) => void;
   onRetry: () => void;
   onClearFilters: () => void;
@@ -366,7 +374,7 @@ function NoticeList({
           key={notice.id}
           notice={notice}
           selected={selectedId === notice.id}
-          onSelect={() => onSelect(notice)}
+          onSelect={() => onSelect(notice.id)}
           onTogglePin={(e) => {
             e.stopPropagation();
             onTogglePin(notice.id, !notice.isPinned);

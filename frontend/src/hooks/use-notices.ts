@@ -44,7 +44,7 @@ export function useNoticeList(filter: NoticeFilters) {
   });
 
   useEffect(() => {
-    const unsubscribe = Events.On("notices:synced", (count) => {
+    const unsubscribe = Events.On("notice:synced", (count) => {
       void queryClient.invalidateQueries({ queryKey: ["notices"] });
       toast.success(`${count.data} new notice${count.data !== 1 ? "s" : ""} synced`);
     });
@@ -143,7 +143,8 @@ export function useSync() {
 
   const syncMutation = useMutation({
     mutationFn: () => NoticeService.SyncNotices(config.sync.fetch_count),
-    onSuccess: (count) => {
+    onSuccess: (notices) => {
+      const count = notices.length;
       if (count > 0) {
         toast.success(`${count} new notice${count !== 1 ? "s" : ""} synced`);
       } else {
