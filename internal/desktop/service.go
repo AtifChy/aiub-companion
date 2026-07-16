@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	mainWindowName  = "main-window"
-	aboutWindowName = "about-window"
+	MainWindowName  = "main-window"
+	AboutWindowName = "about-window"
 )
 
 type Service struct {
@@ -70,7 +70,7 @@ func (s *Service) onApplicationStarted(_ *application.ApplicationEvent) {
 		HideOnClose:   cfg.Launch.CloseToTray && cfg.Launch.KeepAlive,
 		RestoreWindow: cfg.Launch.RestoreWindow,
 		WebviewWindowOptions: application.WebviewWindowOptions{
-			Name:             mainWindowName,
+			Name:             MainWindowName,
 			Title:            meta.DisplayName,
 			Frameless:        true,
 			BackgroundColour: application.NewRGBA(0, 0, 0, 255),
@@ -87,7 +87,7 @@ func (s *Service) onApplicationStarted(_ *application.ApplicationEvent) {
 	s.about = window.NewWindow(s.app, window.WindowOptions{
 		HideOnClose: true,
 		WebviewWindowOptions: application.WebviewWindowOptions{
-			Name:                aboutWindowName,
+			Name:                AboutWindowName,
 			Title:               "About " + meta.DisplayName,
 			Width:               400,
 			Height:              350,
