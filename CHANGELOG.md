@@ -1,3 +1,49 @@
+## [0.3.50] - 2026-07-16
+
+### 🚀 Features
+
+- *(desktop)* Add main window show on notice click [`35953de`](https://github.com/AtifChy/aiub-companion/commit/35953dedf52679ba6bcc2a5265de54f62ed5cf05)
+- *(autostart)* Add cross-platform autostart functionality [`cc5753a`](https://github.com/AtifChy/aiub-companion/commit/cc5753ad98e466ce6fcba9587cae296bc15d792f)
+- *(config)* Add autostart option [`50a5ee4`](https://github.com/AtifChy/aiub-companion/commit/50a5ee4ac69ff84d3e21d1ee74b65c16931a0ea3)
+- *(config)* Implement autostart functionality [`44acf17`](https://github.com/AtifChy/aiub-companion/commit/44acf17d58736f04def9676701ee53c143d8c9d4)
+
+### 🐛 Bug Fixes
+
+- *(config)* Garbled config validation error message [`c97dffb`](https://github.com/AtifChy/aiub-companion/commit/c97dffb643a2261628803e471c195e98f7e742de)
+
+### 💼 Other
+
+- *(docker)* Update golang base image to trixie [`0c8690a`](https://github.com/AtifChy/aiub-companion/commit/0c8690a9c7de3b2485989ff6fcbe30652909d814)
+- *(meta)* Update ldflags module path [`58a8caa`](https://github.com/AtifChy/aiub-companion/commit/58a8caae7f9a083c0a3728f55e69211149b6289b)
+
+### 🚜 Refactor
+
+- *(updater)* Reuse updater not initialized error [`37d3856`](https://github.com/AtifChy/aiub-companion/commit/37d385631ab2aaf5b317640574d2f213ba2e993c)
+- *(service)* Extract asset matcher function [`151641d`](https://github.com/AtifChy/aiub-companion/commit/151641db7cda30f01043e10406f39dc6293dcb4d)
+- *(worker)* Simplify notification body message [`edab442`](https://github.com/AtifChy/aiub-companion/commit/edab442aeadcdadca46cb949b68f8fa0f40df136)
+- *(autostart)* Remove service struct [`6e0857c`](https://github.com/AtifChy/aiub-companion/commit/6e0857cb6635322a72d12f781d62c74386cd0dde)
+- Move build info to meta package [`ee79297`](https://github.com/AtifChy/aiub-companion/commit/ee792971ae2cd5a134fac90c93172c61d6cf41e7)
+- *(config)* Reorder and add auto_start property [`370225c`](https://github.com/AtifChy/aiub-companion/commit/370225c62cc7ddeb550728c749066f88a31d2584)
+- Rename config service to meta [`c7cf370`](https://github.com/AtifChy/aiub-companion/commit/c7cf3703c9905f440761e61a6db18dec46cbaeb7)
+- *(config)* Extract config changed handler [`6ce0380`](https://github.com/AtifChy/aiub-companion/commit/6ce0380485992261cae9986746db1da0193a86fa)
+- *(log)* Extract config changed handler [`80faf9b`](https://github.com/AtifChy/aiub-companion/commit/80faf9b20c352cb93dd7880b5acbb6fcb041c6b2)
+- *(log)* Use meta app name [`6b4dc52`](https://github.com/AtifChy/aiub-companion/commit/6b4dc520d1aeb7ac7c2b6832c4127e2578a30d34)
+
+### 🎨 Styling
+
+- *(lint)* Fix lint issues [`3f34965`](https://github.com/AtifChy/aiub-companion/commit/3f349657d6d0d96e93f37850a1ae48de075a22ec)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(lint)* Add golangci-lint config [`9214915`](https://github.com/AtifChy/aiub-companion/commit/9214915feaab1db9f6bfb9adda746478adeb7782)
+- *(release)* Remove changelog generation [`18e825f`](https://github.com/AtifChy/aiub-companion/commit/18e825f4be4a39824581ba8111963a31c0c07041)
+- Add prepare release workflow [`bd2d2e6`](https://github.com/AtifChy/aiub-companion/commit/bd2d2e68c25fbe26f035d43ee4daffb0d8d7d552)
+- Update setup-go and setup-node actions [`4d29716`](https://github.com/AtifChy/aiub-companion/commit/4d297165fc7422fd82976b09009967de721d09cc)
+- *(release)* Bump version to v0.3.50 [`748f273`](https://github.com/AtifChy/aiub-companion/commit/748f273dd3c12329cf24085d5063e18fc4f7353b)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.3.30...v0.3.50
+
 ## [0.3.30] - 2026-07-14
 
 ### 🚀 Features
