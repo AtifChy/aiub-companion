@@ -23,8 +23,6 @@ tasks:
     vars:
       DEFAULT_OUTPUT: "{{.BIN_DIR}}/{{.APP_NAME}}"
       OUTPUT: "{{ .OUTPUT | default .DEFAULT_OUTPUT }}"
-      VERSION:
-        sh: git describe --tags --dirty --always
       BUILD_TIME:
         sh: date -u +"%Y-%m-%dT%H:%M:%SZ"
 
