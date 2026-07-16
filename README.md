@@ -1,187 +1,183 @@
 # 🎓 AIUB Companion
 
 [![Go Version](https://img.shields.io/badge/Go-1.26.0-00ADD8?style=flat&logo=go&logoColor=white)](https://go.dev/)
-[![React Version](https://img.shields.io/badge/React-19.2-61DAFB?style=flat&logo=react&logoColor=white)](https://react.dev/)
-[![Vite Version](https://img.shields.io/badge/Vite-8.0-646CFF?style=flat&logo=vite&logoColor=white)](https://vite.dev/)
-[![Wails Version](https://img.shields.io/badge/Wails-v3--alpha-red?style=flat)](https://v3.wails.io/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.3-38B2AC?style=flat&logo=tailwindcss)](https://tailwindcss.com/)
-[![SQLite](https://img.shields.io/badge/SQLite-FTS5-003B57?style=flat&logo=sqlite&logoColor=white)](https://sqlite.org/)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![React Version](https://img.shields.io/badge/React-19-61DAFB?style=flat&logo=react&logoColor=white)](https://react.dev/)
+[![Vite Version](https://img.shields.io/badge/Vite-8-646CFF?style=flat&logo=vite&logoColor=white)](https://vite.dev/)
+[![Wails Version](https://img.shields.io/badge/Wails-v3--alpha-red?style=flat&logo=wails)](https://v3.wails.io/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?style=flat&logo=tailwindcss)](https://tailwindcss.com/)
+[![SQLite](https://img.shields.io/badge/SQLite-DB-003B57?style=flat&logo=sqlite&logoColor=white)](https://sqlite.org/)
+[![License](https://img.shields.io/badge/License-Apache_2.0-Green.svg)](https://opensource.org/licenses/Apache-2.0)
 
-**AIUB Companion** is a highly optimized, offline-first, modern desktop application designed for students and faculty of the American International University-Bangladesh (AIUB). It streamlines daily academic activities by scraping official university notices, managing routine class schedules from Excel sheets, and providing an array of interactive academic tools.
+**AIUB Companion** is an offline-first desktop application for students of the American International University-Bangladesh (AIUB). It scrapes official university notices, manages class schedules from Excel sheets, and provides academic utilities — all in a native, lightweight desktop app.
 
-Built on the cutting-edge **Wails v3 framework**, AIUB Companion features a blazing-fast pure-Go backend integrated with a fluid React 19 single-page application, styled gracefully with Tailwind CSS v4.
+Built with **Wails v3**, a pure-Go backend, and a React 19 SPA frontend styled with Tailwind CSS v4.
 
 ---
 
-## 🚀 Key Features
+## 🚀 Features
 
-### 📡 Offline-First Notice Scraper & Sync
+### 📡 Notice Board
 
-- **Automatic Background Synchronization:** Keeps you updated with the latest AIUB notices without manually visiting the website.
-- **Fast Full-Text Search (FTS):** Search notices instantly using the SQLite FTS5 engine.
-- **Attachment Downloader:** Easily browse and download associated notice PDF/image attachments locally.
-- **Native OS Notifications:** Receive system notifications the moment a new notice is published.
+- **Background Sync** — Automatically fetches the latest AIUB notices at a configurable interval.
+- **Fuzzy Full-Text Search** — JaroWinkler-based in-memory fuzzy search.
+- **Attachment Viewer** — Browse and download PDF/image attachments associated with each notice.
+- **Pin & Read State** — Mark notices as read or pin important ones; state persists locally.
+- **Native Notifications** — System-level OS notifications on new notice arrival.
 
-### 📅 Academic Routine & Class Schedule
+### 📅 Class Routine
 
-- **Excel Importer:** Import your class or offered course schedule directly from official AIUB spreadsheet files (using the pure-Go `excelize` library).
-- **Flexible Searching & Filtering:** Search by Course Title, Course Code, Class ID, Faculty name, Day, Room, or Department.
-- **Conflict Checker & Day View:** Quickly check what classes you have on any given day.
+- **Excel Importer** — Import offered courses directly from official AIUB spreadsheet files (`excelize`).
+- **Fuzzy Course Search** — In-memory JaroWinkler fuzzy search across course title, code, section, faculty, and department — powered by an in-memory cache for zero DB round-trips while typing.
+- **Week Timeline View** — Visual day-by-day schedule with live "Ongoing" and "Up Next" status indicators.
 
-### 🧮 Academic Utilities
+### 📆 Academic Calendar
 
-- **CGPA Calculator:** Dynamic and interactive tracker to calculate and forecast your Cumulative GPA.
-- **GPA Trend Analyzer:** Beautifully visualize your academic progress and GPA trajectory across multiple semesters.
-- **Exam Countdown:** Configurable timers and countdowns for midterms, finals, or other critical deadlines.
+- Scrapes and caches the official AIUB academic calendar locally.
 
-### ⚙️ Deep System Integration
+### ⚙️ System Integration
 
-- **System Tray/App Indicator Support:** Minimize to system tray, launch minimized, or close-to-tray to stay lightweight in the background.
-- **Flexible Configuration:** Customizable background sync intervals, notification preferences, system startup behavior, logging details, and dark/light/system theme toggles.
-- **Cross-Platform:** Built with cross-compilation in mind, supporting Windows, macOS, and Linux (with exploratory setups for mobile Android/iOS).
-- **Headless Server Mode:** Supports compiling and running as a lightweight GUI-less HTTP server containerizable via Docker.
+- **System Tray** — Minimize to tray, close-to-tray, and tray-click to restore.
+- **Single Instance Lock** — Prevents multiple instances; focuses existing window instead.
+- **Autostart** — Optional Windows startup shortcut via `WScript.Shell` COM automation.
+- **Auto-Update** — Powered by Wails v3's built-in updater with GitHub Releases as the provider. Supports daily, weekly, or monthly scheduled checks with persistent last-check state.
+- **Deep Configuration** — Theme, log level, sync interval, notification toggle, launch behaviour — all persisted to `config.json` with JSON Schema validation.
 
 ---
 
 ## 🛠️ Technology Stack
 
-| Backend (Go)                       | Frontend (React & TS)                  | Database & Tooling                  |
-| ---------------------------------- | -------------------------------------- | ----------------------------------- |
-| **Go 1.26.0**                      | **React 19** & **TypeScript 6/7**      | **SQLite** (Pure Go, Zero-CGO)      |
-| **Wails v3** (Alpha 2.106)         | **Vite 8** & **Rolldown**              | **SQLC** (Type-safe SQL generation) |
-| **Excelize v2** (Excel parsing)    | **Tailwind CSS v4**                    | **Taskfile** (Advanced Task runner) |
-| **Bluemonday** (HTML sanitization) | **TanStack React Query v5**            | **Docker** (Cross-compiling/Server) |
-| **Slog** (Structured logging)      | **Base UI (Radix)** & **Lucide React** | **Prettier & ESLint**               |
+| Backend (Go) | Frontend (React & TS) | Tooling |
+| --- | --- | --- |
+| **Go 1.26.0** | **React 19** + **TypeScript** | **SQLite** (Pure Go, Zero-CGO via `modernc.org/sqlite`) |
+| **Wails v3** (`alpha2.117`) | **Vite 8** | **SQLC** (type-safe SQL → Go codegen) |
+| **excelize v2** (Excel parsing) | **Tailwind CSS v4** | **Task** (task runner) |
+| **go-edlib** (JaroWinkler fuzzy) | **TanStack Query v5** | **Docker** (cross-compile & server mode) |
+| **bluemonday** (HTML sanitizer) | **Radix UI** + **Lucide React** | **PNPM** |
+| **slog** + **tint** (structured logging) | **Sonner** (toasts) | **Prettier** + **ESLint** |
+| **go-ole** (Windows COM) | | |
 
 ---
 
 ## 📂 Project Structure
 
-A guide to the main directories and components of the application:
-
 ```text
-├── .task/                  # Taskfile execution cache
-├── bin/                    # Compiled production executables
-├── build/                  # Platform-specific build assets (icons, configs, installers, Dockerfiles)
-├── frontend/               # React frontend application
-│   ├── src/
-│   │   ├── components/     # Reusable UI components (custom inputs, buttons, etc.)
-│   │   ├── hooks/          # React hooks (use-notices, use-debounce, etc.)
-│   │   ├── lib/            # Shared utilities, logging, routing, and configurations
-│   │   ├── pages/          # Layout pages (Notices, Routine, CGPA, Exam Countdown, Settings, Help)
-│   │   ├── App.tsx         # Main application component & routes
-│   │   └── main.tsx        # React entry point
-│   ├── package.json        # Frontend dependencies (React 19, Tailwind v4, etc.)
-│   └── vite.config.ts      # Vite compilation configuration
-├── internal/               # Go backend package modules (private domain logic)
-│   ├── config/             # Config service, validation, schemas, and launch rules
-│   ├── database/           # SQLite connection pool, migrations, and transactions
-│   │   ├── db/             # Generated SQLC Go files (models, querier)
-│   │   └── sql/            # Raw SQL schemas and queries
-│   ├── desktop/            # Native window handling, single-instance lock, system tray
-│   ├── log/                # Custom structured logging and logger middleware
-│   ├── notice/             # Scraper client, database repositories, notice services
-│   ├── routine/            # Offered course Excel importer, routine queries, service binds
-│   └── worker/             # Background synchronization ticker & OS notification dispatch
-├── main.go                 # Entry point of the Go backend
-├── sqlc.yaml               # SQLC compiler configuration
-└── Taskfile.yml            # Main automation task configuration
+aiub-companion/
+├── build/                   # Platform build assets (icons, Taskfiles, Dockerfiles, installers)
+├── frontend/                # React SPA
+│   └── src/
+│       ├── components/      # Reusable UI components
+│       ├── hooks/           # Custom React hooks (use-notices, use-debounce, use-updater, ...)
+│       ├── lib/             # Shared utilities (logger, router, utils)
+│       └── pages/           # Route-level pages (Notices, Routine, Calendar, Settings, ...)
+├── internal/
+│   ├── autostart/           # Manages start-on-boot shortcut creation/removal
+│   ├── calendar/            # Academic calendar scraper & cache
+│   ├── config/              # JSON config with schema validation; persists to config.json
+│   ├── console/             # Wails devtools console bridge (dev-only)
+│   ├── database/            # SQLite connection, migrations
+│   │   ├── db/              # SQLC-generated Go models & queries
+│   │   └── sql/
+│   │       ├── queries/     # Raw SQL query files
+│   │       └── schemas/     # Schema migration files (01_schema.sql, 02_indexes.sql)
+│   ├── desktop/             # Window management, tray icon, single-instance
+│   ├── event/               # Shared event name constants
+│   ├── log/                 # Structured file+console logger (slog + tint)
+│   ├── meta/                # App constants (name, version, repo)
+│   ├── notice/              # Notice scraper, repository, service, fuzzy search
+│   ├── routine/             # Course Excel importer, in-memory cache, fuzzy search
+│   ├── search/              # Generic JaroWinkler fuzzy search (FuzzySearch[T])
+│   ├── updater/             # Wails v3 updater wrapper; scheduled checks; state persistence
+│   └── worker/              # Background sync ticker; notification dispatch
+├── main.go                  # App entry point & service wiring
+├── sqlc.yaml                # SQLC compiler config
+├── Taskfile.yml             # Task runner definitions
+└── go.mod
 ```
 
 ---
 
 ## 🚀 Getting Started
 
-Ensure you have the following installed on your machine:
+### Prerequisites
 
-- **Go** (1.26.0 or higher)
-- **Node.js** (v18 or higher) and **PNPM** (or npm/yarn/bun)
-- **Wails v3 CLI** (Required for hot-reload dev mode)
-- **Task** (Highly recommended task runner: `go install github.com/go-task/task/v3/cmd/task@latest`)
+- **Go** 1.26.0+
+- **Node.js** 26+ and **PNPM**
+- **Wails v3 CLI** — `go install github.com/wailsapp/wails/v3/cmd/wails3@latest`
+- **Task** — `go install github.com/go-task/task/v3/cmd/task@latest`
+- **SQLC** (only needed if modifying SQL) — `go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest`
 
-### 1. Installation & Setup
-
-Clone the repository and install the frontend dependencies:
+### Install & Run
 
 ```bash
-# Clone the repository
 git clone https://github.com/atifchy/aiub-companion.git
 cd aiub-companion
 
-# Install frontend dependencies (automatically managed if using Task)
-cd frontend
-pnpm install
-cd ..
-```
+# Install frontend dependencies
+cd frontend && pnpm install && cd ..
 
-### 2. Running in Development Mode
-
-Run the application with real-time hot-reloading for both backend Go code and frontend React UI:
-
-```bash
-# Using Task (Recommended)
+# Run in dev mode (hot-reload for both Go and React)
 task dev
-
-# Or directly using Wails3
-wails3 dev
 ```
 
-### 3. Compilation & Building
-
-To generate optimized binary releases for your current Operating System:
+### Build
 
 ```bash
-# Production Build
+# Production binary for current OS
 task build
 
-# Packaging an Installer (e.g. MSI on Windows, AppImage/Deb on Linux, DMG/App on macOS)
+# Packaged installer (NSIS on Windows, DMG on macOS, AppImage/deb on Linux)
 task package
 ```
 
-Built executables are created in the `bin/` directory.
+Executables are written to `bin/`.
 
 ---
 
-## 🌐 Headless Server Mode (Docker Support)
+## 🗃️ Database
 
-AIUB Companion can be run as a headless, UI-less server that scrapes notices and exposes endpoints via an HTTP API.
+The app uses a local SQLite database via `modernc.org/sqlite` (pure Go, zero CGO).
 
-To build and deploy using Docker:
+- **Schemas** live in `internal/database/sql/schemas/` and are embedded + auto-applied on startup.
+- **Queries** live in `internal/database/sql/queries/` and are compiled to type-safe Go by SQLC.
+
+After editing any `.sql` file, regenerate:
 
 ```bash
-# Build the production server mode Docker container
-task build:docker
-
-# Run the Docker container
-task run:docker
+sqlc generate
 ```
-
-The server is configured using the Dockerfile located at `build/docker/Dockerfile.server`.
 
 ---
 
-## 📝 Development Guide
+## 🔄 Auto-Update
 
-- **Database Migrations & SQLC:** If you edit schema files in `internal/database/sql/schemas/` or queries in `internal/database/sql/queries/`, regenerate the SQLC bindings:
+Updates are delivered via GitHub Releases using the Wails v3 built-in updater. The updater:
 
-  ```bash
-  sqlc generate
-  ```
+- Filters assets to skip installer packages, selecting only the portable binary.
+- Supports configurable check intervals: **daily**, **weekly**, **monthly**, or **never**.
+- Persists the last check timestamp so schedules survive restarts.
+- Can be triggered manually from the Settings page.
 
-- **Logging:** Structured logging is implemented through Go's native `slog` library. Log files can be found locally in the application's storage path under the `logs` folder.
-- **Configurations:** The application uses a local JSON configuration file parsed dynamically with JSonSchema validation (`internal/config/schema.json`).
+---
+
+## 🖥️ Server Mode
+
+AIUB Companion can be compiled without a GUI as a headless HTTP server (for scraping/deployment):
+
+```bash
+task build:server
+task run:server
+
+# Or via Docker
+task build:docker
+task run:docker
+```
 
 ---
 
 ## 🛡️ License
 
-This project is licensed under the **Apache License 2.0**. See the [LICENSE](LICENSE) file for details.
+Licensed under the **Apache License 2.0**. See [LICENSE](LICENSE) for details.
 
 ---
 
-## 🤝 Contributing
-
-Contributions are highly welcomed! Please feel free to open an issue or submit a pull request if you want to enhance the UI, add features, improve scraping robustness, or fix bugs.
-
-_Disclaimer: AIUB Companion is an unofficial fan-made companion tool and is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the American International University-Bangladesh (AIUB)._
+_AIUB Companion is an unofficial fan-made tool and is not affiliated with or endorsed by the American International University-Bangladesh (AIUB)._
