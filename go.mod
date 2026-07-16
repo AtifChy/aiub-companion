@@ -4,13 +4,13 @@ go 1.26.0
 
 require (
 	github.com/hbollon/go-edlib v1.7.0
-	github.com/lmittmann/tint v1.1.3
+	github.com/lmittmann/tint v1.2.0
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
 	github.com/wailsapp/wails/v3 v3.0.0-alpha2.117
 	github.com/xuri/excelize/v2 v2.11.0
-	golang.org/x/net v0.56.0
-	modernc.org/sqlite v1.53.0
+	golang.org/x/net v0.57.0
+	modernc.org/sqlite v1.54.0
 )
 
 require (
@@ -40,7 +40,7 @@ require (
 	github.com/invopop/jsonschema v0.14.0
 	github.com/jchv/go-winloader v0.0.0-20250406163304-c1995be93bd1 // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
-	github.com/mattn/go-isatty v0.0.22 // indirect
+	github.com/mattn/go-isatty v0.0.23 // indirect
 	github.com/ncruces/go-strftime v1.0.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	golang.org/x/crypto v0.54.0 // indirect
