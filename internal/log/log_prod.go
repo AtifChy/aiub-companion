@@ -9,8 +9,8 @@ import (
 	"path"
 	"path/filepath"
 
-	"aiub-companion/internal/config"
 	"aiub-companion/internal/log/logger"
+	"aiub-companion/internal/meta"
 )
 
 func SetupLogger() (*logger.Logger, error) {
@@ -33,10 +33,10 @@ func logPath() (string, error) {
 		return "", err
 	}
 
-	logDir = path.Join(logDir, config.AppName, "logs")
+	logDir = path.Join(logDir, meta.AppName, "logs")
 	if err := os.MkdirAll(logDir, 0o755); err != nil {
 		return "", fmt.Errorf("create log directory: %w", err)
 	}
 
-	return filepath.Join(logDir, config.AppName+".log"), nil
+	return filepath.Join(logDir, meta.AppName+".log"), nil
 }
