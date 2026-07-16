@@ -15,33 +15,14 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { WindowControls } from "@/components/window-controls";
-import { sections } from "@/lib/routes";
+import { routes } from "@/lib/routes";
 
 export default function Layout() {
-  const location = useLocation();
-
-  const breadcrumb = (() => {
-    for (const [key, items] of Object.entries(sections)) {
-      const match = items.find((item) =>
-        matchPath({ path: item.path, end: true }, location.pathname),
-      );
-      if (match) {
-        return { section: key as keyof typeof sections, label: match.label };
-      }
-    }
-    return null;
-  })();
-
-  const { section, label } = breadcrumb ?? {
-    section: "workspace",
-    label: "unknown",
-  };
-
   return (
     <div className="flex h-screen w-full">
       <AppSidebar />
       <SidebarInset className="overflow-hidden">
-        <Header section={section} label={label} />
+        <Header />
         <main className="min-h-0 flex-1 overflow-hidden">
           <Suspense fallback={<Loading />}>
             <Outlet />
@@ -52,9 +33,13 @@ export default function Layout() {
   );
 }
 
-function Header({ section, label }: { section: string; label: string }) {
-  const [maximized, setMaximized] = useState(false);
+function Header() {
+  const location = useLocation();
+  const breadcrumb = routes.find((route) =>
+    matchPath({ path: route.path, end: true }, location.pathname),
+  );
 
+  const [maximized, setMaximized] = useState(false);
   useEffect(() => void Window.IsMaximised().then(setMaximized), []);
 
   const toggleMaximize = async () => {
@@ -75,11 +60,11 @@ function Header({ section, label }: { section: string; label: string }) {
       <Breadcrumb className="pointer-events-none select-none">
         <BreadcrumbList className="min-w-xs">
           <BreadcrumbItem>
-            <BreadcrumbLink className="capitalize">{section}</BreadcrumbLink>
+            <BreadcrumbLink className="capitalize">{breadcrumb?.section}</BreadcrumbLink>
           </BreadcrumbItem>
-          <BreadcrumbSeparator />
+          {breadcrumb?.label && <BreadcrumbSeparator />}
           <BreadcrumbItem>
-            <BreadcrumbPage>{label}</BreadcrumbPage>
+            <BreadcrumbPage>{breadcrumb?.label}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
