@@ -1,3 +1,23 @@
+## [0.3.60] - 2026-07-16
+
+### 💼 Other
+
+- Remove redundant version variable [`7bd8d49`](https://github.com/AtifChy/aiub-companion/commit/7bd8d4970a4b354945e9d6434e25d56be0312be8)
+
+### 🚜 Refactor
+
+- *(routes)* Remove unused routes and icons [`af6ec70`](https://github.com/AtifChy/aiub-companion/commit/af6ec70c71586a6b6cae305d85d67d085ea02431)
+- Remove tools section from sidebar [`27c6c1c`](https://github.com/AtifChy/aiub-companion/commit/27c6c1c53cd5699001c2fb22b133e7bec1d9af95)
+- *(route)* Update routes object structure [`2fbc179`](https://github.com/AtifChy/aiub-companion/commit/2fbc17941308a62c17f8df9cc45fb3a6a60ac91b)
+- *(layout)* Simplify header breadcrumb logic [`7bb8590`](https://github.com/AtifChy/aiub-companion/commit/7bb8590b7c88acb7bf061434a6c1e74f43070b63)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Bump version to v0.3.60 [`e22133d`](https://github.com/AtifChy/aiub-companion/commit/e22133d67b5c39957468f17c4b165ce2a42586bb)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.3.50...v0.3.60
+
 ## [0.3.50] - 2026-07-16
 
 ### 🚀 Features
@@ -40,6 +60,7 @@
 - Add prepare release workflow [`bd2d2e6`](https://github.com/AtifChy/aiub-companion/commit/bd2d2e68c25fbe26f035d43ee4daffb0d8d7d552)
 - Update setup-go and setup-node actions [`4d29716`](https://github.com/AtifChy/aiub-companion/commit/4d297165fc7422fd82976b09009967de721d09cc)
 - *(release)* Bump version to v0.3.50 [`748f273`](https://github.com/AtifChy/aiub-companion/commit/748f273dd3c12329cf24085d5063e18fc4f7353b)
+- Update changelog [`9bdcaca`](https://github.com/AtifChy/aiub-companion/commit/9bdcaca474c976ee483390ac79f09f71a80ab5b4)
 
 
 > **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.3.30...v0.3.50
