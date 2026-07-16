@@ -64,9 +64,8 @@ export const sections: Record<Section, RouteItem[]> = {
   ],
 };
 
-export const routes = Object.values(sections)
-  .flat()
-  .filter((item): item is RouteItem & { component: React.ComponentType } => !!item.component) as [
-  RouteItem & { component: React.ComponentType },
-  ...(RouteItem & { component: React.ComponentType })[],
-];
+type AppRoute = RouteItem & { section: Section };
+
+export const routes = Object.entries(sections).flatMap(([section, items]) =>
+  items.map((item) => ({ ...item, section })),
+) as [AppRoute, ...AppRoute[]];
