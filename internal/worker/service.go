@@ -5,11 +5,12 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"strings"
 	"time"
 
 	"aiub-companion/internal/config"
+	"aiub-companion/internal/desktop"
 	"aiub-companion/internal/event"
-	"aiub-companion/internal/meta"
 	"aiub-companion/internal/notice"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
@@ -18,7 +19,8 @@ import (
 
 func init() {
 	// Register a custom event whose associated data type is string.
-	application.RegisterEvent[int](event.EventNoticesSynced)
+	application.RegisterEvent[int](event.EventNoticeSynced)
+	application.RegisterEvent[string](event.EventNoticeOpen)
 }
 
 type Service struct {
@@ -56,7 +58,15 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 			slog.Error("Failed to send notification", "error", result.Error)
 			return
 		}
+
 		app.Event.Emit(event.EventShowMainWindow)
+
+		// Only works when the window is already open, otherwise it will be ignored.
+		if !strings.HasPrefix(result.Response.ID, "sync-") {
+			if window, ok := app.Window.Get(desktop.MainWindowName); ok {
+				window.EmitEvent(event.EventNoticeOpen, result.Response.ID)
+			}
+		}
 	})
 
 	go s.run(ctx)
@@ -79,26 +89,43 @@ func (s *Service) run(ctx context.Context) {
 	defer ticker.Stop()
 
 	doSync := func() {
-		count, err := s.notice.SyncNotices(ctx, cfg.Sync.FetchCount)
+		newNotices, err := s.notice.SyncNotices(ctx, cfg.Sync.FetchCount)
 		if err != nil {
 			slog.Error("Failed to sync notices", "error", err)
 			return
 		}
+
+		count := len(newNotices)
 		if count == 0 {
 			slog.Info("No new notices found")
 			return
 		}
 
+		var id, title, body string
+		if count == 1 {
+			notice := newNotices[0]
+			id = notice.ID
+			title = notice.Title
+			body = notice.Summary
+		} else {
+			plural := "s"
+			if count == 1 {
+				plural = ""
+			}
+			id = fmt.Sprintf("sync-%d", time.Now().Local().UnixMilli())
+			title = fmt.Sprintf("%d new notice%s available", count, plural)
+		}
+
 		err = s.notification.SendNotification(notifications.NotificationOptions{
-			ID:    fmt.Sprintf("sync-%d", time.Now().Local().UnixMilli()),
-			Title: meta.DisplayName,
-			Body:  fmt.Sprintf("%d new notice(s) available", count),
+			ID:    id,
+			Title: title,
+			Body:  body,
 		})
 		if err != nil {
 			slog.Error("Failed to send notification", "error", err)
 		}
 
-		app.Event.Emit(event.EventNoticesSynced, int(count))
+		app.Event.Emit(event.EventNoticeSynced, int(count))
 
 		slog.Info("Synced notices", "count", count)
 	}
