@@ -7,5 +7,5 @@ const (
 	EventNoticeSynced = "notice:synced"
 	EventNoticeOpen   = "notice:open"
 
-	EventShowMainWindow = "main-window:show"
+	EventMainWindowShow = "main-window:show"
 )

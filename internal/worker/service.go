@@ -59,7 +59,7 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 			return
 		}
 
-		app.Event.Emit(event.EventShowMainWindow)
+		app.Event.Emit(event.EventMainWindowShow)
 
 		// Only works when the window is already open, otherwise it will be ignored.
 		if !strings.HasPrefix(result.Response.ID, "sync-") {

@@ -49,7 +49,7 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 		}
 	})
 
-	app.Event.On(event.EventShowMainWindow, func(_ *application.CustomEvent) {
+	app.Event.On(event.EventMainWindowShow, func(_ *application.CustomEvent) {
 		s.main.Show()
 	})
 
