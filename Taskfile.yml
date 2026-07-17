@@ -5,7 +5,7 @@ dotenv:
   - .env.local
 
 vars:
-  VERSION: "v0.3.60"
+  VERSION: "v0.4.0"
   APP_NAME: "aiub-companion"
   MODULE: "aiub-companion"
   BIN_DIR: "bin"
