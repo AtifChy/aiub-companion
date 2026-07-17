@@ -2,12 +2,12 @@ package config
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"sync"
 	"sync/atomic"
 
-	"aiub-companion/internal/autostart"
 	"aiub-companion/internal/event"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
@@ -42,29 +42,41 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 	s.path = path
 	s.config.Store(config)
 
-	application.Get().Event.On(event.EventConfigChanged, s.onConfigChanged)
+	application.Get().Event.On(event.EventConfigChanged, onConfigChange)
 
 	return nil
 }
 
-func (s *Service) onConfigChanged(ev *application.CustomEvent) {
-	cfg, ok := ev.Data.(Config)
+func onConfigChange(e *application.CustomEvent) {
+	cfg, ok := e.Data.(Config)
 	if !ok {
 		return
 	}
 
-	s.syncAutostart(&cfg)
-}
+	app := application.Get()
 
-func (s *Service) syncAutostart(cfg *Config) {
-	if enabled, err := autostart.IsEnabled(); err != nil {
-		slog.Error("Failed to check autostart status", "error", err)
-	} else if cfg.Launch.AutoStart != enabled {
-		if err := autostart.Set(cfg.Launch.AutoStart); err != nil {
-			slog.Error("Failed to set autostart", "error", err)
+	enabled, err := app.Autostart.IsEnabled()
+	if err != nil {
+		if !errors.Is(err, application.ErrAutostartNotSupported) {
+			slog.Error("Failed to check autostart status", "error", err)
+		}
+	}
+
+	if cfg.Launch.AutoStart != enabled {
+		var err error
+
+		if cfg.Launch.AutoStart {
+			err = app.Autostart.Enable()
+		} else {
+			err = app.Autostart.Disable()
+		}
+
+		if err != nil {
+			slog.Error("Failed to toggle autostart", "error", err)
 			return
 		}
-		slog.Info("Autostart status synchronized", "enabled", cfg.Launch.AutoStart)
+
+		slog.Info("Autostart status", "enabled", cfg.Launch.AutoStart)
 	}
 }
 
