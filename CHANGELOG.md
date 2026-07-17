@@ -1,3 +1,37 @@
+## [0.4.0] - 2026-07-17
+
+### 🚀 Features
+
+- *(event)* Add notice events [`1c1d561`](https://github.com/AtifChy/aiub-companion/commit/1c1d561e785df7e333c72abdf587f09dbf9ab19c)
+- *(worker)* Rich notice notifications [`007e6f9`](https://github.com/AtifChy/aiub-companion/commit/007e6f94483275d1f621d072f722e98eca6ffde1)
+
+### 🚜 Refactor
+
+- *(routes)* Rename sections to SECTIONS constant [`b4e01d0`](https://github.com/AtifChy/aiub-companion/commit/b4e01d0107cadcbfed53eb2643b29a21c0bd2f6e)
+- *(desktop)* Export window name constants [`c55122c`](https://github.com/AtifChy/aiub-companion/commit/c55122c0d6da2b08e5166506295853f1e579a064)
+- *(db)* Update upsert and insert notice queries [`3a8ad0e`](https://github.com/AtifChy/aiub-companion/commit/3a8ad0e6c43530778f0ccb7a8841c9143d7cd41a)
+- *(notice)* Use upsert notice for syncing [`62ee4df`](https://github.com/AtifChy/aiub-companion/commit/62ee4df55596d01aff98c937a05c9d906fab1862)
+- *(notice)* Update notice event and selection logic [`0cd3114`](https://github.com/AtifChy/aiub-companion/commit/0cd3114163ff5578a7cc90e91c387b7a81037e10)
+- *(autostart)* Remove custom implementation and use wails library [`470f5e0`](https://github.com/AtifChy/aiub-companion/commit/470f5e0ad4dbcf136373d73647648c75edd467a8)
+- *(config)* Remove redundant log message [`19716f7`](https://github.com/AtifChy/aiub-companion/commit/19716f723940ce0d844f55ffa4b8b463b6b4f4bd)
+- *(event)* Rename main window show event [`72b56a0`](https://github.com/AtifChy/aiub-companion/commit/72b56a0ce2ecf3bd9eb6cf35b42d08ec6500ddca)
+- *(notices)* Split up notice list and toolbar components [`d6857af`](https://github.com/AtifChy/aiub-companion/commit/d6857af86e8b093dfe42b838c3429398c1248d7f)
+- *(notices)* Rename category styles constant [`f90df96`](https://github.com/AtifChy/aiub-companion/commit/f90df963f4a5dddf851f37ef5aa61e1bd8362341)
+- *(nav)* Extract nav item component [`df326c0`](https://github.com/AtifChy/aiub-companion/commit/df326c0b76e54529815607c888a0456af7d7b258)
+
+### 📚 Documentation
+
+- *(README)* Update `README.md` with latest features [`510c4d2`](https://github.com/AtifChy/aiub-companion/commit/510c4d2256a439f9edd56da2350d0a0364666b48)
+
+### ⚙️ Miscellaneous Tasks
+
+- Update prepare-release workflow [`bd42fda`](https://github.com/AtifChy/aiub-companion/commit/bd42fdacfb8f67d95a3d255e12f487dc72e076a7)
+- *(cliff)* Remove skip ci commit parser [`5dc59f5`](https://github.com/AtifChy/aiub-companion/commit/5dc59f5ee53f180e108d25006c29f420063e48b4)
+- *(release)* Bump version to v0.4.0 [`149315e`](https://github.com/AtifChy/aiub-companion/commit/149315e6950544e346ea9b217e7914ca5cfc6091)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.3.60...v0.4.0
+
 ## [0.3.60] - 2026-07-16
 
 ### 💼 Other
@@ -14,6 +48,7 @@
 ### ⚙️ Miscellaneous Tasks
 
 - *(release)* Bump version to v0.3.60 [`e22133d`](https://github.com/AtifChy/aiub-companion/commit/e22133d67b5c39957468f17c4b165ce2a42586bb)
+- Update changelog [`5248973`](https://github.com/AtifChy/aiub-companion/commit/52489736989ffafd7ece7f3d653ac0bcc865c656)
 
 
 > **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.3.50...v0.3.60
@@ -55,6 +90,7 @@
 
 ### ⚙️ Miscellaneous Tasks
 
+- Update changelog [skip ci] [`68b3138`](https://github.com/AtifChy/aiub-companion/commit/68b3138802fd74adfb62329a7244ad320f900b71)
 - *(lint)* Add golangci-lint config [`9214915`](https://github.com/AtifChy/aiub-companion/commit/9214915feaab1db9f6bfb9adda746478adeb7782)
 - *(release)* Remove changelog generation [`18e825f`](https://github.com/AtifChy/aiub-companion/commit/18e825f4be4a39824581ba8111963a31c0c07041)
 - Add prepare release workflow [`bd2d2e6`](https://github.com/AtifChy/aiub-companion/commit/bd2d2e68c25fbe26f035d43ee4daffb0d8d7d552)
@@ -115,6 +151,10 @@
 
 - *(updater)* Sanitizing markdown [`67baf64`](https://github.com/AtifChy/aiub-companion/commit/67baf64a230d09b62ef88c7381da29551920eb5e)
 
+### ⚙️ Miscellaneous Tasks
+
+- Update changelog [skip ci] [`87ca849`](https://github.com/AtifChy/aiub-companion/commit/87ca8493b3bbf73760db76f166481a7364018f58)
+
 
 > **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.3.20...v0.3.21
 
@@ -133,6 +173,7 @@
 
 ### ⚙️ Miscellaneous Tasks
 
+- Update changelog [skip ci] [`c9fcfc9`](https://github.com/AtifChy/aiub-companion/commit/c9fcfc9e99e6ece282c7cd9569b4bee3032284e5)
 - *(ci)* Update cliff config [`65f3f4e`](https://github.com/AtifChy/aiub-companion/commit/65f3f4e160181b4f92882481b4062c3da9f7c8c2)
 - *(changelog)* Add new contributors and full changelog [`f8655d8`](https://github.com/AtifChy/aiub-companion/commit/f8655d893264ee5e3a1f312e96a86346b4136f49)
 - *(scripts)* Rename pre-commit hook script [`a2130e9`](https://github.com/AtifChy/aiub-companion/commit/a2130e9090bb4d4e98ff94db968dbc509c611e93)
@@ -164,6 +205,7 @@
 
 ### ⚙️ Miscellaneous Tasks
 
+- Update changelog [skip ci] [`f3b65a5`](https://github.com/AtifChy/aiub-companion/commit/f3b65a5b7069914924dd70c3064d46e8317e9778)
 - *(fmt)* Run formatter on frontend codebase [`8a838ff`](https://github.com/AtifChy/aiub-companion/commit/8a838ff2b44f5bacb7d7182112bb8ee991dc7659)
 - *(git)* Add git pre-commit hooks [`2998e3f`](https://github.com/AtifChy/aiub-companion/commit/2998e3f5ff8a565020ab48046d41659c7cc4039a)
 - *(github/workflow)* Pin pnpm version [`37a55cd`](https://github.com/AtifChy/aiub-companion/commit/37a55cdf8f30e09119abfd0cb2e8412425777d16)
@@ -176,6 +218,10 @@
 ### 🚀 Features
 
 - *(updater)* Add asset matcher to exclude installers [`5b798d1`](https://github.com/AtifChy/aiub-companion/commit/5b798d110bc6614b82b7e2711f539180df9e2771)
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelog [skip ci] [`2131721`](https://github.com/AtifChy/aiub-companion/commit/21317217fd659ab4833a1ab7ec09069eb5a0a891)
 
 
 > **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.3.0...v0.3.2
@@ -217,6 +263,7 @@
 
 ### ⚙️ Miscellaneous Tasks
 
+- Update changelog [skip ci] [`543d4c3`](https://github.com/AtifChy/aiub-companion/commit/543d4c31662c1fbbb69c63411c0d03cdc44a37af)
 - *(gitignore)* Add `bin/` [`388ed20`](https://github.com/AtifChy/aiub-companion/commit/388ed20f61e2c729777038e58a55f637f1b4a289)
 - *(lint)* Switch back to `eslint` [`76462fc`](https://github.com/AtifChy/aiub-companion/commit/76462fc854aef1b0e88c6bb5ca0edf6cf6a07774)
 - *(lint)* Fix linting issues in frontend components and hooks [`944ba3d`](https://github.com/AtifChy/aiub-companion/commit/944ba3d77b0c64e503ef3525be37daba300d2c54)
@@ -240,6 +287,7 @@
 
 ### ⚙️ Miscellaneous Tasks
 
+- Update changelog [skip ci] [`a905fba`](https://github.com/AtifChy/aiub-companion/commit/a905fba94f59c8cb80bfdca2ac40731a3ba86c16)
 - Switch to `oxfmt` for formatting [`45c4835`](https://github.com/AtifChy/aiub-companion/commit/45c48350c9257ed9d09b3b042011366b8d012206)
 - *(fmt)* Apply `oxfmt` formatting on frontend files [`122dac8`](https://github.com/AtifChy/aiub-companion/commit/122dac86e72367013a87a9e0de136863c3036e03)
 - *(lint)* Switch from `eslint` to `oxlint` [`3f7901a`](https://github.com/AtifChy/aiub-companion/commit/3f7901a2f70be86b392e8eff82d81aada417b3ef)
@@ -266,6 +314,7 @@
 
 ### ⚙️ Miscellaneous Tasks
 
+- Update changelog [skip ci] [`e55d86c`](https://github.com/AtifChy/aiub-companion/commit/e55d86c7c67eb4716ceb2163e26ed6e7eb92772b)
 - *(ci)* Rename release artifacts by os and arch [`f7facb7`](https://github.com/AtifChy/aiub-companion/commit/f7facb727fe87e36fef2bc5e7a524aae8eae442c)
 
 
@@ -281,6 +330,7 @@
 
 - *(ci)* Add github token to release workflow [`681ddff`](https://github.com/AtifChy/aiub-companion/commit/681ddff88a67724198345923b6527eb97907ef19)
 - *(ci)* Add changelog generation workflow [`c1ea487`](https://github.com/AtifChy/aiub-companion/commit/c1ea48759e481e4204de25d8ee3bc5787b9d9052)
+- Update changelog [skip ci] [`0408c54`](https://github.com/AtifChy/aiub-companion/commit/0408c541bd88c90b1ccff96bebec2efc369737f7)
 - Comment out unsupported platforms [`2785700`](https://github.com/AtifChy/aiub-companion/commit/27857005a23eae7a8ca9c347d4cf1e5b7ce8cd44)
 - *(ci)* Define github repo for release workflow [`e956f8c`](https://github.com/AtifChy/aiub-companion/commit/e956f8cfa26550bc80d6b26fc99479fb55d21170)
 
