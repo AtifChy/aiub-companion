@@ -14,7 +14,7 @@ export const CATEGORIES: Category[] = [
 
 export type AltCategory = Exclude<Category, "all">;
 
-export const categoryStyles: Record<AltCategory, string> = {
+export const CATEGORY_STYLES: Record<AltCategory, string> = {
   admission: "border-blue-500/20 bg-blue-500/10 text-blue-500",
   exam: "border-red-500/20 bg-red-500/10 text-red-500",
   registration: "border-violet-500/20 bg-violet-500/10 text-violet-500",

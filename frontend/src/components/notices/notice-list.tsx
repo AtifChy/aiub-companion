@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-import { categoryStyles, type AltCategory } from "./type";
+import { CATEGORY_STYLES, type AltCategory } from "./type";
 
 interface NoticeListProps {
   notices: Notice[];
@@ -123,7 +123,7 @@ function NoticeListItem({ notice, onTogglePin }: NoticeListItemProps) {
           <Badge
             className={cn(
               "h-4 px-1.5 py-0 text-[0.6rem] font-semibold tracking-wider uppercase",
-              categoryStyles[notice.category as AltCategory],
+              CATEGORY_STYLES[notice.category as AltCategory],
             )}
           >
             {notice.category}

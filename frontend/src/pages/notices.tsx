@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import { AppTooltip } from "@/components/app-tooltip";
 import { NoticeList } from "@/components/notices/notice-list";
 import { NoticeListToolbar } from "@/components/notices/notice-list-toolbar";
-import { categoryStyles, type AltCategory } from "@/components/notices/type";
+import { CATEGORY_STYLES, type AltCategory } from "@/components/notices/type";
 import { NoticeSelectionContext } from "@/components/notices/use-notice-selection";
 import { formatDate } from "@/components/notices/utils";
 import { Badge } from "@/components/ui/badge";
@@ -171,7 +171,7 @@ function DetailPanel({ notice, loading, onTogglePin, onToggleRead }: DetailPanel
           <Badge
             className={cn(
               "px-2 text-[0.65rem] font-bold tracking-wider uppercase",
-              categoryStyles[notice.category as AltCategory],
+              CATEGORY_STYLES[notice.category as AltCategory],
             )}
           >
             {notice.category}
