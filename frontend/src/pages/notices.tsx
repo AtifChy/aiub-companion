@@ -3,37 +3,26 @@ import { Browser, Events } from "@wailsio/runtime";
 import {
   CircleCheckBigIcon,
   CircleIcon,
-  DotIcon,
   DownloadIcon,
   ExternalLinkIcon,
   FileTextIcon,
-  FilterIcon,
-  FilterXIcon,
   InboxIcon,
   Loader2Icon,
   PaperclipIcon,
   PinIcon,
   PinOffIcon,
-  RefreshCwIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { AppTooltip } from "@/components/app-tooltip";
-import { HorizontalFadeScroll } from "@/components/horizontal-fade-scroll";
-import { SearchInput } from "@/components/search-input";
+import { NoticeList } from "@/components/notices/notice-list";
+import { NoticeListToolbar } from "@/components/notices/notice-list-toolbar";
+import { categoryStyles, type AltCategory } from "@/components/notices/type";
+import { NoticeSelectionContext } from "@/components/notices/use-notice-selection";
+import { formatDate } from "@/components/notices/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Separator } from "@/components/ui/separator";
 import { Toggle } from "@/components/ui/toggle";
@@ -43,36 +32,10 @@ import {
   useNoticeList,
   useNoticeMutations,
   useSync,
-  type Category,
   type NoticeFilters,
 } from "@/hooks/use-notices";
 import { logger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
-
-const CATEGORIES: Category[] = [
-  "all",
-  "general",
-  "admission",
-  "exam",
-  "registration",
-  "internship",
-  "scholarship",
-  "payment",
-  "holiday",
-];
-
-type AltCategory = Exclude<Category, "all">;
-
-const categoryStyles: Record<AltCategory, string> = {
-  admission: "border-blue-500/20 bg-blue-500/10 text-blue-500",
-  exam: "border-red-500/20 bg-red-500/10 text-red-500",
-  registration: "border-violet-500/20 bg-violet-500/10 text-violet-500",
-  internship: "border-cyan-500/20 bg-cyan-500/10 text-cyan-500",
-  scholarship: "border-yellow-500/20 bg-yellow-500/10 text-yellow-500",
-  payment: "border-green-500/20 bg-green-500/10 text-green-500",
-  holiday: "border-orange-500/20 bg-orange-500/10 text-orange-500",
-  general: "border-zinc-500/20 bg-zinc-500/10 text-zinc-500",
-};
 
 const INITIAL_FILTERS: NoticeFilters = {
   search: "",
@@ -84,6 +47,7 @@ const INITIAL_FILTERS: NoticeFilters = {
 
 export default function NoticesPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+
   const { toggleRead, togglePin } = useNoticeMutations();
   const { query: detailQuery, readNotice } = useNoticeDetail(selectedId, (id) =>
     toggleRead({ id, next: true }),
@@ -93,7 +57,7 @@ export default function NoticesPage() {
   const detail = detailQuery.data ?? null;
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleSelect = (id: string) => {
+  const select = (id: string) => {
     if (selectedId === id) return;
     setSelectedId(id);
     readNotice(id);
@@ -101,21 +65,21 @@ export default function NoticesPage() {
 
   useEffect(() => {
     const unsubscribe = Events.On("notice:open", (event) => {
-      handleSelect(event.data);
+      select(event.data);
     });
     return unsubscribe;
-  }, [handleSelect]);
+  }, [select]);
 
   return (
     <ResizablePanelGroup orientation="horizontal" className="flex h-full">
       <ResizablePanel defaultSize="40%" minSize="35%" className="flex flex-col bg-card">
-        <NoticeListPanel
-          selectedId={selectedId}
-          onSelect={handleSelect}
-          onTogglePin={(id, next) => togglePin({ id, next })}
-          syncing={syncing}
-          onSync={sync}
-        />
+        <NoticeSelectionContext.Provider value={{ selectedId, select }}>
+          <NoticeListPanel
+            onTogglePin={(id, next) => togglePin({ id, next })}
+            syncing={syncing}
+            onSync={sync}
+          />
+        </NoticeSelectionContext.Provider>
       </ResizablePanel>
 
       <ResizableHandle withHandle />
@@ -133,20 +97,12 @@ export default function NoticesPage() {
 }
 
 interface NoticeListPanelProps {
-  selectedId: string | null;
-  onSelect: (id: string) => void;
   onTogglePin: (id: string, next: boolean) => void;
   syncing: boolean;
   onSync: () => void;
 }
 
-function NoticeListPanel({
-  selectedId,
-  onSelect,
-  onTogglePin,
-  syncing,
-  onSync,
-}: NoticeListPanelProps) {
+function NoticeListPanel({ onTogglePin, syncing, onSync }: NoticeListPanelProps) {
   const [filters, setFilters] = useState<NoticeFilters>(INITIAL_FILTERS);
   const { query } = useNoticeList(filters);
 
@@ -171,8 +127,6 @@ function NoticeListPanel({
         notices={notices}
         loading={query.isLoading}
         error={query.error}
-        selectedId={selectedId}
-        onSelect={onSelect}
         onTogglePin={onTogglePin}
         onRetry={() => void query.refetch()}
         onClearFilters={() => setFilters(INITIAL_FILTERS)}
@@ -182,303 +136,14 @@ function NoticeListPanel({
   );
 }
 
-interface NoticeListToolbarProps {
-  filters: NoticeFilters;
-  onFilterChange: (value: NoticeFilters) => void;
-  onFilterClear: () => void;
-
-  syncing: boolean;
-  onSync: () => void;
-
-  noticeCount: number;
-  unreadCount: number;
-  loading: boolean;
-}
-
-function NoticeListToolbar({
-  filters,
-  onFilterChange,
-  onFilterClear,
-  syncing,
-  onSync,
-  noticeCount,
-  unreadCount,
-  loading,
-}: NoticeListToolbarProps) {
-  const hasActiveFilters = filters.urgent || filters.pinned || filters.unread;
-
-  return (
-    <>
-      {/*search + categories*/}
-      <div className="border-b px-3 py-2.5">
-        <SearchInput
-          value={filters.search}
-          onValueChange={(v) => onFilterChange({ ...filters, search: v })}
-          placeholder="Search notices..."
-        />
-
-        <HorizontalFadeScroll className="mt-2 flex scrollbar-none gap-1 overflow-x-auto scroll-smooth px-1 outline-none">
-          {CATEGORIES.map((cat) => (
-            <Badge
-              key={cat}
-              onClick={() => onFilterChange({ ...filters, category: cat })}
-              variant={filters.category === cat ? "default" : "outline"}
-              className={cn(
-                "cursor-pointer font-semibold capitalize",
-                filters.category !== cat &&
-                  "text-muted-foreground hover:border-foreground/20 hover:text-foreground",
-              )}
-            >
-              {cat}
-            </Badge>
-          ))}
-        </HorizontalFadeScroll>
-      </div>
-
-      {/*list header*/}
-      <div className="flex items-center justify-between border-b px-2 py-1.5 text-[0.7rem] text-muted-foreground">
-        <span>
-          {loading ? (
-            "Loading…"
-          ) : (
-            <div className="flex h-0 items-center">
-              <span className="font-semibold text-foreground">{noticeCount} notices</span>
-              {unreadCount > 0 && (
-                <>
-                  <DotIcon />
-                  <span className="font-semibold text-primary">{unreadCount} unread</span>
-                </>
-              )}
-            </div>
-          )}
-        </span>
-
-        <div className="flex gap-1.5">
-          <DropdownMenu>
-            <AppTooltip content="Filter">
-              <DropdownMenuTrigger
-                render={
-                  <Button variant="ghost" className="h-auto p-0.5">
-                    {hasActiveFilters ? (
-                      <FilterXIcon className="size-3.5 fill-primary/20 text-primary" />
-                    ) : (
-                      <FilterIcon className="size-3.5 fill-foreground/20" />
-                    )}
-                  </Button>
-                }
-              />
-            </AppTooltip>
-            <DropdownMenuContent>
-              <DropdownMenuGroup>
-                <DropdownMenuLabel>Filter</DropdownMenuLabel>
-                {(["urgent", "pinned", "unread"] as const).map((key) => (
-                  <DropdownMenuCheckboxItem
-                    key={key}
-                    checked={filters[key]}
-                    onCheckedChange={(v) => onFilterChange({ ...filters, [key]: v })}
-                  >
-                    {key.charAt(0).toUpperCase() + key.slice(1)}
-                  </DropdownMenuCheckboxItem>
-                ))}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem disabled={!hasActiveFilters} onClick={onFilterClear}>
-                  Clear
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <AppTooltip content="Sync notices">
-            <Button variant="ghost" onClick={onSync} disabled={syncing} className="h-auto p-0.5">
-              <RefreshCwIcon className={cn("size-3.5", syncing && "animate-spin")} />
-            </Button>
-          </AppTooltip>
-        </div>
-      </div>
-    </>
-  );
-}
-
-interface NoticeListProps {
-  notices: Notice[];
-  loading: boolean;
-  error: Error | null;
-  selectedId: string | null;
-  onSelect: (id: string) => void;
-  onTogglePin: (id: string, next: boolean) => void;
-  onRetry: () => void;
-  onClearFilters: () => void;
-  hasActiveFilters: boolean;
-}
-
-function NoticeList({
-  notices,
-  loading,
-  error,
-  selectedId,
-  onSelect,
-  onTogglePin,
-  onRetry,
-  onClearFilters,
-  hasActiveFilters,
-}: NoticeListProps) {
-  if (loading) {
-    return (
-      <div className="flex h-32 items-center justify-center">
-        <Loader2Icon className="size-5 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center gap-1 px-4 py-16 text-center text-muted-foreground">
-        <InboxIcon className="size-8 opacity-20" />
-        <p className="text-xs font-semibold text-destructive">Failed to load notices</p>
-        <p className="text-[0.65rem] break-all">{error.message}</p>
-        <Button
-          variant="ghost"
-          size="xs"
-          onClick={onRetry}
-          className="text-primary underline-offset-2 hover:underline"
-        >
-          Retry
-        </Button>
-      </div>
-    );
-  }
-
-  if (notices.length === 0) {
-    return (
-      <div className="flex flex-col items-center gap-2 px-4 py-16 text-center text-muted-foreground">
-        <InboxIcon className="size-9 opacity-20" />
-        <p className="text-xs">No notices found</p>
-        {hasActiveFilters && (
-          <Button
-            variant="ghost"
-            size="xs"
-            onClick={onClearFilters}
-            className="text-primary underline-offset-2 hover:underline"
-          >
-            Clear filters
-          </Button>
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex-1 scrollbar-thin scrollbar-thumb-accent overflow-y-auto">
-      {notices.map((notice) => (
-        <NoticeListItem
-          key={notice.id}
-          notice={notice}
-          selected={selectedId === notice.id}
-          onSelect={() => onSelect(notice.id)}
-          onTogglePin={(e) => {
-            e.stopPropagation();
-            onTogglePin(notice.id, !notice.isPinned);
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-interface NoticeListItemProps {
-  notice: Notice;
-  selected: boolean;
-  onSelect: () => void;
-  onTogglePin: (e: React.MouseEvent) => void;
-}
-
-function NoticeListItem({ notice, selected, onSelect, onTogglePin }: NoticeListItemProps) {
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          onSelect();
-        }
-      }}
-      tabIndex={0}
-      className={cn(
-        "group w-full animate-in cursor-pointer border-b p-3 text-left transition-colors duration-300 slide-in-from-bottom-5 fade-in",
-        "outline-none focus-visible:rounded focus-visible:border-ring focus-visible:border-b-transparent focus-visible:border-l-transparent focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-inset",
-        selected
-          ? "border-l-2 border-l-primary bg-primary/10"
-          : "border-l-2 border-l-transparent hover:bg-muted/50",
-      )}
-    >
-      <div className="flex items-center justify-between gap-2">
-        <div className="mb-1 flex items-center gap-1.5">
-          {!notice.isRead && <CircleIcon className="size-1.5 fill-primary text-primary" />}
-          <Badge
-            className={cn(
-              "h-4 px-1.5 py-0 text-[0.6rem] font-semibold tracking-wider uppercase",
-              categoryStyles[notice.category as AltCategory],
-            )}
-          >
-            {notice.category}
-          </Badge>
-          {notice.isUrgent && (
-            <Badge
-              variant="destructive"
-              className="h-4 border border-destructive/20 px-1.5 py-0 text-[0.6rem] font-semibold tracking-wider uppercase"
-            >
-              urgent
-            </Badge>
-          )}
-          <Button
-            variant="ghost"
-            onClick={onTogglePin}
-            tabIndex={notice.isPinned ? 0 : -1}
-            className={cn(
-              "h-auto p-0.5 opacity-0 group-hover:opacity-100",
-              notice.isPinned
-                ? "text-chart-4 opacity-100 hover:text-chart-4/50"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {notice.isPinned ? (
-              <PinIcon className="size-3 fill-foreground/20" />
-            ) : (
-              <PinOffIcon className="size-3 fill-foreground/20" />
-            )}
-          </Button>
-        </div>
-
-        <span className="text-[0.65rem] text-muted-foreground">
-          {formatDate(notice.postedDate)}
-        </span>
-      </div>
-
-      <p
-        className={cn(
-          "line-clamp-1 text-sm leading-snug",
-          notice.isRead ? "font-medium text-muted-foreground" : "font-semibold text-foreground",
-        )}
-      >
-        {notice.fullTitle || notice.title}
-      </p>
-
-      {notice.summary && (
-        <p className="line-clamp-2 text-[0.7rem] text-muted-foreground">{notice.summary}</p>
-      )}
-    </button>
-  );
-}
-
-interface DetailViewProps {
+interface DetailPanelProps {
   notice: Notice | null;
   loading: boolean;
   onTogglePin: () => void;
   onToggleRead: () => void;
 }
 
-function DetailPanel({ notice, loading, onTogglePin, onToggleRead }: DetailViewProps) {
+function DetailPanel({ notice, loading, onTogglePin, onToggleRead }: DetailPanelProps) {
   const showLoader = useDelayedLoading(loading);
 
   if (loading) {
@@ -654,15 +319,4 @@ function AttachmentItem({ attachment }: AttachmentItemProps) {
       </div>
     </div>
   );
-}
-
-function formatDate(raw: string): string {
-  if (!raw) return "";
-  const date = new Date(raw);
-  if (isNaN(date.getTime())) return raw;
-  return date.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
 }
