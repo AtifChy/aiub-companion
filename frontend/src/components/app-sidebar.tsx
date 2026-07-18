@@ -15,12 +15,14 @@ import { AboutPage, SECTIONS } from "@/lib/routes";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [appInfo, setAppInfo] = useState<BuildInfo | null>(null);
-  const year = new Date().getFullYear();
+  const year = () => new Date().getFullYear();
 
   useEffect(() => {
     MetaService.GetBuildInfo()
       .then(setAppInfo)
-      .catch((err) => console.error("Failed to get app info: ", err));
+      .catch((err: unknown) => {
+        console.error("Failed to get app info: ", err);
+      });
   }, []);
 
   return (
@@ -28,8 +30,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenuButton
           onClick={() => void DesktopService.ShowAboutWindow()}
-          onMouseEnter={() => void AboutPage.preload?.()}
-          onFocus={() => void AboutPage.preload?.()}
+          onMouseEnter={() => void AboutPage.preload()}
+          onFocus={() => void AboutPage.preload()}
           size="lg"
           className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
         >
@@ -50,7 +52,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter className="flex items-center truncate group-data-[collapsible=icon]:hidden">
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <CopyrightIcon className="size-3" />
-          {year} AIUB Companion
+          {year()} AIUB Companion
         </div>
       </SidebarFooter>
     </Sidebar>

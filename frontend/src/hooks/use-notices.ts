@@ -46,7 +46,7 @@ export function useNoticeList(filter: NoticeFilters) {
   useEffect(() => {
     const unsubscribe = Events.On("notice:synced", (count) => {
       void queryClient.invalidateQueries({ queryKey: ["notices"] });
-      toast.success(`${count.data} new notice${count.data !== 1 ? "s" : ""} synced`);
+      toast.success(`${String(count.data)} new notice${count.data !== 1 ? "s" : ""} synced`);
     });
     return unsubscribe;
   }, [queryClient]);
@@ -117,7 +117,7 @@ function useToggleField(
     },
 
     onError: (err, { id }, context) => {
-      context?.oldList?.forEach(([key, data]) => {
+      context?.oldList.forEach(([key, data]) => {
         queryClient.setQueryData(key, data);
       });
       if (context?.oldDetail !== undefined) {
@@ -146,7 +146,7 @@ export function useSync() {
     onSuccess: (notices) => {
       const count = notices.length;
       if (count > 0) {
-        toast.success(`${count} new notice${count !== 1 ? "s" : ""} synced`);
+        toast.success(`${String(count)} new notice${count !== 1 ? "s" : ""} synced`);
       } else {
         toast.info("No new notices to sync");
       }

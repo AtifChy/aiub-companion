@@ -53,13 +53,15 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         .then(() => {
           toast.success("Settings saved successfully");
         })
-        .catch((err) => {
+        .catch((err: unknown) => {
           logger.error("Failed to save settings", err);
           toast.error("Error saving settings");
         });
     }, 500);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+    };
   }, [config, queryClient]);
 
   const { mutateAsync: resetConfig } = useMutation({
@@ -91,11 +93,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     );
   }
 
-  return (
-    <SettingsContext.Provider value={{ config, setConfig, resetConfig }}>
-      {children}
-    </SettingsContext.Provider>
-  );
+  return <SettingsContext value={{ config, setConfig, resetConfig }}>{children}</SettingsContext>;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components

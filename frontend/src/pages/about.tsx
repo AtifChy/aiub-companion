@@ -11,12 +11,12 @@ import { logger } from "@/lib/logger";
 
 export default function AboutPage() {
   const [appInfo, setAppInfo] = useState<BuildInfo | null>(null);
-  const year = new Date().getFullYear();
+  const year = () => new Date().getFullYear();
 
   useEffect(() => {
     MetaService.GetBuildInfo()
       .then(setAppInfo)
-      .catch((err) => {
+      .catch((err: unknown) => {
         logger.error("Failed to fetch build info:", err);
         toast.error("Failed to fetch build info. Please try again later.");
       });
@@ -53,7 +53,7 @@ export default function AboutPage() {
 
           <div className="mt-4 flex items-center gap-1 text-xs text-muted-foreground">
             <CopyrightIcon className="size-3" />
-            {year} {appInfo?.name}. All rights reserved.
+            {year()} {appInfo?.name}. All rights reserved.
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, use } from "react";
 
 interface NoticeSelectionContextType {
   selectedId: string | null;
@@ -8,7 +8,7 @@ interface NoticeSelectionContextType {
 export const NoticeSelectionContext = createContext<NoticeSelectionContextType | null>(null);
 
 export function useNoticeSelection() {
-  const context = useContext(NoticeSelectionContext);
+  const context = use(NoticeSelectionContext);
   if (!context) {
     throw new Error("useNoticeSelection must be used within a NoticeSelectionProvider");
   }

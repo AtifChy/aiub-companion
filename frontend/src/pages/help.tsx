@@ -123,10 +123,12 @@ function FAQList({ searchQuery }: { searchQuery: string }) {
       {filteredFaqs.length > 0 ? (
         filteredFaqs.map((faq, idx) => (
           <FAQItem
-            key={faq.category + idx}
+            key={faq.category + String(idx)}
             faq={faq}
             expanded={expandedIndex === idx}
-            onExpand={() => toggleExpand(idx)}
+            onExpand={() => {
+              toggleExpand(idx);
+            }}
           />
         ))
       ) : (
@@ -184,7 +186,7 @@ function Footer() {
             variant="outline"
             className="gap-2"
             onClick={() => {
-              Browser.OpenURL("https://github.com/atifchy/aiub-companion").catch((err) =>
+              Browser.OpenURL("https://github.com/atifchy/aiub-companion").catch((err: unknown) =>
                 toast.error(`Failed to open URL`, {
                   description: err instanceof Error ? err.message : String(err),
                 }),
@@ -199,7 +201,7 @@ function Footer() {
             variant="outline"
             className="gap-2"
             onClick={() => {
-              Browser.OpenURL("https://www.aiub.edu").catch((err) =>
+              Browser.OpenURL("https://www.aiub.edu").catch((err: unknown) =>
                 toast.error(`Failed to open URL`, {
                   description: err instanceof Error ? err.message : String(err),
                 }),

@@ -101,7 +101,9 @@ function NoticeListItem({ notice, onTogglePin }: NoticeListItemProps) {
   return (
     <button
       type="button"
-      onClick={() => select(notice.id)}
+      onClick={() => {
+        select(notice.id);
+      }}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
           e.preventDefault();

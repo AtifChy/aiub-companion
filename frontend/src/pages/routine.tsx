@@ -81,7 +81,7 @@ export default function RoutinePage() {
         if (!path) return;
         importCourses(path);
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         logger.error("Failed to open file dialog", err);
         toast.error("Failed to open file dialog", {
           description: (err as Error).message,
@@ -89,13 +89,10 @@ export default function RoutinePage() {
       });
   };
 
-  const routineByDay = DAYS.reduce(
-    (acc, day) => {
-      acc[day] = routine?.filter((c) => c.day === day) ?? [];
-      return acc;
-    },
-    {} as Record<string, Course[]>,
-  );
+  const routineByDay = DAYS.reduce<Record<string, Course[]>>((acc, day) => {
+    acc[day] = routine?.filter((c) => c.day === day) ?? [];
+    return acc;
+  }, {});
 
   const stats: RoutineStatsProps["stats"] = {
     totalClasses: routine?.length ?? 0,
@@ -114,7 +111,7 @@ export default function RoutinePage() {
     <div className="mr-0.5 flex h-full animate-in scrollbar-thin scrollbar-thumb-accent scrollbar-gutter-both flex-col gap-6 overflow-auto p-6 duration-200 fade-in-10 lg:p-10">
       <RoutineHeader onImport={handleImportCourses} />
 
-      {routine && routine.length > 0 && !loading && <RoutineStats stats={stats} />}
+      {routine && routine.length > 0 && <RoutineStats stats={stats} />}
 
       <CourseSearch />
 
@@ -127,7 +124,9 @@ export default function RoutinePage() {
       ) : (
         <DayScheduleTimeline
           routineByDay={routineByDay}
-          onRemoveCourse={(classId) => removeCourse(classId)}
+          onRemoveCourse={(classId) => {
+            removeCourse(classId);
+          }}
         />
       )}
     </div>
@@ -274,7 +273,9 @@ function SearchResultItem({ course, onAdd }: { course: Course; onAdd: (classId: 
       type="button"
       key={course.classID}
       tabIndex={0}
-      onClick={() => onAdd(course.classID)}
+      onClick={() => {
+        onAdd(course.classID);
+      }}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
           e.preventDefault();
@@ -372,7 +373,7 @@ interface CourseCardProps {
 
 function CourseCard({ course, onRemoveCourse }: CourseCardProps) {
   const status = getCourseStatus(course);
-  const isLab = course.type?.toLowerCase().includes("lab");
+  const isLab = course.type.toLowerCase().includes("lab");
 
   return (
     <Card
@@ -444,7 +445,9 @@ function CourseCard({ course, onRemoveCourse }: CourseCardProps) {
         variant="destructive"
         size="icon"
         className="absolute right-3 bottom-3 h-8 w-8 rounded-md opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-        onClick={() => onRemoveCourse(course.classID)}
+        onClick={() => {
+          onRemoveCourse(course.classID);
+        }}
       >
         <Trash2Icon className="size-4" />
       </Button>

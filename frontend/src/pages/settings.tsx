@@ -31,7 +31,7 @@ const logLevelItems: Items<string> = ["DEBUG", "INFO", "WARNING", "ERROR"].map((
 
 const syncIntervalItems: Items<number> = [30, 60, 120, 180, 360].map((v) => ({
   value: v,
-  label: v >= 60 ? `${v / 60} hour${v === 60 ? "" : "s"}` : `${v} minutes`,
+  label: v >= 60 ? `${String(v / 60)} hour${v === 60 ? "" : "s"}` : `${String(v)} minutes`,
 }));
 
 const updateIntervalItems: Items<string> = ["daily", "weekly", "monthly", "never"].map((v) => ({
@@ -41,19 +41,11 @@ const updateIntervalItems: Items<string> = ["daily", "weekly", "monthly", "never
 
 const fetchCountItems: Items<number> = [10, 20, 30, 50].map((v) => ({
   value: v,
-  label: `${v} notices`,
+  label: `${String(v)} notices`,
 }));
 
 export default function SettingsPage() {
   const { config, setConfig, resetConfig } = useSettings();
-
-  if (!config) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-muted-foreground">Failed to load settings data.</p>
-      </div>
-    );
-  }
 
   return <SettingsView config={config} setConfig={setConfig} resetConfig={resetConfig} />;
 }
@@ -102,11 +94,11 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
             <SettingRow label="Enable" description="Show desktop alert for new notices">
               <Switch
                 checked={config.notifications.enabled}
-                onCheckedChange={(v) =>
+                onCheckedChange={(v) => {
                   setConfig((draft) => {
                     if (draft) draft.notifications.enabled = v;
-                  })
-                }
+                  });
+                }}
                 className="cursor-pointer"
               />
             </SettingRow>
@@ -150,11 +142,11 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
             >
               <Switch
                 checked={config.sync.on_startup}
-                onCheckedChange={(v) =>
+                onCheckedChange={(v) => {
                   setConfig((draft) => {
                     if (draft) draft.sync.on_startup = v;
-                  })
-                }
+                  });
+                }}
                 className="cursor-pointer"
               />
             </SettingRow>
@@ -180,11 +172,11 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
             >
               <Switch
                 checked={config.launch.start_minimized}
-                onCheckedChange={(v) =>
+                onCheckedChange={(v) => {
                   setConfig((draft) => {
                     if (draft) draft.launch.start_minimized = v;
-                  })
-                }
+                  });
+                }}
                 className="cursor-pointer"
               />
             </SettingRow>
@@ -195,11 +187,11 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
             >
               <Switch
                 checked={config.launch.close_to_tray}
-                onCheckedChange={(v) =>
+                onCheckedChange={(v) => {
                   setConfig((draft) => {
                     if (draft) draft.launch.close_to_tray = v;
-                  })
-                }
+                  });
+                }}
                 className="cursor-pointer"
               />
             </SettingRow>
@@ -211,11 +203,11 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
               <Switch
                 disabled={!config.launch.close_to_tray}
                 checked={config.launch.keep_alive}
-                onCheckedChange={(v) =>
+                onCheckedChange={(v) => {
                   setConfig((draft) => {
                     if (draft) draft.launch.keep_alive = v;
-                  })
-                }
+                  });
+                }}
                 className="cursor-pointer"
               />
             </SettingRow>
@@ -226,11 +218,11 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
             >
               <Switch
                 checked={config.launch.restore_window}
-                onCheckedChange={(v) =>
+                onCheckedChange={(v) => {
                   setConfig((draft) => {
                     if (draft) draft.launch.restore_window = v;
-                  })
-                }
+                  });
+                }}
                 className="cursor-pointer"
               />
             </SettingRow>
@@ -238,11 +230,11 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
             <SettingRow label="Sidebar Open" description="Keep the sidebar open on app start">
               <Switch
                 checked={config.launch.sidebar_open}
-                onCheckedChange={(v) =>
+                onCheckedChange={(v) => {
                   setConfig((draft) => {
                     if (draft) draft.launch.sidebar_open = v;
-                  })
-                }
+                  });
+                }}
                 className="cursor-pointer"
               />
             </SettingRow>
@@ -263,7 +255,13 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
               </SettingRow>
 
               <SettingRow label="Check for Updates" description="Manually check for updates">
-                <Button variant="outline" disabled={check.isPending} onClick={() => check.mutate()}>
+                <Button
+                  variant="outline"
+                  disabled={check.isPending}
+                  onClick={() => {
+                    check.mutate();
+                  }}
+                >
                   {check.isPending ? "Checking..." : "Check Now"}
                 </Button>
               </SettingRow>
@@ -294,7 +292,7 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
               <Button
                 variant="outline"
                 onClick={() => {
-                  LogService.OpenLogFile().catch((err) => {
+                  LogService.OpenLogFile().catch((err: unknown) => {
                     logger.error("Failed to open log file", err);
                     toast.error("Failed to open log file", {
                       description: parseWailsError(err)?.message,

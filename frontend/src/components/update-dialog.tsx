@@ -49,7 +49,12 @@ export function UpdateDialog() {
           <AlertDialogCancel disabled={downloading} variant="outline">
             Later
           </AlertDialogCancel>
-          <DownlaodAction downloading={downloading} onClick={() => install.mutate()} />
+          <DownlaodAction
+            downloading={downloading}
+            onClick={() => {
+              install.mutate();
+            }}
+          />
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -73,7 +78,7 @@ function DownlaodAction({ downloading, onClick }: DownlaodActionProps) {
       {downloading && (
         <span
           className="absolute inset-y-0 left-0 bg-primary transition-all duration-100"
-          style={{ width: `${percent}%` }}
+          style={{ width: `${String(percent)}%` }}
         />
       )}
       <span className="relative z-10">{downloading || "Download & Install"}</span>

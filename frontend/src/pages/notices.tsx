@@ -12,7 +12,7 @@ import {
   PinIcon,
   PinOffIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { AppTooltip } from "@/components/app-tooltip";
@@ -49,19 +49,21 @@ export default function NoticesPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const { toggleRead, togglePin } = useNoticeMutations();
-  const { query: detailQuery, readNotice } = useNoticeDetail(selectedId, (id) =>
-    toggleRead({ id, next: true }),
-  );
+  const { query: detailQuery, readNotice } = useNoticeDetail(selectedId, (id) => {
+    toggleRead({ id, next: true });
+  });
   const { syncing, sync } = useSync();
 
   const detail = detailQuery.data ?? null;
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const select = (id: string) => {
-    if (selectedId === id) return;
-    setSelectedId(id);
-    readNotice(id);
-  };
+  const select = useCallback(
+    (id: string) => {
+      if (selectedId === id) return;
+      setSelectedId(id);
+      readNotice(id);
+    },
+    [selectedId, readNotice],
+  );
 
   useEffect(() => {
     const unsubscribe = Events.On("notice:open", (event) => {
@@ -73,13 +75,15 @@ export default function NoticesPage() {
   return (
     <ResizablePanelGroup orientation="horizontal" className="flex h-full">
       <ResizablePanel defaultSize="40%" minSize="35%" className="flex flex-col bg-card">
-        <NoticeSelectionContext.Provider value={{ selectedId, select }}>
+        <NoticeSelectionContext value={{ selectedId, select }}>
           <NoticeListPanel
-            onTogglePin={(id, next) => togglePin({ id, next })}
+            onTogglePin={(id, next) => {
+              togglePin({ id, next });
+            }}
             syncing={syncing}
             onSync={sync}
           />
-        </NoticeSelectionContext.Provider>
+        </NoticeSelectionContext>
       </ResizablePanel>
 
       <ResizableHandle withHandle />
@@ -88,8 +92,12 @@ export default function NoticesPage() {
         <DetailPanel
           notice={detail}
           loading={detailQuery.isLoading}
-          onTogglePin={() => detail && togglePin({ id: detail.id, next: !detail.isPinned })}
-          onToggleRead={() => detail && toggleRead({ id: detail.id, next: !detail.isRead })}
+          onTogglePin={() => {
+            if (detail) togglePin({ id: detail.id, next: !detail.isPinned });
+          }}
+          onToggleRead={() => {
+            if (detail) toggleRead({ id: detail.id, next: !detail.isRead });
+          }}
         />
       </ResizablePanel>
     </ResizablePanelGroup>
@@ -114,9 +122,9 @@ function NoticeListPanel({ onTogglePin, syncing, onSync }: NoticeListPanelProps)
       <NoticeListToolbar
         filters={filters}
         onFilterChange={setFilters}
-        onFilterClear={() =>
-          setFilters({ ...filters, urgent: false, pinned: false, unread: false })
-        }
+        onFilterClear={() => {
+          setFilters({ ...filters, urgent: false, pinned: false, unread: false });
+        }}
         syncing={syncing}
         onSync={onSync}
         noticeCount={notices.length}
@@ -129,7 +137,9 @@ function NoticeListPanel({ onTogglePin, syncing, onSync }: NoticeListPanelProps)
         error={query.error}
         onTogglePin={onTogglePin}
         onRetry={() => void query.refetch()}
-        onClearFilters={() => setFilters(INITIAL_FILTERS)}
+        onClearFilters={() => {
+          setFilters(INITIAL_FILTERS);
+        }}
         hasActiveFilters={filters.urgent || filters.pinned || filters.unread}
       />
     </>
@@ -184,7 +194,7 @@ function DetailPanel({ notice, loading, onTogglePin, onToggleRead }: DetailPanel
               urgent
             </Badge>
           )}
-          {notice.attachments?.length > 0 && (
+          {notice.attachments.length > 0 && (
             <Badge variant="outline" className="px-2 text-xs font-semibold">
               <PaperclipIcon />
               {notice.attachments.length}
@@ -237,7 +247,7 @@ function DetailPanel({ notice, loading, onTogglePin, onToggleRead }: DetailPanel
                 variant="ghost"
                 className="hover:text-primary"
                 onClick={() =>
-                  void Browser.OpenURL("https://aiub.edu/" + notice.id).catch((err) => {
+                  void Browser.OpenURL("https://aiub.edu/" + notice.id).catch((err: unknown) => {
                     logger.error("Failed to open URL", err);
                     toast.error("Failed to open URL", {
                       description: (err as Error).message,
@@ -263,7 +273,7 @@ function DetailPanel({ notice, loading, onTogglePin, onToggleRead }: DetailPanel
           <p className="text-sm text-muted-foreground italic">No content available</p>
         )}
 
-        {notice.attachments?.length > 0 && (
+        {notice.attachments.length > 0 && (
           <div className="mt-4">
             <Separator className="mb-4" />
             <h3 className="mb-2.5 flex items-center gap-1.5 text-xs tracking-wider uppercase">
@@ -289,7 +299,7 @@ interface AttachmentItemProps {
 function AttachmentItem({ attachment }: AttachmentItemProps) {
   const openUrl = () => {
     if (!attachment.url) return;
-    Browser.OpenURL(attachment.url).catch((err) => {
+    Browser.OpenURL(attachment.url).catch((err: unknown) => {
       toast.error("Failed to open attachment URL", {
         description: (err as Error).message,
       });

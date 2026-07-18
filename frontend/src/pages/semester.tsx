@@ -122,7 +122,9 @@ export default function SemesterPage() {
             <Select
               items={CALENDAR_TYPES}
               value={calendarType}
-              onValueChange={(v) => v && setCalendarType(v)}
+              onValueChange={(v) => {
+                if (v) setCalendarType(v);
+              }}
             >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Calendar type" />
@@ -138,7 +140,9 @@ export default function SemesterPage() {
             <Button
               variant="outline"
               size="icon"
-              onClick={() => mutate(calendarType)}
+              onClick={() => {
+                mutate(calendarType);
+              }}
               disabled={isPending}
             >
               <RefreshCwIcon className={cn("h-4 w-4", isPending && "animate-spin")} />
@@ -195,7 +199,7 @@ export default function SemesterPage() {
               <BookOpenIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{calendar?.events?.length ?? 0}</div>
+              <div className="text-2xl font-bold">{calendar?.events.length ?? 0}</div>
               <p className="text-xs text-muted-foreground">events this semester</p>
             </CardContent>
           </Card>
@@ -206,14 +210,18 @@ export default function SemesterPage() {
           <Button
             variant={view === "timeline" ? "default" : "outline"}
             size="sm"
-            onClick={() => setView("timeline")}
+            onClick={() => {
+              setView("timeline");
+            }}
           >
             Timeline
           </Button>
           <Button
             variant={view === "all" ? "default" : "outline"}
             size="sm"
-            onClick={() => setView("all")}
+            onClick={() => {
+              setView("all");
+            }}
           >
             All Events
           </Button>
@@ -225,7 +233,7 @@ export default function SemesterPage() {
             <CardTitle>
               {view === "timeline"
                 ? "Upcoming Events"
-                : `All Events (${calendar?.events?.length ?? 0})`}
+                : `All Events (${String(calendar?.events.length ?? 0)})`}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -238,15 +246,15 @@ export default function SemesterPage() {
                   <p className="py-8 text-center text-muted-foreground">No upcoming events</p>
                 ) : (
                   upcomingEvents.map((event, idx) => (
-                    <EventItem key={event.category + idx} event={event} />
+                    <EventItem key={event.category + String(idx)} event={event} />
                   ))
                 )}
               </div>
             ) : (
               <div className="space-y-2">
-                {calendar?.events?.map((event, idx) => (
+                {calendar?.events.map((event, idx) => (
                   <div
-                    key={event.category + idx}
+                    key={event.category + String(idx)}
                     className="flex items-center justify-between rounded-lg border p-3"
                   >
                     <div className="space-y-1">
@@ -297,7 +305,7 @@ function EventItem({ event }: { event: AcademicEvent }) {
             <p className="leading-none font-medium">{event.title}</p>
             <p className="text-sm text-muted-foreground">
               {formatEventDate(event)}
-              {event.week && ` • Week ${event.week}`}
+              {event.week && ` • Week ${String(event.week)}`}
             </p>
           </div>
           <Badge variant="outline" className={cn("capitalize", style)}>
@@ -310,10 +318,8 @@ function EventItem({ event }: { event: AcademicEvent }) {
 }
 
 function formatEventDate(event: AcademicEvent): string {
-  const date = event.date ?? null;
+  const date = event.date;
   const endDate = event.endDate ?? null;
-
-  if (!date) return "TBD";
 
   const opts: Intl.DateTimeFormatOptions = {
     month: "short",

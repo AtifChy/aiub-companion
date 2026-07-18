@@ -9,8 +9,12 @@ export function useDelayedLoading(value: boolean, delay = 300) {
 
   useEffect(() => {
     if (!value) return;
-    const timer = setTimeout(() => setDelayed(true), delay);
-    return () => clearTimeout(timer);
+    const timer = setTimeout(() => {
+      setDelayed(true);
+    }, delay);
+    return () => {
+      clearTimeout(timer);
+    };
   }, [delay, value]);
 
   return delayed;

@@ -37,10 +37,14 @@ export function HorizontalFadeScroll({ children, className }: HorizontalFadeScro
 
     checkOverflow();
 
-    const resizeObserver = new ResizeObserver(() => checkOverflow());
+    const resizeObserver = new ResizeObserver(() => {
+      checkOverflow();
+    });
     resizeObserver.observe(container);
 
-    return () => resizeObserver.disconnect();
+    return () => {
+      resizeObserver.disconnect();
+    };
   }, []);
 
   const handleWheel = (e: WheelEvent) => {
@@ -55,7 +59,9 @@ export function HorizontalFadeScroll({ children, className }: HorizontalFadeScro
     const container = scrollRef.current;
     if (!container) return;
     container.addEventListener("wheel", handleWheel, { passive: false });
-    return () => container.removeEventListener("wheel", handleWheel);
+    return () => {
+      container.removeEventListener("wheel", handleWheel);
+    };
   }, []);
 
   return (

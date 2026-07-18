@@ -20,8 +20,12 @@ export function WindowControls({
   const [focused, setFocused] = useState(() => document.hasFocus());
 
   useEffect(() => {
-    const handleFocus = () => setFocused(true);
-    const handleBlur = () => setFocused(false);
+    const handleFocus = () => {
+      setFocused(true);
+    };
+    const handleBlur = () => {
+      setFocused(false);
+    };
 
     window.addEventListener("focus", handleFocus);
     window.addEventListener("blur", handleBlur);

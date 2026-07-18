@@ -9,9 +9,9 @@ interface ThemeProviderProps {
   defaultTheme?: Theme;
 }
 
-export function ThemeProvider({ children, defaultTheme = "system" }: ThemeProviderProps) {
+export function ThemeProvider({ children }: ThemeProviderProps) {
   const { config } = useSettings();
-  const theme = (config.appearance.theme as Theme) || defaultTheme;
+  const theme = config.appearance.theme as Theme;
 
   return (
     <NextThemesProvider attribute="class" defaultTheme={theme} enableSystem>

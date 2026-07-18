@@ -33,8 +33,8 @@ function NavItem({ item }: { item: RouteItem }) {
     <SidebarMenuItem key={item.label}>
       <SidebarMenuButton
         isActive={location.pathname === item.path}
-        onMouseEnter={() => void item.component.preload?.()}
-        onFocus={() => void item.component.preload?.()}
+        onMouseEnter={() => void item.component.preload()}
+        onFocus={() => void item.component.preload()}
         render={
           <Link to={item.path} className="flex items-center gap-2">
             <item.icon />

@@ -6,10 +6,15 @@ import { createRoot } from "react-dom/client";
 import App from "@/App";
 
 const container = document.getElementById("root");
-const root = createRoot(container!);
+if (!container) {
+  throw new Error("Root container missing in index.html");
+}
+const root = createRoot(container);
 
 if (import.meta.env.DEV) {
-  void import("react-scan").then(({ scan }) => scan());
+  void import("react-scan").then(({ scan }) => {
+    scan();
+  });
 }
 
 root.render(

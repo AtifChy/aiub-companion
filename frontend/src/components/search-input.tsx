@@ -1,5 +1,5 @@
 import { Loader2Icon, SearchIcon, SlashIcon, XIcon } from "lucide-react";
-import React, { useEffect, useImperativeHandle, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,7 +26,14 @@ export function SearchInput({
 }: SearchInputProps) {
   const innerRef = useRef<HTMLInputElement>(null);
 
-  useImperativeHandle(ref, () => innerRef.current!, []);
+  const setRef = (el: HTMLInputElement | null) => {
+    innerRef.current = el;
+    if (typeof ref === "function") {
+      ref(el);
+    } else if (ref) {
+      ref.current = el;
+    }
+  };
 
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
@@ -36,16 +43,20 @@ export function SearchInput({
       }
     };
     window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
+    return () => {
+      window.removeEventListener("keydown", handler);
+    };
   }, []);
 
   return (
     <div className={cn("relative", className)} {...props}>
       <SearchIcon className="absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
       <Input
-        ref={innerRef}
+        ref={setRef}
         value={value}
-        onChange={(e) => onValueChange(e.target.value)}
+        onChange={(e) => {
+          onValueChange(e.target.value);
+        }}
         placeholder={placeholder ?? "Search..."}
         autoComplete="off"
         className="pr-7 pl-8 text-xs"
@@ -56,7 +67,9 @@ export function SearchInput({
         (showClearButton ?? true) && (
           <Button
             variant="ghost"
-            onClick={() => onValueChange("")}
+            onClick={() => {
+              onValueChange("");
+            }}
             className="absolute top-1/2 right-2 h-auto -translate-y-1/2 p-0.5 text-muted-foreground hover:text-foreground"
           >
             <XIcon strokeWidth="2.5" className="size-3.5" />

@@ -50,7 +50,9 @@ export function NoticeListToolbar({
       <div className="border-b px-3 py-2.5">
         <SearchInput
           value={filters.search}
-          onValueChange={(v) => onFilterChange({ ...filters, search: v })}
+          onValueChange={(v) => {
+            onFilterChange({ ...filters, search: v });
+          }}
           placeholder="Search notices..."
         />
 
@@ -58,7 +60,9 @@ export function NoticeListToolbar({
           {CATEGORIES.map((cat) => (
             <Badge
               key={cat}
-              onClick={() => onFilterChange({ ...filters, category: cat })}
+              onClick={() => {
+                onFilterChange({ ...filters, category: cat });
+              }}
               variant={filters.category === cat ? "default" : "outline"}
               className={cn(
                 "cursor-pointer font-semibold capitalize",
@@ -112,7 +116,9 @@ export function NoticeListToolbar({
                   <DropdownMenuCheckboxItem
                     key={key}
                     checked={filters[key]}
-                    onCheckedChange={(v) => onFilterChange({ ...filters, [key]: v })}
+                    onCheckedChange={(v) => {
+                      onFilterChange({ ...filters, [key]: v });
+                    }}
                   >
                     {key.charAt(0).toUpperCase() + key.slice(1)}
                   </DropdownMenuCheckboxItem>

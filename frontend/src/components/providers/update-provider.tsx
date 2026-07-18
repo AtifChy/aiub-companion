@@ -1,7 +1,7 @@
 import { Release, Service as UpdaterService } from "@bindings/updater";
 import { useMutation } from "@tanstack/react-query";
 import { Events, Updater } from "@wailsio/runtime";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, use, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { logger } from "@/lib/logger";
@@ -72,15 +72,15 @@ export function UpdateProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <UpdateContext.Provider value={{ release, dialogOpen, setDialogOpen, check, install }}>
+    <UpdateContext value={{ release, dialogOpen, setDialogOpen, check, install }}>
       {children}
-    </UpdateContext.Provider>
+    </UpdateContext>
   );
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
 export function useUpdate() {
-  const context = useContext(UpdateContext);
+  const context = use(UpdateContext);
   if (!context) {
     throw new Error("useUpdate must be used within an UpdateProvider");
   }
