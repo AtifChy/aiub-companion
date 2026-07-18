@@ -1,4 +1,4 @@
-import { Course } from "@bindings/routine";
+import { Schedule } from "@bindings/routine";
 import { describe, expect, it } from "vitest";
 
 import { getCourseStatus, parseTimeToMinutes } from "./routine";
@@ -38,46 +38,46 @@ describe("Routine Utils", () => {
     // 2026-07-21 is a Tuesday
     const testNow = new Date("2026-07-21T10:00:00.000+06:00");
 
-    const createCourse = (day: string, start: string, end: string): Course => {
-      const course = new Course();
-      course.day = day;
-      course.startTime = start;
-      course.endTime = end;
-      return course;
+    const createSchedule = (day: string, start: string, end: string): Schedule => {
+      const schedule = new Schedule();
+      schedule.day = day;
+      schedule.startTime = start;
+      schedule.endTime = end;
+      return schedule;
     };
 
     it("returns 'inactive' if the course is not today", () => {
-      const course = createCourse("Monday", "10:00 AM", "12:00 PM");
+      const course = createSchedule("Monday", "10:00 AM", "12:00 PM");
       expect(getCourseStatus(course, testNow)).toBe("inactive");
     });
 
     it("returns 'ongoing' if current time is within course bounds", () => {
       // Tuesday 09:30 AM to 11:30 AM -> 10:00 AM is inside
-      const course = createCourse("Tuesday", "09:30 AM", "11:30 AM");
+      const course = createSchedule("Tuesday", "09:30 AM", "11:30 AM");
       expect(getCourseStatus(course, testNow)).toBe("ongoing");
     });
 
     it("returns 'upcoming' if current time is exactly 60 minutes before start", () => {
       // Tuesday 11:00 AM -> 10:00 AM is exactly 60m before
-      const course = createCourse("Tuesday", "11:00 AM", "12:00 PM");
+      const course = createSchedule("Tuesday", "11:00 AM", "12:00 PM");
       expect(getCourseStatus(course, testNow)).toBe("upcoming");
     });
 
     it("returns 'upcoming' if current time is 30 minutes before start", () => {
       // Tuesday 10:30 AM -> 10:00 AM is 30m before
-      const course = createCourse("Tuesday", "10:30 AM", "12:00 PM");
+      const course = createSchedule("Tuesday", "10:30 AM", "12:00 PM");
       expect(getCourseStatus(course, testNow)).toBe("upcoming");
     });
 
     it("returns 'inactive' if current time is more than 60 minutes before start", () => {
       // Tuesday 11:05 AM -> 10:00 AM is 65m before
-      const course = createCourse("Tuesday", "11:05 AM", "12:00 PM");
+      const course = createSchedule("Tuesday", "11:05 AM", "12:00 PM");
       expect(getCourseStatus(course, testNow)).toBe("inactive");
     });
 
     it("returns 'inactive' if current time is after course ends", () => {
       // Tuesday 08:00 AM to 09:50 AM -> 10:00 AM is after
-      const course = createCourse("Tuesday", "08:00 AM", "09:50 AM");
+      const course = createSchedule("Tuesday", "08:00 AM", "09:50 AM");
       expect(getCourseStatus(course, testNow)).toBe("inactive");
     });
   });
