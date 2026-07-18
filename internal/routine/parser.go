@@ -32,8 +32,9 @@ func parseCourses(rows [][]string) ([]Course, error) {
 	var (
 		idx         columnIndex
 		headerFound bool
-		courses     = make([]Course, 0, len(rows))
 	)
+
+	coursesByID := make(map[string]*Course, len(rows))
 
 	for _, row := range rows {
 		if !headerFound {
@@ -41,22 +42,33 @@ func parseCourses(rows [][]string) ([]Course, error) {
 			continue
 		}
 
-		course, ok := parseCourse(row, idx)
+		classID, meta, schedule, ok := parseCourseRow(row, idx)
 		if !ok {
 			continue
 		}
 
-		courses = append(courses, course)
+		if course, exists := coursesByID[classID]; exists {
+			course.Schedules = append(course.Schedules, schedule)
+			continue
+		}
+
+		meta.Schedules = []Schedule{schedule}
+		coursesByID[classID] = &meta
 	}
 
 	if !headerFound {
 		return nil, errors.New("header row not found")
 	}
 
+	courses := make([]Course, 0, len(coursesByID))
+	for _, course := range coursesByID {
+		courses = append(courses, *course)
+	}
+
 	return courses, nil
 }
 
-func parseCourse(row []string, idx columnIndex) (Course, bool) {
+func parseCourseRow(row []string, idx columnIndex) (classID string, meta Course, schedule Schedule, ok bool) {
 	get := func(col int) string {
 		if col < 0 || col >= len(row) {
 			return ""
@@ -64,27 +76,31 @@ func parseCourse(row []string, idx columnIndex) (Course, bool) {
 		return strings.TrimSpace(row[col])
 	}
 
+	classID = get(idx.classID)
 	title := sectionRe.ReplaceAllString(get(idx.courseTitle), "")
+	section := get(idx.section)
 
-	course := Course{
+	if classID == "" && title == "" && section == "" {
+		return "", Course{}, Schedule{}, false
+	}
+
+	meta = Course{
 		ClassID:     get(idx.classID),
 		CourseCode:  get(idx.courseCode),
 		CourseTitle: title,
 		Section:     get(idx.section),
 		Faculty:     get(idx.faculty),
-		Type:        get(idx.classType),
-		Day:         get(idx.day),
-		StartTime:   get(idx.startTime),
-		EndTime:     get(idx.endTime),
-		Room:        get(idx.room),
 		Department:  get(idx.department),
 	}
-
-	if course.ClassID == "" || course.CourseTitle == "" || course.Section == "" {
-		return Course{}, false
+	schedule = Schedule{
+		Type:      get(idx.classType),
+		Day:       get(idx.day),
+		StartTime: get(idx.startTime),
+		EndTime:   get(idx.endTime),
+		Room:      get(idx.room),
 	}
 
-	return course, true
+	return classID, meta, schedule, true
 }
 
 type columnIndex struct {

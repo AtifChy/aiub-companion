@@ -55,19 +55,28 @@ func (r *repository) ListOfferedCourses(ctx context.Context) ([]Course, error) {
 }
 
 func (r *repository) InsertOfferedCourse(ctx context.Context, c Course) error {
-	return r.queries.InsertOfferedCourse(ctx, sqlc.InsertOfferedCourseParams{
+	param := sqlc.InsertOfferedCourseParams{
 		ClassID:     c.ClassID,
 		CourseCode:  database.StringOrNull(c.CourseCode),
 		CourseTitle: c.CourseTitle,
 		Section:     c.Section,
 		Faculty:     database.StringOrNull(c.Faculty),
-		ClassType:   database.StringOrNull(c.Type),
-		Day:         database.StringOrNull(c.Day),
-		StartTime:   database.StringOrNull(c.StartTime),
-		EndTime:     database.StringOrNull(c.EndTime),
-		Room:        database.StringOrNull(c.Room),
 		Department:  database.StringOrNull(c.Department),
-	})
+	}
+
+	for _, schedule := range c.Schedules {
+		param.ClassType = database.StringOrNull(schedule.Type)
+		param.Day = database.StringOrNull(schedule.Day)
+		param.StartTime = database.StringOrNull(schedule.StartTime)
+		param.EndTime = database.StringOrNull(schedule.EndTime)
+		param.Room = database.StringOrNull(schedule.Room)
+
+		if err := r.queries.InsertOfferedCourse(ctx, param); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (r *repository) AddToUserRoutine(ctx context.Context, classID string) error {
@@ -83,21 +92,36 @@ func (r *repository) ClearOfferedCourses(ctx context.Context) error {
 }
 
 func toCourses(rows []sqlc.OfferedCourse) []Course {
-	courses := make([]Course, len(rows))
+	coursesByID := make(map[string]*Course, len(rows))
+
 	for i := range rows {
-		courses[i] = Course{
-			ClassID:     rows[i].ClassID,
-			CourseCode:  rows[i].CourseCode.String,
-			CourseTitle: rows[i].CourseTitle,
-			Section:     rows[i].Section,
-			Faculty:     rows[i].Faculty.String,
-			Type:        rows[i].ClassType.String,
-			Day:         rows[i].Day.String,
-			StartTime:   rows[i].StartTime.String,
-			EndTime:     rows[i].EndTime.String,
-			Room:        rows[i].Room.String,
-			Department:  rows[i].Department.String,
+		course, exists := coursesByID[rows[i].ClassID]
+
+		if !exists {
+			course = &Course{
+				ClassID:     rows[i].ClassID,
+				CourseCode:  rows[i].CourseCode.String,
+				CourseTitle: rows[i].CourseTitle,
+				Section:     rows[i].Section,
+				Faculty:     rows[i].Faculty.String,
+				Department:  rows[i].Department.String,
+			}
+			coursesByID[rows[i].ClassID] = course
 		}
+
+		course.Schedules = append(course.Schedules, Schedule{
+			Type:      rows[i].ClassType.String,
+			Day:       rows[i].Day.String,
+			StartTime: rows[i].StartTime.String,
+			EndTime:   rows[i].EndTime.String,
+			Room:      rows[i].Room.String,
+		})
 	}
+
+	courses := make([]Course, 0, len(coursesByID))
+	for _, course := range coursesByID {
+		courses = append(courses, *course)
+	}
+
 	return courses
 }
