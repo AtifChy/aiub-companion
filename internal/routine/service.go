@@ -56,8 +56,8 @@ func (s *Service) saveCourses(ctx context.Context, courses []Course) error {
 	})
 }
 
-func (s *Service) GetUserRoutine(ctx context.Context) ([]Course, error) {
-	return s.repo.GetUserRoutine(ctx)
+func (s *Service) ListUserRoutine(ctx context.Context) ([]Course, error) {
+	return s.repo.ListUserRoutine(ctx)
 }
 
 func (s *Service) SearchOfferedCourses(ctx context.Context, query string) ([]Course, error) {

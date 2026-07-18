@@ -37,7 +37,7 @@ export default function RoutinePage() {
 
   const { data: routine, isLoading: loading } = useQuery({
     queryKey: ["routine"],
-    queryFn: () => RoutineService.GetUserRoutine(),
+    queryFn: () => RoutineService.ListUserRoutine(),
   });
 
   const { mutate: removeCourse } = useMutation({

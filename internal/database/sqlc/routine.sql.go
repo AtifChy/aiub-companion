@@ -32,51 +32,6 @@ func (q *Queries) ClearOfferedCourses(ctx context.Context) error {
 	return err
 }
 
-const getUserRoutine = `-- name: GetUserRoutine :many
-SELECT
-  o.class_id, o.course_code, o.course_title, o.section, o.faculty, o.class_type, o.day, o.start_time, o.end_time, o.room, o.department
-FROM
-  user_routine u
-  JOIN offered_courses o ON u.class_id = o.class_id
-ORDER BY
-  o.day ASC, o.start_time ASC
-`
-
-func (q *Queries) GetUserRoutine(ctx context.Context) ([]OfferedCourse, error) {
-	rows, err := q.db.QueryContext(ctx, getUserRoutine)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []OfferedCourse{}
-	for rows.Next() {
-		var i OfferedCourse
-		if err := rows.Scan(
-			&i.ClassID,
-			&i.CourseCode,
-			&i.CourseTitle,
-			&i.Section,
-			&i.Faculty,
-			&i.ClassType,
-			&i.Day,
-			&i.StartTime,
-			&i.EndTime,
-			&i.Room,
-			&i.Department,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const insertOfferedCourse = `-- name: InsertOfferedCourse :exec
 INSERT INTO
   offered_courses (class_id, course_code, course_title, section, faculty, class_type, day, start_time, end_time, room, department)
@@ -118,13 +73,58 @@ func (q *Queries) InsertOfferedCourse(ctx context.Context, arg InsertOfferedCour
 
 const listOfferedCourses = `-- name: ListOfferedCourses :many
 SELECT
-  o.class_id, o.course_code, o.course_title, o.section, o.faculty, o.class_type, o.day, o.start_time, o.end_time, o.room, o.department
+  class_id, course_code, course_title, section, faculty, class_type, day, start_time, end_time, room, department
 FROM
-  offered_courses o
+  offered_courses
 `
 
 func (q *Queries) ListOfferedCourses(ctx context.Context) ([]OfferedCourse, error) {
 	rows, err := q.db.QueryContext(ctx, listOfferedCourses)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []OfferedCourse{}
+	for rows.Next() {
+		var i OfferedCourse
+		if err := rows.Scan(
+			&i.ClassID,
+			&i.CourseCode,
+			&i.CourseTitle,
+			&i.Section,
+			&i.Faculty,
+			&i.ClassType,
+			&i.Day,
+			&i.StartTime,
+			&i.EndTime,
+			&i.Room,
+			&i.Department,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listUserRoutine = `-- name: ListUserRoutine :many
+SELECT
+  o.class_id, o.course_code, o.course_title, o.section, o.faculty, o.class_type, o.day, o.start_time, o.end_time, o.room, o.department
+FROM
+  user_routine u
+  JOIN offered_courses o ON u.class_id = o.class_id
+ORDER BY
+  o.day ASC, o.start_time ASC
+`
+
+func (q *Queries) ListUserRoutine(ctx context.Context) ([]OfferedCourse, error) {
+	rows, err := q.db.QueryContext(ctx, listUserRoutine)
 	if err != nil {
 		return nil, err
 	}

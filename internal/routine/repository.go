@@ -10,7 +10,8 @@ import (
 
 type Repository interface {
 	WithTx(ctx context.Context, fn func(Repository) error) error
-	GetUserRoutine(ctx context.Context) ([]Course, error)
+
+	ListUserRoutine(ctx context.Context) ([]Course, error)
 	ListOfferedCourses(ctx context.Context) ([]Course, error)
 	InsertOfferedCourse(ctx context.Context, c Course) error
 	AddToUserRoutine(ctx context.Context, classID string) error
@@ -36,8 +37,8 @@ func (r *repository) WithTx(ctx context.Context, fn func(Repository) error) erro
 	})
 }
 
-func (r *repository) GetUserRoutine(ctx context.Context) ([]Course, error) {
-	rows, err := r.queries.GetUserRoutine(ctx)
+func (r *repository) ListUserRoutine(ctx context.Context) ([]Course, error) {
+	rows, err := r.queries.ListUserRoutine(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -10,9 +10,9 @@ ON CONFLICT DO NOTHING;
 
 -- name: ListOfferedCourses :many
 SELECT
-  o.*
+  *
 FROM
-  offered_courses o;
+  offered_courses;
 
 -- name: AddToUserRoutine :exec
 INSERT INTO
@@ -27,7 +27,7 @@ DELETE FROM
 WHERE
   class_id = ?;
 
--- name: GetUserRoutine :many
+-- name: ListUserRoutine :many
 SELECT
   o.*
 FROM
