@@ -54,7 +54,7 @@ if [ -n "$FRONTEND_FILES" ]; then
     if ! command -v pnpm >/dev/null 2>&1; then
         echo "⚠️  pnpm is not installed. Skipping frontend checks."
     else
-        # Run OxFmt check
+        # Run oxfmt check
         echo "Running frontend formatter check (oxfmt)..."
         if ! pnpm --dir frontend run fmt:check; then
             echo "❌ Frontend formatting check failed. Run 'pnpm --dir frontend run fmt' to format."
@@ -63,8 +63,8 @@ if [ -n "$FRONTEND_FILES" ]; then
             echo "✅ Frontend formatting check passed."
         fi
 
-        # Run ESLint check
-        echo "Running frontend linter (eslint)..."
+        # Run oxlint check
+        echo "Running frontend linter (oxlint)..."
         if ! pnpm --dir frontend run lint; then
             echo "❌ Frontend linting failed. Fix lint errors and try again."
             FAIL=1
