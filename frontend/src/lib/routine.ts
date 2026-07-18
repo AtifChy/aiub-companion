@@ -1,22 +1,26 @@
-import type { Course } from "@bindings/routine";
+import type { Schedule } from "@bindings/routine";
 
 export type CourseStatus = "ongoing" | "upcoming" | "inactive";
 
-export const getCourseStatus = (course: Course, now: Date = new Date()): CourseStatus => {
-  const daysMap = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const daysMap = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+export const getCourseStatus = (schedule: Schedule, now: Date = new Date()): CourseStatus => {
   const currentDay = daysMap[now.getDay()];
-
-  if (course.day !== currentDay) return "inactive";
-
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
-  const startMinutes = parseTimeToMinutes(course.startTime);
-  const endMinutes = parseTimeToMinutes(course.endTime);
 
-  if (currentMinutes >= startMinutes && currentMinutes <= endMinutes) {
-    return "ongoing";
-  } else if (currentMinutes < startMinutes && startMinutes - currentMinutes <= 60) {
-    return "upcoming";
+  if (schedule.day === currentDay) {
+    const startMinutes = parseTimeToMinutes(schedule.startTime);
+    const endMinutes = parseTimeToMinutes(schedule.endTime);
+
+    if (currentMinutes >= startMinutes && currentMinutes <= endMinutes) {
+      return "ongoing";
+    }
+
+    if (currentMinutes < startMinutes && startMinutes - currentMinutes <= 60) {
+      return "upcoming";
+    }
   }
+
   return "inactive";
 };
 

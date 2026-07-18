@@ -1,4 +1,4 @@
-import { Course, Service as RoutineService } from "@bindings/routine";
+import { Course, Service as RoutineService, Schedule } from "@bindings/routine";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Dialogs } from "@wailsio/runtime";
 import {
@@ -89,16 +89,22 @@ export default function RoutinePage() {
   };
 
   const routineByDay = DAYS.reduce<Record<string, Course[]>>((acc, day) => {
-    acc[day] = routine?.filter((c) => c.day === day) ?? [];
+    acc[day] = routine?.filter((course) => course.schedules.some((s) => s.day === day)) ?? [];
     return acc;
   }, {});
 
   const stats: RoutineStatsProps["stats"] = {
     totalClasses: routine?.length ?? 0,
     studyHours:
-      routine?.reduce((acc, c) => {
-        const duration = parseTimeToMinutes(c.endTime) - parseTimeToMinutes(c.startTime);
-        return acc + (duration > 0 ? duration / 60 : 0);
+      routine?.reduce((total, course) => {
+        return (
+          total +
+          course.schedules.reduce((sum, schedule) => {
+            const duration =
+              parseTimeToMinutes(schedule.endTime) - parseTimeToMinutes(schedule.startTime);
+            return sum + Math.max(duration, 0) / 60;
+          }, 0)
+        );
       }, 0) ?? 0,
     activeDays: Object.keys(routineByDay).filter((day) => {
       const dayCourses = routineByDay[day];
@@ -301,10 +307,11 @@ function SearchResultItem({ course, onAdd }: { course: Course; onAdd: (classId: 
             <UserIcon className="size-3" /> {course.faculty}
           </span>
           <span className="flex items-center gap-1">
-            <CalendarIcon className="size-3" /> {course.day}
+            <CalendarIcon className="size-3" /> {course.schedules.map((s) => s.day).join(", ")}
           </span>
           <span className="flex items-center gap-1">
-            <ClockIcon className="size-3" /> {course.startTime} - {course.endTime}
+            <ClockIcon className="size-3" />
+            {[...new Set(course.schedules.map((s) => `${s.startTime} - ${s.endTime}`))].join(", ")}
           </span>
         </div>
       </div>
@@ -354,9 +361,18 @@ function DayScheduleTimeline({ routineByDay, onRemoveCourse }: DayScheduleTimeli
 
             {/* Day Grid Courses */}
             <div className="grid flex-1 grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {dayCourses.map((course) => (
-                <CourseCard key={course.classID} course={course} onRemoveCourse={onRemoveCourse} />
-              ))}
+              {dayCourses.flatMap((course) =>
+                course.schedules
+                  .filter((schedule) => schedule.day === day)
+                  .map((schedule) => (
+                    <CourseCard
+                      key={`${course.classID}-${schedule.day}-${schedule.startTime}`}
+                      course={course}
+                      schedule={schedule}
+                      onRemoveCourse={onRemoveCourse}
+                    />
+                  )),
+              )}
             </div>
           </div>
         );
@@ -367,12 +383,13 @@ function DayScheduleTimeline({ routineByDay, onRemoveCourse }: DayScheduleTimeli
 
 interface CourseCardProps {
   course: Course;
+  schedule: Schedule;
   onRemoveCourse: (classId: string) => void;
 }
 
-function CourseCard({ course, onRemoveCourse }: CourseCardProps) {
-  const status = getCourseStatus(course);
-  const isLab = course.type.toLowerCase().includes("lab");
+function CourseCard({ course, schedule, onRemoveCourse }: CourseCardProps) {
+  const status = getCourseStatus(schedule);
+  const isLab = schedule.type.toLowerCase().includes("lab");
 
   return (
     <Card
@@ -399,7 +416,7 @@ function CourseCard({ course, onRemoveCourse }: CourseCardProps) {
             </Badge>
           )}
           <Badge variant="outline" className="-ml-1 px-2 py-0 text-[0.65rem] font-medium">
-            {course.type}
+            {schedule.type}
           </Badge>
           {status === "ongoing" && (
             <Badge className="border-0 bg-emerald-500 px-1.5 py-0 text-[8px] font-bold tracking-wider text-white uppercase">
@@ -424,13 +441,13 @@ function CourseCard({ course, onRemoveCourse }: CourseCardProps) {
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <ClockIcon className="size-3.5 text-foreground/60" />
           <span className="font-medium text-foreground/90">
-            {course.startTime} - {course.endTime}
+            {schedule.startTime} - {schedule.endTime}
           </span>
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <MapPinIcon className="size-3.5 text-foreground/60" />
           <span className="truncate">
-            Room {course.room} ({course.department})
+            Room {schedule.room} ({course.department})
           </span>
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
