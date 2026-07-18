@@ -19,9 +19,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDebounce } from "@/hooks/use-debounce";
 import { logger } from "@/lib/logger";
+import { getCourseStatus, parseTimeToMinutes } from "@/lib/routine";
 import { cn } from "@/lib/utils";
-
-type CourseStatus = "ongoing" | "upcoming" | "inactive";
 
 const DAYS: readonly string[] = [
   "Sunday",
@@ -454,42 +453,3 @@ function CourseCard({ course, onRemoveCourse }: CourseCardProps) {
     </Card>
   );
 }
-
-// Helper to determine if a course is ongoing, upcoming (starts within 60 minutes), or inactive
-const getCourseStatus = (course: Course): CourseStatus => {
-  const now = new Date();
-  const daysMap = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const currentDay = daysMap[now.getDay()];
-
-  if (course.day !== currentDay) return "inactive";
-
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
-  const startMinutes = parseTimeToMinutes(course.startTime);
-  const endMinutes = parseTimeToMinutes(course.endTime);
-
-  if (currentMinutes >= startMinutes && currentMinutes <= endMinutes) {
-    return "ongoing";
-  } else if (currentMinutes < startMinutes && startMinutes - currentMinutes <= 60) {
-    return "upcoming";
-  }
-  return "inactive";
-};
-
-// Helper to parse time string ("08:00 AM") to minutes since midnight
-const parseTimeToMinutes = (timeStr: string | undefined): number => {
-  if (!timeStr) return 0;
-  const parts = timeStr.trim().split(" ");
-  if (parts.length < 2) return 0;
-  const timeVal = parts[0];
-  const modifier = parts[1];
-  if (!timeVal || !modifier) return 0;
-
-  const [hoursStr, minutesStr] = timeVal.split(":");
-  let hours = parseInt(hoursStr ?? "0", 10);
-  const minutes = parseInt(minutesStr ?? "0", 10);
-
-  if (modifier === "PM" && hours < 12) hours += 12;
-  if (modifier === "AM" && hours === 12) hours = 0;
-
-  return hours * 60 + minutes;
-};
