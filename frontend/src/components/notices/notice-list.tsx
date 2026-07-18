@@ -1,13 +1,11 @@
 import type { Notice } from "@bindings/notice";
 import { CircleIcon, InboxIcon, Loader2Icon, PinIcon, PinOffIcon } from "lucide-react";
 
-import { useNoticeSelection } from "@/components/notices/use-notice-selection";
-import { formatDate } from "@/components/notices/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useNoticeSelection } from "@/hooks/use-notice-selection";
+import { CATEGORY_STYLES, formatDate, type AltCategory } from "@/lib/notices";
 import { cn } from "@/lib/utils";
-
-import { CATEGORY_STYLES, type AltCategory } from "./type";
 
 interface NoticeListProps {
   notices: Notice[];

@@ -2,7 +2,6 @@ import { DotIcon, FilterIcon, FilterXIcon, RefreshCwIcon } from "lucide-react";
 
 import { AppTooltip } from "@/components/app-tooltip";
 import { HorizontalFadeScroll } from "@/components/horizontal-fade-scroll";
-import { CATEGORIES } from "@/components/notices/type";
 import { SearchInput } from "@/components/search-input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { NoticeFilters } from "@/hooks/use-notices";
+import { CATEGORIES } from "@/lib/notices";
 import { cn } from "@/lib/utils";
 
 interface NoticeListToolbarProps {

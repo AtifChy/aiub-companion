@@ -24,3 +24,14 @@ export const CATEGORY_STYLES: Record<AltCategory, string> = {
   holiday: "border-orange-500/20 bg-orange-500/10 text-orange-500",
   general: "border-zinc-500/20 bg-zinc-500/10 text-zinc-500",
 };
+
+export function formatDate(raw: string): string {
+  if (!raw) return "";
+  const date = new Date(raw);
+  if (isNaN(date.getTime())) return raw;
+  return date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}

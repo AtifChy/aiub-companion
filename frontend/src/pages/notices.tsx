@@ -18,15 +18,13 @@ import { toast } from "sonner";
 import { AppTooltip } from "@/components/app-tooltip";
 import { NoticeList } from "@/components/notices/notice-list";
 import { NoticeListToolbar } from "@/components/notices/notice-list-toolbar";
-import { CATEGORY_STYLES, type AltCategory } from "@/components/notices/type";
-import { NoticeSelectionContext } from "@/components/notices/use-notice-selection";
-import { formatDate } from "@/components/notices/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Separator } from "@/components/ui/separator";
 import { Toggle } from "@/components/ui/toggle";
 import { useDelayedLoading } from "@/hooks/use-delayed-loading";
+import { NoticeSelectionContext } from "@/hooks/use-notice-selection";
 import {
   useNoticeDetail,
   useNoticeList,
@@ -35,6 +33,7 @@ import {
   type NoticeFilters,
 } from "@/hooks/use-notices";
 import { logger } from "@/lib/logger";
+import { CATEGORY_STYLES, formatDate, type AltCategory } from "@/lib/notices";
 import { cn } from "@/lib/utils";
 
 const INITIAL_FILTERS: NoticeFilters = {
