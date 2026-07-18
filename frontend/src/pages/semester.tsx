@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/select";
 import { useDelayedLoading } from "@/hooks/use-delayed-loading";
 import { logger } from "@/lib/logger";
+import { formatEventDate } from "@/lib/semester";
 import { cn } from "@/lib/utils";
 
 const CALENDAR_TYPES = [
@@ -315,24 +316,4 @@ function EventItem({ event }: { event: AcademicEvent }) {
       </div>
     </div>
   );
-}
-
-function formatEventDate(event: AcademicEvent): string {
-  const date = event.date;
-  const endDate = event.endDate ?? null;
-
-  const opts: Intl.DateTimeFormatOptions = {
-    month: "short",
-    day: "numeric",
-  };
-
-  if (date.getFullYear() !== new Date().getFullYear()) {
-    opts.year = "numeric";
-  }
-
-  if (endDate) {
-    return `${date.toLocaleDateString(undefined, opts)} – ${endDate.toLocaleDateString(undefined, opts)}`;
-  }
-
-  return date.toLocaleDateString(undefined, opts);
 }
