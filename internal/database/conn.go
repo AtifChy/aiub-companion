@@ -10,7 +10,7 @@ import (
 	"aiub-companion/internal/meta"
 )
 
-//go:embed sql/schemas/*.sql
+//go:embed migrations/*.sql
 var schemasFS embed.FS
 
 // open initializes the database connection and creates the schema if it doesn't exist
@@ -59,13 +59,13 @@ func dbPath() (string, error) {
 
 // runSchemas reads and executes all SQL schema files from the embedded filesystem
 func runSchemas(conn *sql.DB) error {
-	entries, err := schemasFS.ReadDir("sql/schemas")
+	entries, err := schemasFS.ReadDir("migrations")
 	if err != nil {
 		return fmt.Errorf("read schema dir: %w", err)
 	}
 
 	for _, entry := range entries {
-		sql, err := schemasFS.ReadFile("sql/schemas/" + entry.Name())
+		sql, err := schemasFS.ReadFile("migrations/" + entry.Name())
 		if err != nil {
 			return fmt.Errorf("read schema file %s: %w", entry.Name(), err)
 		}
