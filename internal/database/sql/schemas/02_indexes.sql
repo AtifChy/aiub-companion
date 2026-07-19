@@ -1,13 +1,36 @@
-CREATE INDEX IF NOT EXISTS idx_notices_category ON notices (category);
+-- =============================================================================
+-- notices
+-- =============================================================================
 
-CREATE INDEX IF NOT EXISTS idx_notices_urgency ON notices (is_urgent);
+-- ListNoticesWithState: optional filter  WHERE n.category = ?
+CREATE INDEX IF NOT EXISTS idx_notices_category
+  ON notices (category);
 
-CREATE INDEX IF NOT EXISTS idx_notices_date_source ON notices (posted_date DESC, source_order DESC);
+-- ListNoticesWithState: optional filter  WHERE n.is_urgent = ?
+CREATE INDEX IF NOT EXISTS idx_notices_urgency
+  ON notices (is_urgent);
 
-CREATE INDEX IF NOT EXISTS idx_attachments_notice_id ON notice_attachments (notice_id);
+-- ListNoticesWithState ORDER BY + GetLatestNoticeInfo MAX() aggregates.
+-- Composite so SQLite can satisfy the sort without a separate sort step.
+CREATE INDEX IF NOT EXISTS idx_notices_date_source
+  ON notices (posted_date DESC, source_order DESC);
 
-CREATE INDEX IF NOT EXISTS idx_user_states_pinned ON user_states (is_pinned);
+-- =============================================================================
+-- notice_attachments
+-- =============================================================================
 
-CREATE INDEX IF NOT EXISTS idx_user_states_read ON user_states (is_read);
+-- GetNoticeAttachments: WHERE notice_id = ?
+-- (notice_id is not the PK here, so a dedicated index is required)
+CREATE INDEX IF NOT EXISTS idx_attachments_notice_id
+  ON notice_attachments (notice_id);
 
-CREATE INDEX IF NOT EXISTS idx_offered_search ON offered_courses (course_title, faculty);
+-- =============================================================================
+-- class_schedule
+-- =============================================================================
+
+-- ListOfferedCourses: JOIN class_schedule s ON o.class_id = s.class_id
+-- ListUserRoutine:    JOIN class_schedule s ON o.class_id = s.class_id
+-- class_id is a non-PK FK column; without this index both queries do a full
+-- table scan of class_schedule for every course in offered_courses.
+CREATE INDEX IF NOT EXISTS idx_class_schedule_class_id
+  ON class_schedule (class_id);
