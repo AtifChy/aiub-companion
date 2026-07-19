@@ -14,8 +14,6 @@ import { SettingRow } from "@/components/settings/settings-row";
 import { SettingSelect } from "@/components/settings/settings-select";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { parseWailsError } from "@/lib/error";
-import { logger } from "@/lib/logger";
 
 type Items<T extends string | number> = { value: T; label: string }[];
 
@@ -293,9 +291,8 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
                 variant="outline"
                 onClick={() => {
                   LogService.OpenLogFile().catch((err: unknown) => {
-                    logger.error("Failed to open log file", err);
                     toast.error("Failed to open log file", {
-                      description: parseWailsError(err)?.message,
+                      description: (err as Error).message,
                     });
                   });
                 }}
