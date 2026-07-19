@@ -81,7 +81,6 @@ export default function RoutinePage() {
         importCourses(path);
       })
       .catch((err: unknown) => {
-        logger.error("Failed to open file dialog", err);
         toast.error("Failed to open file dialog", {
           description: (err as Error).message,
         });
