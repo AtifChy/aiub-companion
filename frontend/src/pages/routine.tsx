@@ -19,18 +19,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDebounce } from "@/hooks/use-debounce";
 import { logger } from "@/lib/logger";
-import { getCourseStatus, parseTimeToMinutes } from "@/lib/routine";
+import { DAYS, getCourseStatus, parseTimeToMinutes } from "@/lib/routine";
 import { cn } from "@/lib/utils";
-
-const DAYS: readonly string[] = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
 
 export default function RoutinePage() {
   const queryClient = useQueryClient();

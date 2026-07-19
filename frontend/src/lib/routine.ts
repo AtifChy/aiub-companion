@@ -2,10 +2,18 @@ import type { Schedule } from "@bindings/routine";
 
 export type CourseStatus = "ongoing" | "upcoming" | "inactive";
 
-const daysMap = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+export const DAYS: readonly string[] = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 
 export const getCourseStatus = (schedule: Schedule, now: Date = new Date()): CourseStatus => {
-  const currentDay = daysMap[now.getDay()];
+  const currentDay = DAYS[now.getDay()];
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
   if (schedule.day === currentDay) {
