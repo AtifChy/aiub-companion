@@ -16,6 +16,7 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { AppTooltip } from "@/components/app-tooltip";
+import { HorizontalScroll } from "@/components/horizontal-scroll";
 import { NoticeList } from "@/components/notices/notice-list";
 import { NoticeListToolbar } from "@/components/notices/notice-list-toolbar";
 import { Badge } from "@/components/ui/badge";
@@ -201,9 +202,11 @@ function DetailPanel({ notice, loading, onTogglePin, onToggleRead }: DetailPanel
           )}
         </div>
 
-        <h1 className="my-3 line-clamp-1 font-serif text-xl leading-snug font-bold">
-          {notice.fullTitle || notice.title}
-        </h1>
+        <HorizontalScroll>
+          <h1 className="my-3 font-serif text-xl leading-snug font-bold text-nowrap">
+            {notice.fullTitle || notice.title}
+          </h1>
+        </HorizontalScroll>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <span className="text-xs text-muted-foreground">{formatDate(notice.postedDate)}</span>

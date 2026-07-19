@@ -1,7 +1,7 @@
 import { DotIcon, FilterIcon, FilterXIcon, RefreshCwIcon } from "lucide-react";
 
 import { AppTooltip } from "@/components/app-tooltip";
-import { HorizontalFadeScroll } from "@/components/horizontal-fade-scroll";
+import { HorizontalScroll } from "@/components/horizontal-scroll";
 import { SearchInput } from "@/components/search-input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -56,7 +56,7 @@ export function NoticeListToolbar({
           placeholder="Search notices..."
         />
 
-        <HorizontalFadeScroll className="mt-2 flex scrollbar-none gap-1 overflow-x-auto scroll-smooth px-1 outline-none">
+        <HorizontalScroll className="mt-2 flex gap-1 px-1 outline-none">
           {CATEGORIES.map((cat) => (
             <Badge
               key={cat}
@@ -73,7 +73,7 @@ export function NoticeListToolbar({
               {cat}
             </Badge>
           ))}
-        </HorizontalFadeScroll>
+        </HorizontalScroll>
       </div>
 
       {/*list header*/}
