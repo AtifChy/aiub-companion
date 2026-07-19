@@ -161,38 +161,3 @@ func toCoursesImpl[T sqlc.ListOfferedCoursesRow | sqlc.ListUserRoutineRow](
 
 	return courses
 }
-
-// func toCourses(rows []sqlc.OfferedCourse) []Course {
-// 	coursesByID := make(map[string]*Course, len(rows))
-//
-// 	for i := range rows {
-// 		course, exists := coursesByID[rows[i].ClassID]
-//
-// 		if !exists {
-// 			course = &Course{
-// 				ClassID:     rows[i].ClassID,
-// 				CourseCode:  rows[i].CourseCode.String,
-// 				CourseTitle: rows[i].CourseTitle,
-// 				Section:     rows[i].Section,
-// 				Faculty:     rows[i].Faculty.String,
-// 				Department:  rows[i].Department.String,
-// 			}
-// 			coursesByID[rows[i].ClassID] = course
-// 		}
-//
-// 		course.Schedules = append(course.Schedules, Schedule{
-// 			Type:      rows[i].ClassType.String,
-// 			Day:       rows[i].Day.String,
-// 			StartTime: rows[i].StartTime.String,
-// 			EndTime:   rows[i].EndTime.String,
-// 			Room:      rows[i].Room.String,
-// 		})
-// 	}
-//
-// 	courses := make([]Course, 0, len(coursesByID))
-// 	for _, course := range coursesByID {
-// 		courses = append(courses, *course)
-// 	}
-//
-// 	return courses
-// }
