@@ -14,6 +14,7 @@ type Repository interface {
 	ListUserRoutine(ctx context.Context) ([]Course, error)
 	ListOfferedCourses(ctx context.Context) ([]Course, error)
 	InsertOfferedCourse(ctx context.Context, c Course) error
+	InsertClassSchedule(ctx context.Context, classID string, schedule Schedule) error
 	AddToUserRoutine(ctx context.Context, classID string) error
 	RemoveFromUserRoutine(ctx context.Context, classID string) error
 	ClearOfferedCourses(ctx context.Context) error
@@ -42,7 +43,29 @@ func (r *repository) ListUserRoutine(ctx context.Context) ([]Course, error) {
 	if err != nil {
 		return nil, err
 	}
-	courses := toCourses(rows)
+	courses := toCoursesImpl(
+		rows,
+		func(row sqlc.ListUserRoutineRow) string { return row.ClassID },
+		func(row sqlc.ListUserRoutineRow) Course {
+			return Course{
+				ClassID:     row.ClassID,
+				CourseCode:  row.CourseCode.String,
+				CourseTitle: row.CourseTitle,
+				Section:     row.Section,
+				Faculty:     row.Faculty.String,
+				Department:  row.Department.String,
+			}
+		},
+		func(row sqlc.ListUserRoutineRow) Schedule {
+			return Schedule{
+				Type:      row.ClassType.String,
+				Day:       row.Day.String,
+				StartTime: row.StartTime.String,
+				EndTime:   row.EndTime.String,
+				Room:      row.Room.String,
+			}
+		},
+	)
 	return courses, nil
 }
 
@@ -51,32 +74,51 @@ func (r *repository) ListOfferedCourses(ctx context.Context) ([]Course, error) {
 	if err != nil {
 		return nil, err
 	}
-	return toCourses(rows), nil
+	return toCoursesImpl(
+		rows,
+		func(row sqlc.ListOfferedCoursesRow) string { return row.ClassID },
+		func(row sqlc.ListOfferedCoursesRow) Course {
+			return Course{
+				ClassID:     row.ClassID,
+				CourseCode:  row.CourseCode.String,
+				CourseTitle: row.CourseTitle,
+				Section:     row.Section,
+				Faculty:     row.Faculty.String,
+				Department:  row.Department.String,
+			}
+		},
+		func(row sqlc.ListOfferedCoursesRow) Schedule {
+			return Schedule{
+				Type:      row.ClassType.String,
+				Day:       row.Day.String,
+				StartTime: row.StartTime.String,
+				EndTime:   row.EndTime.String,
+				Room:      row.Room.String,
+			}
+		},
+	), nil
 }
 
 func (r *repository) InsertOfferedCourse(ctx context.Context, c Course) error {
-	param := sqlc.InsertOfferedCourseParams{
+	return r.queries.InsertOfferedCourse(ctx, sqlc.InsertOfferedCourseParams{
 		ClassID:     c.ClassID,
 		CourseCode:  database.StringOrNull(c.CourseCode),
 		CourseTitle: c.CourseTitle,
 		Section:     c.Section,
 		Faculty:     database.StringOrNull(c.Faculty),
 		Department:  database.StringOrNull(c.Department),
-	}
+	})
+}
 
-	for _, schedule := range c.Schedules {
-		param.ClassType = database.StringOrNull(schedule.Type)
-		param.Day = database.StringOrNull(schedule.Day)
-		param.StartTime = database.StringOrNull(schedule.StartTime)
-		param.EndTime = database.StringOrNull(schedule.EndTime)
-		param.Room = database.StringOrNull(schedule.Room)
-
-		if err := r.queries.InsertOfferedCourse(ctx, param); err != nil {
-			return err
-		}
-	}
-
-	return nil
+func (r *repository) InsertClassSchedule(ctx context.Context, classID string, schedule Schedule) error {
+	return r.queries.InsertClassSchedule(ctx, sqlc.InsertClassScheduleParams{
+		ClassID:   classID,
+		ClassType: database.StringOrNull(schedule.Type),
+		Day:       database.StringOrNull(schedule.Day),
+		StartTime: database.StringOrNull(schedule.StartTime),
+		EndTime:   database.StringOrNull(schedule.EndTime),
+		Room:      database.StringOrNull(schedule.Room),
+	})
 }
 
 func (r *repository) AddToUserRoutine(ctx context.Context, classID string) error {
@@ -91,31 +133,25 @@ func (r *repository) ClearOfferedCourses(ctx context.Context) error {
 	return r.queries.ClearOfferedCourses(ctx)
 }
 
-func toCourses(rows []sqlc.OfferedCourse) []Course {
+func toCoursesImpl[T sqlc.ListOfferedCoursesRow | sqlc.ListUserRoutineRow](
+	rows []T,
+	getClassID func(T) string,
+	getCourses func(T) Course,
+	getSchedules func(T) Schedule,
+) []Course {
 	coursesByID := make(map[string]*Course, len(rows))
 
 	for i := range rows {
-		course, exists := coursesByID[rows[i].ClassID]
+		id := getClassID(rows[i])
 
+		course, exists := coursesByID[id]
 		if !exists {
-			course = &Course{
-				ClassID:     rows[i].ClassID,
-				CourseCode:  rows[i].CourseCode.String,
-				CourseTitle: rows[i].CourseTitle,
-				Section:     rows[i].Section,
-				Faculty:     rows[i].Faculty.String,
-				Department:  rows[i].Department.String,
-			}
-			coursesByID[rows[i].ClassID] = course
+			c := getCourses(rows[i])
+			course = &c
+			coursesByID[id] = course
 		}
 
-		course.Schedules = append(course.Schedules, Schedule{
-			Type:      rows[i].ClassType.String,
-			Day:       rows[i].Day.String,
-			StartTime: rows[i].StartTime.String,
-			EndTime:   rows[i].EndTime.String,
-			Room:      rows[i].Room.String,
-		})
+		course.Schedules = append(course.Schedules, getSchedules(rows[i]))
 	}
 
 	courses := make([]Course, 0, len(coursesByID))
@@ -125,3 +161,38 @@ func toCourses(rows []sqlc.OfferedCourse) []Course {
 
 	return courses
 }
+
+// func toCourses(rows []sqlc.OfferedCourse) []Course {
+// 	coursesByID := make(map[string]*Course, len(rows))
+//
+// 	for i := range rows {
+// 		course, exists := coursesByID[rows[i].ClassID]
+//
+// 		if !exists {
+// 			course = &Course{
+// 				ClassID:     rows[i].ClassID,
+// 				CourseCode:  rows[i].CourseCode.String,
+// 				CourseTitle: rows[i].CourseTitle,
+// 				Section:     rows[i].Section,
+// 				Faculty:     rows[i].Faculty.String,
+// 				Department:  rows[i].Department.String,
+// 			}
+// 			coursesByID[rows[i].ClassID] = course
+// 		}
+//
+// 		course.Schedules = append(course.Schedules, Schedule{
+// 			Type:      rows[i].ClassType.String,
+// 			Day:       rows[i].Day.String,
+// 			StartTime: rows[i].StartTime.String,
+// 			EndTime:   rows[i].EndTime.String,
+// 			Room:      rows[i].Room.String,
+// 		})
+// 	}
+//
+// 	courses := make([]Course, 0, len(coursesByID))
+// 	for _, course := range coursesByID {
+// 		courses = append(courses, *course)
+// 	}
+//
+// 	return courses
+// }

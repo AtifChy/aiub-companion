@@ -50,6 +50,12 @@ func (s *Service) saveCourses(ctx context.Context, courses []Course) error {
 			if err := txRepo.InsertOfferedCourse(ctx, courses[i]); err != nil {
 				return fmt.Errorf("insert offered course: %w", err)
 			}
+
+			for _, schedule := range courses[i].Schedules {
+				if err := txRepo.InsertClassSchedule(ctx, courses[i].ClassID, schedule); err != nil {
+					return fmt.Errorf("insert class schedule: %w", err)
+				}
+			}
 		}
 
 		return nil
