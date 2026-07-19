@@ -15,7 +15,7 @@ INSERT INTO
   user_routine (class_id)
 VALUES
   (?)
-ON CONFLICT DO NOTHING
+ON CONFLICT(class_id) DO NOTHING
 `
 
 func (q *Queries) AddToUserRoutine(ctx context.Context, classID string) error {
@@ -32,11 +32,39 @@ func (q *Queries) ClearOfferedCourses(ctx context.Context) error {
 	return err
 }
 
+const insertClassSchedule = `-- name: InsertClassSchedule :exec
+INSERT INTO
+  class_schedule (class_id, class_type, day, start_time, end_time, room)
+VALUES
+  (?, ?, ?, ?, ?, ?)
+`
+
+type InsertClassScheduleParams struct {
+	ClassID   string
+	ClassType sql.NullString
+	Day       sql.NullString
+	StartTime sql.NullString
+	EndTime   sql.NullString
+	Room      sql.NullString
+}
+
+func (q *Queries) InsertClassSchedule(ctx context.Context, arg InsertClassScheduleParams) error {
+	_, err := q.db.ExecContext(ctx, insertClassSchedule,
+		arg.ClassID,
+		arg.ClassType,
+		arg.Day,
+		arg.StartTime,
+		arg.EndTime,
+		arg.Room,
+	)
+	return err
+}
+
 const insertOfferedCourse = `-- name: InsertOfferedCourse :exec
 INSERT INTO
-  offered_courses (class_id, course_code, course_title, section, faculty, class_type, day, start_time, end_time, room, department)
+  offered_courses (class_id, course_code, course_title, section, faculty, department)
 VALUES
-  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  (?, ?, ?, ?, ?, ?)
 ON CONFLICT DO NOTHING
 `
 
@@ -46,11 +74,6 @@ type InsertOfferedCourseParams struct {
 	CourseTitle string
 	Section     string
 	Faculty     sql.NullString
-	ClassType   sql.NullString
-	Day         sql.NullString
-	StartTime   sql.NullString
-	EndTime     sql.NullString
-	Room        sql.NullString
 	Department  sql.NullString
 }
 
@@ -61,11 +84,6 @@ func (q *Queries) InsertOfferedCourse(ctx context.Context, arg InsertOfferedCour
 		arg.CourseTitle,
 		arg.Section,
 		arg.Faculty,
-		arg.ClassType,
-		arg.Day,
-		arg.StartTime,
-		arg.EndTime,
-		arg.Room,
 		arg.Department,
 	)
 	return err
@@ -73,32 +91,57 @@ func (q *Queries) InsertOfferedCourse(ctx context.Context, arg InsertOfferedCour
 
 const listOfferedCourses = `-- name: ListOfferedCourses :many
 SELECT
-  class_id, course_code, course_title, section, faculty, class_type, day, start_time, end_time, room, department
+  o.class_id,
+  o.course_code,
+  o.course_title,
+  o.section,
+  o.faculty,
+  o.department,
+  s.class_type,
+  s.day,
+  s.start_time,
+  s.end_time,
+  s.room
 FROM
-  offered_courses
+  offered_courses o
+  JOIN class_schedule s ON o.class_id = s.class_id
 `
 
-func (q *Queries) ListOfferedCourses(ctx context.Context) ([]OfferedCourse, error) {
+type ListOfferedCoursesRow struct {
+	ClassID     string
+	CourseCode  sql.NullString
+	CourseTitle string
+	Section     string
+	Faculty     sql.NullString
+	Department  sql.NullString
+	ClassType   sql.NullString
+	Day         sql.NullString
+	StartTime   sql.NullString
+	EndTime     sql.NullString
+	Room        sql.NullString
+}
+
+func (q *Queries) ListOfferedCourses(ctx context.Context) ([]ListOfferedCoursesRow, error) {
 	rows, err := q.db.QueryContext(ctx, listOfferedCourses)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []OfferedCourse{}
+	items := []ListOfferedCoursesRow{}
 	for rows.Next() {
-		var i OfferedCourse
+		var i ListOfferedCoursesRow
 		if err := rows.Scan(
 			&i.ClassID,
 			&i.CourseCode,
 			&i.CourseTitle,
 			&i.Section,
 			&i.Faculty,
+			&i.Department,
 			&i.ClassType,
 			&i.Day,
 			&i.StartTime,
 			&i.EndTime,
 			&i.Room,
-			&i.Department,
 		); err != nil {
 			return nil, err
 		}
@@ -115,35 +158,70 @@ func (q *Queries) ListOfferedCourses(ctx context.Context) ([]OfferedCourse, erro
 
 const listUserRoutine = `-- name: ListUserRoutine :many
 SELECT
-  o.class_id, o.course_code, o.course_title, o.section, o.faculty, o.class_type, o.day, o.start_time, o.end_time, o.room, o.department
+  o.class_id,
+  o.course_code,
+  o.course_title,
+  o.section,
+  o.faculty,
+  o.department,
+  s.class_type,
+  s.day,
+  s.start_time,
+  s.end_time,
+  s.room
 FROM
   user_routine u
   JOIN offered_courses o ON u.class_id = o.class_id
+  JOIN class_schedule s ON o.class_id = s.class_id
 ORDER BY
-  o.day ASC, o.start_time ASC
+  CASE s.day
+    WHEN 'Sunday' THEN 1
+    WHEN 'Monday' THEN 2
+    WHEN 'Tuesday' THEN 3
+    WHEN 'Wednesday' THEN 4
+    WHEN 'Thursday' THEN 5
+    WHEN 'Friday' THEN 6
+    WHEN 'Saturday' THEN 7
+    ELSE 8
+  END,
+  s.start_time ASC
 `
 
-func (q *Queries) ListUserRoutine(ctx context.Context) ([]OfferedCourse, error) {
+type ListUserRoutineRow struct {
+	ClassID     string
+	CourseCode  sql.NullString
+	CourseTitle string
+	Section     string
+	Faculty     sql.NullString
+	Department  sql.NullString
+	ClassType   sql.NullString
+	Day         sql.NullString
+	StartTime   sql.NullString
+	EndTime     sql.NullString
+	Room        sql.NullString
+}
+
+func (q *Queries) ListUserRoutine(ctx context.Context) ([]ListUserRoutineRow, error) {
 	rows, err := q.db.QueryContext(ctx, listUserRoutine)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []OfferedCourse{}
+	items := []ListUserRoutineRow{}
 	for rows.Next() {
-		var i OfferedCourse
+		var i ListUserRoutineRow
 		if err := rows.Scan(
 			&i.ClassID,
 			&i.CourseCode,
 			&i.CourseTitle,
 			&i.Section,
 			&i.Faculty,
+			&i.Department,
 			&i.ClassType,
 			&i.Day,
 			&i.StartTime,
 			&i.EndTime,
 			&i.Room,
-			&i.Department,
 		); err != nil {
 			return nil, err
 		}

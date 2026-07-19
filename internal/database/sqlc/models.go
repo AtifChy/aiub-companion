@@ -14,6 +14,16 @@ type CalendarCache struct {
 	ScrapedAt    string
 }
 
+type ClassSchedule struct {
+	ID        int64
+	ClassID   string
+	ClassType sql.NullString
+	Day       sql.NullString
+	StartTime sql.NullString
+	EndTime   sql.NullString
+	Room      sql.NullString
+}
+
 type Notice struct {
 	ID          string
 	Title       string
@@ -44,11 +54,6 @@ type OfferedCourse struct {
 	CourseTitle string
 	Section     string
 	Faculty     sql.NullString
-	ClassType   sql.NullString
-	Day         sql.NullString
-	StartTime   sql.NullString
-	EndTime     sql.NullString
-	Room        sql.NullString
 	Department  sql.NullString
 }
 
