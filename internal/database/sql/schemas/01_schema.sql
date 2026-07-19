@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS notices (
   source_order INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
+) WITHOUT ROWID;
 
 CREATE TABLE IF NOT EXISTS notice_attachments (
   id TEXT PRIMARY KEY,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS notice_attachments (
   local_path TEXT,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (notice_id) REFERENCES notices (id) ON DELETE CASCADE
-);
+) WITHOUT ROWID;
 
 CREATE TABLE IF NOT EXISTS user_states (
   notice_id TEXT PRIMARY KEY,
@@ -30,30 +30,36 @@ CREATE TABLE IF NOT EXISTS user_states (
   pinned_at TEXT,
   last_read_at TEXT,
   FOREIGN KEY (notice_id) REFERENCES notices (id) ON DELETE CASCADE
-);
+) WITHOUT ROWID;
 
 CREATE TABLE IF NOT EXISTS calendar_cache (
   calendar_type TEXT PRIMARY KEY,
   data TEXT NOT NULL,
   scraped_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
+) WITHOUT ROWID;
 
 CREATE TABLE IF NOT EXISTS offered_courses (
-  class_id TEXT NOT NULL,
+  class_id TEXT NOT NULL PRIMARY KEY,
   course_code TEXT,
   course_title TEXT NOT NULL,
   section TEXT NOT NULL,
   faculty TEXT,
+  department TEXT
+) WITHOUT ROWID;
+
+CREATE TABLE IF NOT EXISTS class_schedule (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  class_id TEXT NOT NULL,
   class_type TEXT,
   day TEXT,
   start_time TEXT,
   end_time TEXT,
   room TEXT,
-  department TEXT,
-  PRIMARY KEY (class_id, day, start_time)
+  FOREIGN KEY (class_id) REFERENCES offered_courses (class_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS user_routine (
-  class_id TEXT NOT NULL,
-  added_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
+  class_id TEXT NOT NULL PRIMARY KEY,
+  added_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (class_id) REFERENCES offered_courses (class_id) ON DELETE CASCADE
+) WITHOUT ROWID;
