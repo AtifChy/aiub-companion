@@ -395,7 +395,8 @@ ON CONFLICT(id) DO UPDATE
     posted_date = EXCLUDED.posted_date,
     category = EXCLUDED.category,
     is_urgent = EXCLUDED.is_urgent,
-    source_order = EXCLUDED.source_order
+    source_order = EXCLUDED.source_order,
+    updated_at = CURRENT_TIMESTAMP
   WHERE
     COALESCE(notices.title, '') != COALESCE(EXCLUDED.title, '')
     OR COALESCE(notices.posted_date, '') != COALESCE(EXCLUDED.posted_date, '')
