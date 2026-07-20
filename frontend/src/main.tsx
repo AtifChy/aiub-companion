@@ -12,9 +12,7 @@ if (!container) {
 const root = createRoot(container);
 
 if (import.meta.env.DEV) {
-  void import("react-scan").then(({ scan }) => {
-    scan();
-  });
+  void import("react-scan").then(({ scan }) => scan());
 }
 
 root.render(

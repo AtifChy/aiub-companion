@@ -32,12 +32,12 @@ export default defineConfig({
           groups: [
             {
               name: "react",
-              test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom)[\\/]/,
+              test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|@tanstack[\\/]react-query)[\\/]/,
               priority: 20,
             },
             {
               name: "ui",
-              test: /[\\/]node_modules[\\/](@radix-ui|lucide-react|sonner|clsx|tailwind-merge|class-variance-authority|framer-motion)[\\/]/,
+              test: /[\\/]node_modules[\\/](@radix-ui|@base-ui|lucide-react|sonner|clsx|tailwind-merge|class-variance-authority|framer-motion)[\\/]/,
               priority: 15,
             },
             {
