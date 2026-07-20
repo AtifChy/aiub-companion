@@ -25,11 +25,11 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 import { Separator } from "@/components/ui/separator";
 import { Toggle } from "@/components/ui/toggle";
 import { useDelayedLoading } from "@/hooks/use-delayed-loading";
+import { useNoticeMutations } from "@/hooks/use-notice-mutation";
 import { NoticeSelectionContext } from "@/hooks/use-notice-selection";
 import {
   useNoticeDetail,
   useNoticeList,
-  useNoticeMutations,
   useSync,
   type NoticeFilters,
 } from "@/hooks/use-notices";

@@ -1,4 +1,4 @@
-import { Notice, Service as NoticeService } from "@bindings/notice";
+import { Service as NoticeService } from "@bindings/notice";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Events } from "@wailsio/runtime";
 import { useEffect } from "react";
@@ -77,64 +77,6 @@ export function useNoticeDetail(selectedId: string | null, readOnOpen: (id: stri
   };
 
   return { query, readNotice };
-}
-
-export function useNoticeMutations() {
-  const { mutate: toggleRead } = useToggleField("isRead", NoticeService.ToggleNoticeRead);
-  const { mutate: togglePin } = useToggleField("isPinned", NoticeService.ToggleNoticePinned);
-  return { toggleRead, togglePin };
-}
-
-function useToggleField(
-  field: "isRead" | "isPinned",
-  mutationFn: (id: string, next: boolean) => Promise<void>,
-) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, next }: { id: string; next: boolean }) => mutationFn(id, next),
-
-    onMutate: async ({ id, next }) => {
-      await queryClient.cancelQueries({ queryKey: ["notices"] });
-      await queryClient.cancelQueries({ queryKey: ["noticeDetails", id] });
-
-      const oldList = queryClient.getQueriesData<Notice[]>({
-        queryKey: ["notices"],
-      });
-      const oldDetail = queryClient.getQueryData<Notice>(["noticeDetails", id]);
-
-      queryClient.setQueriesData<Notice[]>(
-        { queryKey: ["notices"] },
-        (old) =>
-          old?.map((n) => (n.id === id ? Object.assign(new Notice(), n, { [field]: next }) : n)) ??
-          old,
-      );
-      queryClient.setQueriesData<Notice>({ queryKey: ["noticeDetails", id] }, (old) =>
-        old ? Object.assign(new Notice(), old, { [field]: next }) : old,
-      );
-
-      return { oldList, oldDetail };
-    },
-
-    onError: (err, { id }, context) => {
-      context?.oldList.forEach(([key, data]) => {
-        queryClient.setQueryData(key, data);
-      });
-      if (context?.oldDetail !== undefined) {
-        queryClient.setQueryData(["noticeDetails", id], context.oldDetail);
-      }
-
-      logger.error(`Failed to toggle ${field} status: `, err);
-      toast.error(`Failed to toggle ${field} status`, {
-        description: err.message,
-      });
-    },
-
-    onSettled: (_data, _err, { id }) => {
-      void queryClient.invalidateQueries({ queryKey: ["notices"] });
-      void queryClient.invalidateQueries({ queryKey: ["noticeDetails", id] });
-    },
-  });
 }
 
 export function useSync() {
