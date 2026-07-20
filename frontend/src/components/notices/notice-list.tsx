@@ -4,6 +4,7 @@ import { CircleIcon, InboxIcon, Loader2Icon, PinIcon, PinOffIcon } from "lucide-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useNoticeMutations } from "@/hooks/use-notice-mutation";
 import { useNoticeSelection } from "@/hooks/use-notice-selection";
 import { CATEGORY_STYLES, formatDate, type AltCategory } from "@/lib/notices";
 import { cn } from "@/lib/utils";
@@ -12,7 +13,6 @@ interface NoticeListProps {
   notices: Notice[];
   loading: boolean;
   error: Error | null;
-  onTogglePin: (id: string, next: boolean) => void;
   onRetry: () => void;
   onClearFilters: () => void;
   hasActiveFilters: boolean;
@@ -22,7 +22,6 @@ export function NoticeList({
   notices,
   loading,
   error,
-  onTogglePin,
   onRetry,
   onClearFilters,
   hasActiveFilters,
@@ -75,14 +74,7 @@ export function NoticeList({
   return (
     <div className="flex-1 scrollbar-thin scrollbar-thumb-accent overflow-y-auto">
       {notices.map((notice) => (
-        <NoticeListItem
-          key={notice.id}
-          notice={notice}
-          onTogglePin={(e) => {
-            e.stopPropagation();
-            onTogglePin(notice.id, !notice.isPinned);
-          }}
-        />
+        <NoticeListItem key={notice.id} notice={notice} />
       ))}
     </div>
   );
@@ -90,13 +82,14 @@ export function NoticeList({
 
 interface NoticeListItemProps {
   notice: Notice;
-  onTogglePin: (e: React.MouseEvent) => void;
 }
 
-function NoticeListItem({ notice, onTogglePin }: NoticeListItemProps) {
+function NoticeListItem({ notice }: NoticeListItemProps) {
   const { selectedId, select, selectionMode, checkedIds, toggleChecked } = useNoticeSelection();
   const selected = selectedId === notice.id;
   const checked = checkedIds.has(notice.id);
+
+  const { togglePin } = useNoticeMutations();
 
   const handleClick = () => {
     if (selectionMode) {
@@ -161,7 +154,7 @@ function NoticeListItem({ notice, onTogglePin }: NoticeListItemProps) {
             )}
             <Button
               variant="ghost"
-              onClick={onTogglePin}
+              onClick={() => togglePin({ id: notice.id, next: !notice.isPinned })}
               tabIndex={notice.isPinned ? 0 : -1}
               className={cn(
                 "h-auto p-0.5 opacity-0 group-hover:opacity-100",

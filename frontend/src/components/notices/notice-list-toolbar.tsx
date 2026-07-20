@@ -23,8 +23,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Toggle } from "@/components/ui/toggle";
+import { useSync } from "@/hooks/use-notice-mutation";
 import { useNoticeSelection } from "@/hooks/use-notice-selection";
-import { useSync, type NoticeFilters } from "@/hooks/use-notices";
+import { type NoticeFilters } from "@/hooks/use-notices";
 import { CATEGORIES } from "@/lib/notices";
 import { cn } from "@/lib/utils";
 
@@ -113,9 +114,9 @@ export function NoticeListToolbar({
               className="h-auto rounded-md p-0.5 data-[state=on]:text-primary"
             >
               {selectionMode ? (
-                <CheckSquareIcon className="size-3.5" />
+                <CheckSquareIcon className="fill size-3.5 fill-primary/10 text-primary" />
               ) : (
-                <SquareIcon className="size-3.5" />
+                <SquareIcon className="size-3.5 fill-foreground/10" />
               )}
             </Toggle>
           </AppTooltip>

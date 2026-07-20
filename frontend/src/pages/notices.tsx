@@ -1,5 +1,5 @@
 import type { Notice } from "@bindings/notice";
-import { Browser, Events } from "@wailsio/runtime";
+import { Browser } from "@wailsio/runtime";
 import {
   CircleCheckBigIcon,
   CircleIcon,
@@ -12,7 +12,7 @@ import {
   PinIcon,
   PinOffIcon,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { AppTooltip } from "@/components/app-tooltip";
@@ -26,9 +26,9 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 import { Separator } from "@/components/ui/separator";
 import { Toggle } from "@/components/ui/toggle";
 import { useDelayedLoading } from "@/hooks/use-delayed-loading";
-import { useNoticeMutations } from "@/hooks/use-notice-mutation";
-import { NoticeSelectionContext } from "@/hooks/use-notice-selection";
-import { useNoticeDetail, useNoticeList, type NoticeFilters } from "@/hooks/use-notices";
+import { useNoticeDetailSelection } from "@/hooks/use-notice-detail-selection";
+import { NoticeSelectionContext, useNoticeSelectionState } from "@/hooks/use-notice-selection";
+import { useNoticeList, type NoticeFilters } from "@/hooks/use-notices";
 import { logger } from "@/lib/logger";
 import { CATEGORY_STYLES, formatDate, type AltCategory } from "@/lib/notices";
 import { cn } from "@/lib/utils";
@@ -42,79 +42,17 @@ const INITIAL_FILTERS: NoticeFilters = {
 };
 
 export default function NoticesPage() {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selection = useNoticeSelectionState();
+  const { selectedId, select, notice, isLoading, toggleRead, togglePin } =
+    useNoticeDetailSelection();
 
-  const [selectionMode, setSelectionMode] = useState(false);
-  const [checkedIds, setCheckedIds] = useState<Set<string>>(() => new Set());
-
-  const toggleChecked = (id: string) => {
-    setCheckedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  };
-
-  const selectAll = (ids: string[]) => {
-    setCheckedIds(new Set(ids));
-  };
-
-  const clearChecked = () => {
-    setCheckedIds(new Set());
-  };
-
-  const handleSelectionMode = (on: boolean) => {
-    setSelectionMode(on);
-    if (!on) clearChecked();
-  };
-
-  const { toggleRead, togglePin } = useNoticeMutations();
-  const { query: detailQuery, readNotice } = useNoticeDetail(selectedId, (id) => {
-    toggleRead({ id, next: true });
-  });
-
-  const detail = detailQuery.data ?? null;
-
-  const select = useCallback(
-    (id: string) => {
-      if (selectedId === id) return;
-      setSelectedId(id);
-      readNotice(id);
-    },
-    [selectedId, readNotice],
-  );
-
-  useEffect(() => {
-    const unsubscribe = Events.On("notice:open", (event) => {
-      select(event.data);
-    });
-    return unsubscribe;
-  }, [select]);
+  const contextValue = { selectedId, select, ...selection };
 
   return (
     <ResizablePanelGroup orientation="horizontal" className="flex h-full">
       <ResizablePanel defaultSize="22rem" minSize="20rem" className="flex flex-col bg-card">
-        <NoticeSelectionContext
-          value={{
-            selectedId,
-            select,
-            selectionMode,
-            setSelectionMode: handleSelectionMode,
-            checkedIds,
-            toggleChecked,
-            selectAll,
-            clearChecked,
-          }}
-        >
-          <NoticeListPanel
-            onTogglePin={(id, next) => {
-              togglePin({ id, next });
-            }}
-          />
+        <NoticeSelectionContext value={contextValue}>
+          <NoticeListPanel />
         </NoticeSelectionContext>
       </ResizablePanel>
 
@@ -122,13 +60,13 @@ export default function NoticesPage() {
 
       <ResizablePanel defaultSize="60%" minSize="30%" className="min-w-0">
         <DetailPanel
-          notice={detail}
-          loading={detailQuery.isLoading}
+          notice={notice ?? null}
+          loading={isLoading}
           onTogglePin={() => {
-            if (detail) togglePin({ id: detail.id, next: !detail.isPinned });
+            if (notice) togglePin({ id: notice.id, next: !notice.isPinned });
           }}
           onToggleRead={() => {
-            if (detail) toggleRead({ id: detail.id, next: !detail.isRead });
+            if (notice) toggleRead({ id: notice.id, next: !notice.isRead });
           }}
         />
       </ResizablePanel>
@@ -136,11 +74,7 @@ export default function NoticesPage() {
   );
 }
 
-interface NoticeListPanelProps {
-  onTogglePin: (id: string, next: boolean) => void;
-}
-
-function NoticeListPanel({ onTogglePin }: NoticeListPanelProps) {
+function NoticeListPanel() {
   const [filters, setFilters] = useState<NoticeFilters>(INITIAL_FILTERS);
   const { query } = useNoticeList(filters);
 
@@ -163,7 +97,6 @@ function NoticeListPanel({ onTogglePin }: NoticeListPanelProps) {
         notices={notices}
         loading={query.isLoading}
         error={query.error}
-        onTogglePin={onTogglePin}
         onRetry={() => void query.refetch()}
         onClearFilters={() => {
           setFilters(INITIAL_FILTERS);

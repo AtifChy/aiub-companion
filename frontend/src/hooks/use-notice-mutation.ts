@@ -2,6 +2,9 @@ import { Notice, Service as NoticeService } from "@bindings/notice";
 import { useMutation, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+import { useSettings } from "@/components/providers/settings-provider";
+import { logger } from "@/lib/logger";
+
 type ToggleableField = "isRead" | "isPinned";
 
 const noticeKeys = {
@@ -146,4 +149,30 @@ export function useNoticeMutations() {
     bulkToggleRead: bulkToggleReadMutation.mutate,
     bulkTogglePin: bulkTogglePinMutation.mutate,
   };
+}
+
+export function useSync() {
+  const queryClient = useQueryClient();
+  const { config } = useSettings();
+
+  const syncMutation = useMutation({
+    mutationFn: () => NoticeService.SyncNotices(config.sync.fetch_count),
+    onSuccess: (notices) => {
+      const count = notices.length;
+      if (count > 0) {
+        toast.success(`${String(count)} new notice${count !== 1 ? "s" : ""} synced`);
+      } else {
+        toast.info("No new notices to sync");
+      }
+      void queryClient.invalidateQueries({ queryKey: ["notices"] });
+    },
+    onError: (err) => {
+      logger.error("Failed to sync notices", err);
+      toast.error("Failed to sync notices", {
+        description: err.message,
+      });
+    },
+  });
+
+  return { syncing: syncMutation.isPending, sync: syncMutation.mutate };
 }
