@@ -1,3 +1,65 @@
+## [0.5.0] - 2026-07-20
+
+### 🚀 Features
+
+- *(frontend)* Add oxlint configuration [`b43505e`](https://github.com/AtifChy/aiub-companion/commit/b43505ec2f577684bb634a92310ec5abffcc98a6)
+- *(frontend)* Add vitest for unit tests [`dc917ce`](https://github.com/AtifChy/aiub-companion/commit/dc917ce59882faba7cdd6bf1622af94e4e1a4345)
+- *(db)* [**breaking**] Add new tables and modify existing ones [`93e9934`](https://github.com/AtifChy/aiub-companion/commit/93e993477afe542de2b52effdc51438054814443)
+- *(db)* [**breaking**] Split class schedule from offered courses [`b3671bb`](https://github.com/AtifChy/aiub-companion/commit/b3671bb1188c6b10f0d049b0a675361bad6c3baf)
+- *(routine)* [**breaking**] Add class schedule insertion [`07897d5`](https://github.com/AtifChy/aiub-companion/commit/07897d53d70570c0713db5f8304a06358bd6e876)
+- *(tooltip)* Add side prop [`a65d7de`](https://github.com/AtifChy/aiub-companion/commit/a65d7de84dabef5b9d5301660191ec00f63f24dc)
+- *(notices)* Extract notice mutations hook [`73299d0`](https://github.com/AtifChy/aiub-companion/commit/73299d03ef3f27abc575726bb317fd9a9cc0cb59)
+- *(notices)* Add bulk selection and actions [`75c880b`](https://github.com/AtifChy/aiub-companion/commit/75c880b164eb7fda900bc1b337c4c872876f517f)
+
+### 🐛 Bug Fixes
+
+- *(db:notice)* Update notice on conflict [`1b42e58`](https://github.com/AtifChy/aiub-companion/commit/1b42e58fcfb15a979ecd99f069bda66ac8aa774f)
+
+### 💼 Other
+
+- Remove tools.go; use go.mod tool directive [`f6cf34d`](https://github.com/AtifChy/aiub-companion/commit/f6cf34d1e118ab7c58dbbc767a66dcf60958f9c4)
+
+### 🚜 Refactor
+
+- *(lint)* Fix linting issues in frontend components and hooks [`adc28f8`](https://github.com/AtifChy/aiub-companion/commit/adc28f8f6838f45faf3d78b9d4c895488e5494f6)
+- *(notices)* Move notice types and utils to lib [`792d656`](https://github.com/AtifChy/aiub-companion/commit/792d6566200159987e1a916e0c57b1a8c99c4fa8)
+- *(routine)* Extract course status logic [`6a5853e`](https://github.com/AtifChy/aiub-companion/commit/6a5853ef005e955e7deee4bbc67a1cb5493cb7ea)
+- *(semester)* Move format event date to lib [`f6054e5`](https://github.com/AtifChy/aiub-companion/commit/f6054e5b822eedd51e8a0f8d05e48279db245383)
+- *(db)* Rename `GetUserRoutine` to `ListUserRoutine` [`5a71f5c`](https://github.com/AtifChy/aiub-companion/commit/5a71f5c6aee3f0cbccecf750f5abf62f44a7e430)
+- *(routine)* Split course and schedule data [`7e32fff`](https://github.com/AtifChy/aiub-companion/commit/7e32fffc79cb85158fe79e70017da7184780eb9e)
+- *(routine)* Update routine logic for multiple schedules [`656d462`](https://github.com/AtifChy/aiub-companion/commit/656d462eb2da10efcf2535b7c7263532b95c687e)
+- *(sql)* Rewrite and add class schedule index [`6366405`](https://github.com/AtifChy/aiub-companion/commit/63664053e1cd8dabc61dab97a8a80271d64885a6)
+- *(db)* [**breaking**] Rename sql schema to migrations [`b9cc229`](https://github.com/AtifChy/aiub-companion/commit/b9cc2292b0749f53f66e9e8f55d654a89c7b09d5)
+- *(db)* Rename conn to db [`fe11220`](https://github.com/AtifChy/aiub-companion/commit/fe11220eaa2c84d41513fb0b11388d9686b275ce)
+- *(frontend:routine)* Move days array to routine lib [`2511ee3`](https://github.com/AtifChy/aiub-companion/commit/2511ee3c778d812ab93960b275345dc57366067f)
+- *(routine)* Remove unused commented code [`ba45ba2`](https://github.com/AtifChy/aiub-companion/commit/ba45ba22aca68870786bf66790b960655a13d103)
+- *(frontend)* Replace horizontal fade scroll with horizontal scroll [`616087b`](https://github.com/AtifChy/aiub-companion/commit/616087b1a0722b8024df2ad02f02d6f671935717)
+- *(frontend:error)* Remove redundant error parsing utility [`5416dc1`](https://github.com/AtifChy/aiub-companion/commit/5416dc14b6a9f1e5a2e62a415a940ea6ddecc938)
+- *(notices)* Centralize notice selection logic [`8e59ba5`](https://github.com/AtifChy/aiub-companion/commit/8e59ba5f364e42e55719e93d229cc0ceecf9f273)
+- *(notices)* Simplify notice detail selection logic [`8048c25`](https://github.com/AtifChy/aiub-companion/commit/8048c250cc75fc67cb2f30fb28776fa81fb61786)
+
+### 🎨 Styling
+
+- *(lint)* Disable confusing void expression rule [`579b49c`](https://github.com/AtifChy/aiub-companion/commit/579b49cbb6a4e506caa4941b1aa7ec3cf3fcb0dc)
+- *(fmt)* Simplify onClick and onPressedChange props [`aba679d`](https://github.com/AtifChy/aiub-companion/commit/aba679d0722ca9d92770153a41d47dd480cc6ec2)
+
+### 🧪 Testing
+
+- *(lib)* Add new utility tests [`b758b33`](https://github.com/AtifChy/aiub-companion/commit/b758b330a9c9c9b50189c33dbf5d499dfa7427d3)
+- *(routine)* Add parse course tests [`df4db1c`](https://github.com/AtifChy/aiub-companion/commit/df4db1c41033d33f18ced06812d07e10b14ff6bc)
+- *(routine)* Update course to schedule in routine [`41cd8ef`](https://github.com/AtifChy/aiub-companion/commit/41cd8efdf6ea757fd9b6468826e53e5e15c65ca8)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(script)* Update linter and formatter names [`78b8244`](https://github.com/AtifChy/aiub-companion/commit/78b8244bab68ecd4b8ea3f42d01d3e8fd2193ac8)
+- *(lint)* Add vitest to oxlint config [`8eb15cd`](https://github.com/AtifChy/aiub-companion/commit/8eb15cd4927c19adbb9b5ac13674620456644de7)
+- *(frontend:routine)* Remove redundant log statement [`57f45bb`](https://github.com/AtifChy/aiub-companion/commit/57f45bb28849a417492ff7cd566921d46a5d0600)
+- *(git)* Typecheck already done by oxlint; skip from pre-commit hook [`0255c38`](https://github.com/AtifChy/aiub-companion/commit/0255c387db43e6be719d22a306e0fa28f7953621)
+- *(release)* Bump version to v0.5.0 [`b4b3f04`](https://github.com/AtifChy/aiub-companion/commit/b4b3f04c27f95e80f1064e6c321e5cc092d1c8c2)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.4.0...v0.5.0
+
 ## [0.4.0] - 2026-07-17
 
 ### 🚀 Features
@@ -22,6 +84,7 @@
 ### 📚 Documentation
 
 - *(README)* Update `README.md` with latest features [`510c4d2`](https://github.com/AtifChy/aiub-companion/commit/510c4d2256a439f9edd56da2350d0a0364666b48)
+- Update changelog [`c94ca0a`](https://github.com/AtifChy/aiub-companion/commit/c94ca0a10d2f1b3870a3d485100eaadadddb45c9)
 
 ### ⚙️ Miscellaneous Tasks
 
