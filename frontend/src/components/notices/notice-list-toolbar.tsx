@@ -1,4 +1,11 @@
-import { DotIcon, FilterIcon, FilterXIcon, RefreshCwIcon } from "lucide-react";
+import {
+  CheckSquareIcon,
+  DotIcon,
+  FilterIcon,
+  FilterXIcon,
+  RefreshCwIcon,
+  SquareIcon,
+} from "lucide-react";
 
 import { AppTooltip } from "@/components/app-tooltip";
 import { HorizontalScroll } from "@/components/horizontal-scroll";
@@ -15,7 +22,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { NoticeFilters } from "@/hooks/use-notices";
+import { Toggle } from "@/components/ui/toggle";
+import { useNoticeSelection } from "@/hooks/use-notice-selection";
+import { useSync, type NoticeFilters } from "@/hooks/use-notices";
 import { CATEGORIES } from "@/lib/notices";
 import { cn } from "@/lib/utils";
 
@@ -23,9 +32,6 @@ interface NoticeListToolbarProps {
   filters: NoticeFilters;
   onFilterChange: (value: NoticeFilters) => void;
   onFilterClear: () => void;
-
-  syncing: boolean;
-  onSync: () => void;
 
   noticeCount: number;
   unreadCount: number;
@@ -36,12 +42,14 @@ export function NoticeListToolbar({
   filters,
   onFilterChange,
   onFilterClear,
-  syncing,
-  onSync,
+
   noticeCount,
   unreadCount,
   loading,
 }: NoticeListToolbarProps) {
+  const { syncing, sync } = useSync();
+  const { selectionMode, setSelectionMode } = useNoticeSelection();
+
   const hasActiveFilters = filters.urgent || filters.pinned || filters.unread;
 
   return (
@@ -95,11 +103,28 @@ export function NoticeListToolbar({
         </span>
 
         <div className="flex gap-1.5">
+          <AppTooltip content={selectionMode ? "Exit selection" : "Select notices"}>
+            <Toggle
+              pressed={selectionMode}
+              onPressedChange={() => {
+                setSelectionMode(!selectionMode);
+              }}
+              size={null}
+              className="h-auto rounded-md p-0.5 data-[state=on]:text-primary"
+            >
+              {selectionMode ? (
+                <CheckSquareIcon className="size-3.5" />
+              ) : (
+                <SquareIcon className="size-3.5" />
+              )}
+            </Toggle>
+          </AppTooltip>
+
           <DropdownMenu>
             <AppTooltip content="Filter">
               <DropdownMenuTrigger
                 render={
-                  <Button variant="ghost" className="h-auto p-0.5">
+                  <Button variant="ghost" className="h-auto rounded-md border-none p-0.5">
                     {hasActiveFilters ? (
                       <FilterXIcon className="size-3.5 fill-primary/20 text-primary" />
                     ) : (
@@ -132,7 +157,14 @@ export function NoticeListToolbar({
           </DropdownMenu>
 
           <AppTooltip content="Sync notices">
-            <Button variant="ghost" onClick={onSync} disabled={syncing} className="h-auto p-0.5">
+            <Button
+              variant="ghost"
+              onClick={() => {
+                sync();
+              }}
+              disabled={syncing}
+              className="h-auto rounded-md border-none p-0.5"
+            >
               <RefreshCwIcon className={cn("size-3.5", syncing && "animate-spin")} />
             </Button>
           </AppTooltip>

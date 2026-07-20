@@ -17,6 +17,7 @@ import { toast } from "sonner";
 
 import { AppTooltip } from "@/components/app-tooltip";
 import { HorizontalScroll } from "@/components/horizontal-scroll";
+import { NoticeActionBar } from "@/components/notices/notice-action-bar";
 import { NoticeList } from "@/components/notices/notice-list";
 import { NoticeListToolbar } from "@/components/notices/notice-list-toolbar";
 import { Badge } from "@/components/ui/badge";
@@ -27,12 +28,7 @@ import { Toggle } from "@/components/ui/toggle";
 import { useDelayedLoading } from "@/hooks/use-delayed-loading";
 import { useNoticeMutations } from "@/hooks/use-notice-mutation";
 import { NoticeSelectionContext } from "@/hooks/use-notice-selection";
-import {
-  useNoticeDetail,
-  useNoticeList,
-  useSync,
-  type NoticeFilters,
-} from "@/hooks/use-notices";
+import { useNoticeDetail, useNoticeList, type NoticeFilters } from "@/hooks/use-notices";
 import { logger } from "@/lib/logger";
 import { CATEGORY_STYLES, formatDate, type AltCategory } from "@/lib/notices";
 import { cn } from "@/lib/utils";
@@ -48,11 +44,38 @@ const INITIAL_FILTERS: NoticeFilters = {
 export default function NoticesPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [checkedIds, setCheckedIds] = useState<Set<string>>(() => new Set());
+
+  const toggleChecked = (id: string) => {
+    setCheckedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const selectAll = (ids: string[]) => {
+    setCheckedIds(new Set(ids));
+  };
+
+  const clearChecked = () => {
+    setCheckedIds(new Set());
+  };
+
+  const handleSelectionMode = (on: boolean) => {
+    setSelectionMode(on);
+    if (!on) clearChecked();
+  };
+
   const { toggleRead, togglePin } = useNoticeMutations();
   const { query: detailQuery, readNotice } = useNoticeDetail(selectedId, (id) => {
     toggleRead({ id, next: true });
   });
-  const { syncing, sync } = useSync();
 
   const detail = detailQuery.data ?? null;
 
@@ -74,14 +97,23 @@ export default function NoticesPage() {
 
   return (
     <ResizablePanelGroup orientation="horizontal" className="flex h-full">
-      <ResizablePanel defaultSize="40%" minSize="35%" className="flex flex-col bg-card">
-        <NoticeSelectionContext value={{ selectedId, select }}>
+      <ResizablePanel defaultSize="22rem" minSize="20rem" className="flex flex-col bg-card">
+        <NoticeSelectionContext
+          value={{
+            selectedId,
+            select,
+            selectionMode,
+            setSelectionMode: handleSelectionMode,
+            checkedIds,
+            toggleChecked,
+            selectAll,
+            clearChecked,
+          }}
+        >
           <NoticeListPanel
             onTogglePin={(id, next) => {
               togglePin({ id, next });
             }}
-            syncing={syncing}
-            onSync={sync}
           />
         </NoticeSelectionContext>
       </ResizablePanel>
@@ -106,11 +138,9 @@ export default function NoticesPage() {
 
 interface NoticeListPanelProps {
   onTogglePin: (id: string, next: boolean) => void;
-  syncing: boolean;
-  onSync: () => void;
 }
 
-function NoticeListPanel({ onTogglePin, syncing, onSync }: NoticeListPanelProps) {
+function NoticeListPanel({ onTogglePin }: NoticeListPanelProps) {
   const [filters, setFilters] = useState<NoticeFilters>(INITIAL_FILTERS);
   const { query } = useNoticeList(filters);
 
@@ -118,15 +148,13 @@ function NoticeListPanel({ onTogglePin, syncing, onSync }: NoticeListPanelProps)
   const unreadCount = notices.filter((notice) => !notice.isRead).length;
 
   return (
-    <>
+    <div className="relative flex flex-1 flex-col overflow-hidden">
       <NoticeListToolbar
         filters={filters}
         onFilterChange={setFilters}
         onFilterClear={() => {
           setFilters({ ...filters, urgent: false, pinned: false, unread: false });
         }}
-        syncing={syncing}
-        onSync={onSync}
         noticeCount={notices.length}
         unreadCount={unreadCount}
         loading={query.isLoading}
@@ -142,7 +170,8 @@ function NoticeListPanel({ onTogglePin, syncing, onSync }: NoticeListPanelProps)
         }}
         hasActiveFilters={filters.urgent || filters.pinned || filters.unread}
       />
-    </>
+      <NoticeActionBar notices={notices} />
+    </div>
   );
 }
 
