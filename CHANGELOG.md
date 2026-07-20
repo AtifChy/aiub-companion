@@ -1,3 +1,31 @@
+## [0.5.5] - 2026-07-20
+
+### 🚀 Features
+
+- *(notices)* Implement notice filters context [`4af599d`](https://github.com/AtifChy/aiub-companion/commit/4af599d25c8060077d0d5827c9217b50a9a13db3)
+
+### 🐛 Bug Fixes
+
+- *(notices)* Fix list not showing more than 50 notices [`0647632`](https://github.com/AtifChy/aiub-companion/commit/064763268b699c5163753bf71a4e772a1b88b78e)
+
+### 🚜 Refactor
+
+- *(notices)* Migrate notice selection to provider pattern [`d5bc07b`](https://github.com/AtifChy/aiub-companion/commit/d5bc07b912389d8e56f8e32e822189f954af6365)
+- *(notices)* Move notice filters to provider [`611de11`](https://github.com/AtifChy/aiub-companion/commit/611de11b2bb5fa449d281df0182292aec7aa559d)
+- *(notices)* Improve notice selection logic [`0ad98d6`](https://github.com/AtifChy/aiub-companion/commit/0ad98d629c0c64bc558f0f3006026a07c64122a0)
+
+### 🎨 Styling
+
+- *(notices)* Update notice action bar styles [`9a0c2b6`](https://github.com/AtifChy/aiub-companion/commit/9a0c2b60e08895a65f6a611183a6da821f631421)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(vite)* Update vendor chunking for ui and react [`127b7bc`](https://github.com/AtifChy/aiub-companion/commit/127b7bc54449c3833f4399b5ea0908d255d36762)
+- *(release)* Bump version to v0.5.5 [`7bcc564`](https://github.com/AtifChy/aiub-companion/commit/7bcc564a6890e23578832fe13d5ae8a9088a6f06)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.5.0...v0.5.5
+
 ## [0.5.0] - 2026-07-20
 
 ### 🚀 Features
@@ -37,6 +65,10 @@
 - *(frontend:error)* Remove redundant error parsing utility [`5416dc1`](https://github.com/AtifChy/aiub-companion/commit/5416dc14b6a9f1e5a2e62a415a940ea6ddecc938)
 - *(notices)* Centralize notice selection logic [`8e59ba5`](https://github.com/AtifChy/aiub-companion/commit/8e59ba5f364e42e55719e93d229cc0ceecf9f273)
 - *(notices)* Simplify notice detail selection logic [`8048c25`](https://github.com/AtifChy/aiub-companion/commit/8048c250cc75fc67cb2f30fb28776fa81fb61786)
+
+### 📚 Documentation
+
+- Update changelog [`07e6edf`](https://github.com/AtifChy/aiub-companion/commit/07e6edf76b2ac6607daab674219ab8a78a6b9d8e)
 
 ### 🎨 Styling
 
