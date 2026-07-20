@@ -3,14 +3,10 @@ import { useMutation, useQueryClient, type QueryClient } from "@tanstack/react-q
 import { toast } from "sonner";
 
 import { useSettings } from "@/components/providers/settings-provider";
+import { noticeKeys } from "@/hooks/use-notices";
 import { logger } from "@/lib/logger";
 
 type ToggleableField = "isRead" | "isPinned";
-
-const noticeKeys = {
-  all: ["notices"] as const,
-  details: (id: string) => ["noticeDetails", id] as const,
-};
 
 function patchNoticeCaches(
   queryClient: QueryClient,
@@ -164,7 +160,7 @@ export function useSync() {
       } else {
         toast.info("No new notices to sync");
       }
-      void queryClient.invalidateQueries({ queryKey: ["notices"] });
+      void queryClient.invalidateQueries({ queryKey: noticeKeys.all });
     },
     onError: (err) => {
       logger.error("Failed to sync notices", err);

@@ -1,5 +1,5 @@
 import type { Notice } from "@bindings/notice";
-import { Browser } from "@wailsio/runtime";
+import { Browser, Events } from "@wailsio/runtime";
 import {
   CircleCheckBigIcon,
   CircleIcon,
@@ -12,7 +12,7 @@ import {
   PinIcon,
   PinOffIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { AppTooltip } from "@/components/app-tooltip";
@@ -26,9 +26,13 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 import { Separator } from "@/components/ui/separator";
 import { Toggle } from "@/components/ui/toggle";
 import { useDelayedLoading } from "@/hooks/use-delayed-loading";
-import { useNoticeDetailSelection } from "@/hooks/use-notice-detail-selection";
-import { NoticeSelectionContext, useNoticeSelectionState } from "@/hooks/use-notice-selection";
-import { useNoticeList, type NoticeFilters } from "@/hooks/use-notices";
+import { useNoticeMutations } from "@/hooks/use-notice-mutation";
+import {
+  NoticeSelectionContext,
+  useNoticeSelection,
+  useNoticeSelectionState,
+} from "@/hooks/use-notice-selection";
+import { useNoticeDetail, useNoticeList, type NoticeFilters } from "@/hooks/use-notices";
 import { logger } from "@/lib/logger";
 import { CATEGORY_STYLES, formatDate, type AltCategory } from "@/lib/notices";
 import { cn } from "@/lib/utils";
@@ -42,34 +46,26 @@ const INITIAL_FILTERS: NoticeFilters = {
 };
 
 export default function NoticesPage() {
-  const selection = useNoticeSelectionState();
-  const { selectedId, select, notice, isLoading, toggleRead, togglePin } =
-    useNoticeDetailSelection();
+  const contextValue = useNoticeSelectionState();
 
-  const contextValue = { selectedId, select, ...selection };
+  useEffect(() => {
+    const unsubscribe = Events.On("notice:open", (event) => contextValue.setSelectedId(event.data));
+    return unsubscribe;
+  }, [contextValue]);
 
   return (
     <ResizablePanelGroup orientation="horizontal" className="flex h-full">
-      <ResizablePanel defaultSize="22rem" minSize="20rem" className="flex flex-col bg-card">
-        <NoticeSelectionContext value={contextValue}>
+      <NoticeSelectionContext value={contextValue}>
+        <ResizablePanel defaultSize="22rem" minSize="20rem" className="flex flex-col bg-card">
           <NoticeListPanel />
-        </NoticeSelectionContext>
-      </ResizablePanel>
+        </ResizablePanel>
 
-      <ResizableHandle withHandle />
+        <ResizableHandle withHandle />
 
-      <ResizablePanel defaultSize="60%" minSize="30%" className="min-w-0">
-        <DetailPanel
-          notice={notice ?? null}
-          loading={isLoading}
-          onTogglePin={() => {
-            if (notice) togglePin({ id: notice.id, next: !notice.isPinned });
-          }}
-          onToggleRead={() => {
-            if (notice) toggleRead({ id: notice.id, next: !notice.isRead });
-          }}
-        />
-      </ResizablePanel>
+        <ResizablePanel defaultSize="60%" minSize="30%" className="min-w-0">
+          <DetailPanel />
+        </ResizablePanel>
+      </NoticeSelectionContext>
     </ResizablePanelGroup>
   );
 }
@@ -108,17 +104,16 @@ function NoticeListPanel() {
   );
 }
 
-interface DetailPanelProps {
-  notice: Notice | null;
-  loading: boolean;
-  onTogglePin: () => void;
-  onToggleRead: () => void;
-}
+function DetailPanel() {
+  const { selectedId } = useNoticeSelection();
+  const { query } = useNoticeDetail(selectedId);
+  const { toggleRead, togglePin } = useNoticeMutations();
 
-function DetailPanel({ notice, loading, onTogglePin, onToggleRead }: DetailPanelProps) {
-  const showLoader = useDelayedLoading(loading);
+  const showLoader = useDelayedLoading(query.isLoading);
 
-  if (loading) {
+  const notice = query.data ?? null;
+
+  if (query.isLoading) {
     if (!showLoader) return null;
     return (
       <div className="flex h-full items-center justify-center">
@@ -177,7 +172,7 @@ function DetailPanel({ notice, loading, onTogglePin, onToggleRead }: DetailPanel
             <AppTooltip content={notice.isRead ? "Mark as unread" : "Mark as read"}>
               <Toggle
                 pressed={notice.isRead}
-                onPressedChange={onToggleRead}
+                onPressedChange={() => toggleRead({ id: notice.id, next: !notice.isRead })}
                 size="sm"
                 className="aria-pressed:bg-transparent aria-pressed:hover:bg-muted"
               >
@@ -193,7 +188,7 @@ function DetailPanel({ notice, loading, onTogglePin, onToggleRead }: DetailPanel
             <AppTooltip content={notice.isPinned ? "Unpin" : "Pin"}>
               <Toggle
                 pressed={notice.isPinned}
-                onPressedChange={onTogglePin}
+                onPressedChange={() => togglePin({ id: notice.id, next: !notice.isPinned })}
                 size="sm"
                 className="aria-pressed:bg-transparent aria-pressed:hover:bg-muted"
               >

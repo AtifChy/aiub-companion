@@ -2,7 +2,7 @@ import { createContext, use, useState } from "react";
 
 interface NoticeSelectionContextType {
   selectedId: string | null;
-  select: (id: string) => void;
+  setSelectedId: (id: string) => void;
 
   selectionMode: boolean;
   setSelectionMode: (on: boolean) => void;
@@ -23,6 +23,7 @@ export function useNoticeSelection() {
 }
 
 export function useNoticeSelectionState() {
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectionMode, setSelectionMode] = useState(false);
   const [checkedIds, setCheckedIds] = useState<Set<string>>(() => new Set());
 
@@ -52,6 +53,8 @@ export function useNoticeSelectionState() {
   };
 
   return {
+    selectedId,
+    setSelectedId,
     selectionMode,
     setSelectionMode: updateSelectionMode,
     checkedIds,

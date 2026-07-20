@@ -85,17 +85,19 @@ interface NoticeListItemProps {
 }
 
 function NoticeListItem({ notice }: NoticeListItemProps) {
-  const { selectedId, select, selectionMode, checkedIds, toggleChecked } = useNoticeSelection();
+  const { selectedId, setSelectedId, selectionMode, checkedIds, toggleChecked } =
+    useNoticeSelection();
   const selected = selectedId === notice.id;
   const checked = checkedIds.has(notice.id);
 
-  const { togglePin } = useNoticeMutations();
+  const { toggleRead, togglePin } = useNoticeMutations();
 
   const handleClick = () => {
     if (selectionMode) {
       toggleChecked(notice.id);
     } else {
-      select(notice.id);
+      setSelectedId(notice.id);
+      if (!notice.isRead) toggleRead({ id: notice.id, next: true });
     }
   };
 

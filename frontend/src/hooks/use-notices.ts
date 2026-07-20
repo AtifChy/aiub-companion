@@ -6,6 +6,11 @@ import { toast } from "sonner";
 
 import { useDebounce } from "@/hooks/use-debounce";
 
+export const noticeKeys = {
+  all: ["notices"] as const,
+  details: (id: string) => ["noticeDetails", id] as const,
+};
+
 export type Category =
   | "all"
   | "general"
@@ -30,7 +35,7 @@ export function useNoticeList(filter: NoticeFilters) {
   const debouncedSearch = useDebounce(filter.search, 300);
 
   const query = useQuery({
-    queryKey: ["notices", { ...filter, search: debouncedSearch }],
+    queryKey: [...noticeKeys.all, { ...filter, search: debouncedSearch }],
     queryFn: () =>
       NoticeService.GetNotices({
         Category: filter.category === "all" ? "" : filter.category,
@@ -43,7 +48,7 @@ export function useNoticeList(filter: NoticeFilters) {
 
   useEffect(() => {
     const unsubscribe = Events.On("notice:synced", (count) => {
-      void queryClient.invalidateQueries({ queryKey: ["notices"] });
+      void queryClient.invalidateQueries({ queryKey: noticeKeys.all });
       toast.success(`${String(count.data)} new notice${count.data !== 1 ? "s" : ""} synced`);
     });
     return unsubscribe;
@@ -52,27 +57,12 @@ export function useNoticeList(filter: NoticeFilters) {
   return { query };
 }
 
-export function useNoticeDetail(selectedId: string | null, readOnOpen: (id: string) => void) {
-  const options = (id: string) => ({
-    queryKey: ["noticeDetails", id],
-    queryFn: () => NoticeService.GetNoticeDetails(id),
-  });
-
+export function useNoticeDetail(selectedId: string | null) {
   const query = useQuery({
-    ...options(selectedId ?? ""),
+    queryKey: noticeKeys.details(selectedId ?? ""),
+    queryFn: () => NoticeService.GetNoticeDetails(selectedId ?? ""),
     enabled: !!selectedId,
   });
 
-  const queryClient = useQueryClient();
-
-  const readNotice = (id: string) => {
-    void queryClient.fetchQuery(options(id)).then((detail) => {
-      if (!detail?.isRead) {
-        readOnOpen(id);
-      }
-      return detail;
-    });
-  };
-
-  return { query, readNotice };
+  return { query };
 }
