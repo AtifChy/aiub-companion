@@ -1,11 +1,11 @@
 import type { Notice } from "@bindings/notice";
 import { CircleIcon, InboxIcon, Loader2Icon, PinIcon, PinOffIcon } from "lucide-react";
 
+import { useNoticeFilters } from "@/components/providers/notice-filters-provider";
 import { useNoticeActive, useNoticeBulk } from "@/components/providers/notice-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useNoticeFilters } from "@/hooks/use-notice-filters";
 import { useNoticeMutations } from "@/hooks/use-notice-mutation";
 import { CATEGORY_STYLES, formatDate, type AltCategory } from "@/lib/notices";
 import { cn } from "@/lib/utils";

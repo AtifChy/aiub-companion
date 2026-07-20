@@ -9,6 +9,7 @@ import {
 
 import { AppTooltip } from "@/components/app-tooltip";
 import { HorizontalScroll } from "@/components/horizontal-scroll";
+import { useNoticeFilters } from "@/components/providers/notice-filters-provider";
 import { useNoticeBulk } from "@/components/providers/notice-provider";
 import { SearchInput } from "@/components/search-input";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +25,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Toggle } from "@/components/ui/toggle";
-import { useNoticeFilters } from "@/hooks/use-notice-filters";
 import { useSync } from "@/hooks/use-notice-mutation";
 import { CATEGORIES } from "@/lib/notices";
 import { cn } from "@/lib/utils";

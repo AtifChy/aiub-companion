@@ -12,7 +12,7 @@ import {
   PinIcon,
   PinOffIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { toast } from "sonner";
 
 import { AppTooltip } from "@/components/app-tooltip";
@@ -20,6 +20,10 @@ import { HorizontalScroll } from "@/components/horizontal-scroll";
 import { NoticeActionBar } from "@/components/notices/notice-action-bar";
 import { NoticeList } from "@/components/notices/notice-list";
 import { NoticeListToolbar } from "@/components/notices/notice-list-toolbar";
+import {
+  NoticeFiltersProvider,
+  useNoticeFilters,
+} from "@/components/providers/notice-filters-provider";
 import { NoticeSelectionProvider, useNoticeActive } from "@/components/providers/notice-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,20 +31,11 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 import { Separator } from "@/components/ui/separator";
 import { Toggle } from "@/components/ui/toggle";
 import { useDelayedLoading } from "@/hooks/use-delayed-loading";
-import { NoticeFiltersContext } from "@/hooks/use-notice-filters";
 import { useNoticeMutations } from "@/hooks/use-notice-mutation";
-import { useNoticeDetail, useNoticeList, type NoticeFilters } from "@/hooks/use-notices";
+import { useNoticeDetail, useNoticeList } from "@/hooks/use-notices";
 import { logger } from "@/lib/logger";
 import { CATEGORY_STYLES, formatDate, type AltCategory } from "@/lib/notices";
 import { cn } from "@/lib/utils";
-
-const INITIAL_FILTERS: NoticeFilters = {
-  search: "",
-  category: "all",
-  urgent: false,
-  pinned: false,
-  unread: false,
-};
 
 export default function NoticesPage() {
   return (
@@ -74,7 +69,15 @@ function NoticesPageInner() {
 }
 
 function NoticeListPanel() {
-  const [filters, setFilters] = useState<NoticeFilters>(INITIAL_FILTERS);
+  return (
+    <NoticeFiltersProvider>
+      <NoticeListPanelInner />
+    </NoticeFiltersProvider>
+  );
+}
+
+function NoticeListPanelInner() {
+  const { filters } = useNoticeFilters();
   const { query } = useNoticeList(filters);
 
   const notices = query.data ?? [];
@@ -82,25 +85,17 @@ function NoticeListPanel() {
 
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden">
-      <NoticeFiltersContext
-        value={{
-          filters,
-          setFilters: (patch) => setFilters({ ...filters, ...patch }),
-          clearFilters: () => setFilters(INITIAL_FILTERS),
-        }}
-      >
-        <NoticeListToolbar
-          noticeCount={notices.length}
-          unreadCount={unreadCount}
-          loading={query.isLoading}
-        />
-        <NoticeList
-          notices={notices}
-          loading={query.isLoading}
-          error={query.error}
-          onRetry={() => void query.refetch()}
-        />
-      </NoticeFiltersContext>
+      <NoticeListToolbar
+        noticeCount={notices.length}
+        unreadCount={unreadCount}
+        loading={query.isLoading}
+      />
+      <NoticeList
+        notices={notices}
+        loading={query.isLoading}
+        error={query.error}
+        onRetry={() => void query.refetch()}
+      />
       <NoticeActionBar notices={notices} />
     </div>
   );
