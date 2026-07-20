@@ -9,6 +9,7 @@ import {
 
 import { AppTooltip } from "@/components/app-tooltip";
 import { HorizontalScroll } from "@/components/horizontal-scroll";
+import { useNoticeBulk } from "@/components/providers/notice-provider";
 import { SearchInput } from "@/components/search-input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Toggle } from "@/components/ui/toggle";
 import { useSync } from "@/hooks/use-notice-mutation";
-import { useNoticeSelection } from "@/hooks/use-notice-selection";
 import { type NoticeFilters } from "@/hooks/use-notices";
 import { CATEGORIES } from "@/lib/notices";
 import { cn } from "@/lib/utils";
@@ -49,7 +49,7 @@ export function NoticeListToolbar({
   loading,
 }: NoticeListToolbarProps) {
   const { syncing, sync } = useSync();
-  const { selectionMode, setSelectionMode } = useNoticeSelection();
+  const { selectionMode, setSelectionMode } = useNoticeBulk();
 
   const hasActiveFilters = filters.urgent || filters.pinned || filters.unread;
 
@@ -59,9 +59,7 @@ export function NoticeListToolbar({
       <div className="border-b px-3 py-2.5">
         <SearchInput
           value={filters.search}
-          onValueChange={(v) => {
-            onFilterChange({ ...filters, search: v });
-          }}
+          onValueChange={(v) => onFilterChange({ ...filters, search: v })}
           placeholder="Search notices..."
         />
 

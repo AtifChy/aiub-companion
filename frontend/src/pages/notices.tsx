@@ -20,6 +20,7 @@ import { HorizontalScroll } from "@/components/horizontal-scroll";
 import { NoticeActionBar } from "@/components/notices/notice-action-bar";
 import { NoticeList } from "@/components/notices/notice-list";
 import { NoticeListToolbar } from "@/components/notices/notice-list-toolbar";
+import { NoticeSelectionProvider, useNoticeActive } from "@/components/providers/notice-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
@@ -27,11 +28,6 @@ import { Separator } from "@/components/ui/separator";
 import { Toggle } from "@/components/ui/toggle";
 import { useDelayedLoading } from "@/hooks/use-delayed-loading";
 import { useNoticeMutations } from "@/hooks/use-notice-mutation";
-import {
-  NoticeSelectionContext,
-  useNoticeSelection,
-  useNoticeSelectionState,
-} from "@/hooks/use-notice-selection";
 import { useNoticeDetail, useNoticeList, type NoticeFilters } from "@/hooks/use-notices";
 import { logger } from "@/lib/logger";
 import { CATEGORY_STYLES, formatDate, type AltCategory } from "@/lib/notices";
@@ -46,26 +42,32 @@ const INITIAL_FILTERS: NoticeFilters = {
 };
 
 export default function NoticesPage() {
-  const contextValue = useNoticeSelectionState();
+  return (
+    <NoticeSelectionProvider>
+      <NoticesPageInner />
+    </NoticeSelectionProvider>
+  );
+}
+
+function NoticesPageInner() {
+  const { setSelectedId } = useNoticeActive();
 
   useEffect(() => {
-    const unsubscribe = Events.On("notice:open", (event) => contextValue.setSelectedId(event.data));
+    const unsubscribe = Events.On("notice:open", (event) => setSelectedId(event.data));
     return unsubscribe;
-  }, [contextValue]);
+  }, [setSelectedId]);
 
   return (
     <ResizablePanelGroup orientation="horizontal" className="flex h-full">
-      <NoticeSelectionContext value={contextValue}>
-        <ResizablePanel defaultSize="22rem" minSize="20rem" className="flex flex-col bg-card">
-          <NoticeListPanel />
-        </ResizablePanel>
+      <ResizablePanel defaultSize="22rem" minSize="20rem" className="flex flex-col bg-card">
+        <NoticeListPanel />
+      </ResizablePanel>
 
-        <ResizableHandle withHandle />
+      <ResizableHandle withHandle />
 
-        <ResizablePanel defaultSize="60%" minSize="30%" className="min-w-0">
-          <DetailPanel />
-        </ResizablePanel>
-      </NoticeSelectionContext>
+      <ResizablePanel defaultSize="60%" minSize="30%" className="min-w-0">
+        <DetailPanel />
+      </ResizablePanel>
     </ResizablePanelGroup>
   );
 }
@@ -103,7 +105,7 @@ function NoticeListPanel() {
 }
 
 function DetailPanel() {
-  const { selectedId } = useNoticeSelection();
+  const { selectedId } = useNoticeActive();
   const { query } = useNoticeDetail(selectedId);
   const { toggleRead, togglePin } = useNoticeMutations();
 

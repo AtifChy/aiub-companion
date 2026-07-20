@@ -1,11 +1,11 @@
 import type { Notice } from "@bindings/notice";
 import { CircleIcon, InboxIcon, Loader2Icon, PinIcon, PinOffIcon } from "lucide-react";
 
+import { useNoticeActive, useNoticeBulk } from "@/components/providers/notice-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useNoticeMutations } from "@/hooks/use-notice-mutation";
-import { useNoticeSelection } from "@/hooks/use-notice-selection";
 import { CATEGORY_STYLES, formatDate, type AltCategory } from "@/lib/notices";
 import { cn } from "@/lib/utils";
 
@@ -85,8 +85,8 @@ interface NoticeListItemProps {
 }
 
 function NoticeListItem({ notice }: NoticeListItemProps) {
-  const { selectedId, setSelectedId, selectionMode, checkedIds, toggleChecked } =
-    useNoticeSelection();
+  const { selectedId, setSelectedId } = useNoticeActive();
+  const { selectionMode, checkedIds, toggleChecked } = useNoticeBulk();
   const selected = selectedId === notice.id;
   const checked = checkedIds.has(notice.id);
 

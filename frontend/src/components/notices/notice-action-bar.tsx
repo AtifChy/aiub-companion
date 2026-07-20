@@ -1,8 +1,8 @@
 import type { Notice } from "@bindings/notice";
 import { CircleCheckBigIcon, CircleIcon, PinIcon, PinOffIcon, XIcon } from "lucide-react";
 
+import { useNoticeBulk } from "@/components/providers/notice-provider";
 import { useNoticeMutations } from "@/hooks/use-notice-mutation";
-import { useNoticeSelection } from "@/hooks/use-notice-selection";
 import { cn } from "@/lib/utils";
 
 import { AppTooltip } from "../app-tooltip";
@@ -25,8 +25,7 @@ interface NoticeActionBarProps {
 }
 
 export function NoticeActionBar({ notices }: NoticeActionBarProps) {
-  const { selectionMode, setSelectionMode, checkedIds, selectAll, clearChecked } =
-    useNoticeSelection();
+  const { selectionMode, setSelectionMode, checkedIds, selectAll, clearChecked } = useNoticeBulk();
   const { bulkToggleRead, bulkTogglePin } = useNoticeMutations();
 
   const allIds = notices.map((notice) => notice.id);
