@@ -5,6 +5,7 @@ import { useNoticeActive, useNoticeBulk } from "@/components/providers/notice-pr
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useNoticeFilters } from "@/hooks/use-notice-filters";
 import { useNoticeMutations } from "@/hooks/use-notice-mutation";
 import { CATEGORY_STYLES, formatDate, type AltCategory } from "@/lib/notices";
 import { cn } from "@/lib/utils";
@@ -14,18 +15,12 @@ interface NoticeListProps {
   loading: boolean;
   error: Error | null;
   onRetry: () => void;
-  onClearFilters: () => void;
-  hasActiveFilters: boolean;
 }
 
-export function NoticeList({
-  notices,
-  loading,
-  error,
-  onRetry,
-  onClearFilters,
-  hasActiveFilters,
-}: NoticeListProps) {
+export function NoticeList({ notices, loading, error, onRetry }: NoticeListProps) {
+  const { filters, clearFilters } = useNoticeFilters();
+  const hasActiveFilters = filters.urgent || filters.pinned || filters.unread;
+
   if (loading) {
     return (
       <div className="flex h-32 items-center justify-center">
@@ -61,7 +56,7 @@ export function NoticeList({
           <Button
             variant="ghost"
             size="xs"
-            onClick={onClearFilters}
+            onClick={clearFilters}
             className="text-primary underline-offset-2 hover:underline"
           >
             Clear filters

@@ -27,6 +27,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 import { Separator } from "@/components/ui/separator";
 import { Toggle } from "@/components/ui/toggle";
 import { useDelayedLoading } from "@/hooks/use-delayed-loading";
+import { NoticeFiltersContext } from "@/hooks/use-notice-filters";
 import { useNoticeMutations } from "@/hooks/use-notice-mutation";
 import { useNoticeDetail, useNoticeList, type NoticeFilters } from "@/hooks/use-notices";
 import { logger } from "@/lib/logger";
@@ -81,24 +82,25 @@ function NoticeListPanel() {
 
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden">
-      <NoticeListToolbar
-        filters={filters}
-        onFilterChange={setFilters}
-        onFilterClear={() =>
-          setFilters({ ...filters, urgent: false, pinned: false, unread: false })
-        }
-        noticeCount={notices.length}
-        unreadCount={unreadCount}
-        loading={query.isLoading}
-      />
-      <NoticeList
-        notices={notices}
-        loading={query.isLoading}
-        error={query.error}
-        onRetry={() => void query.refetch()}
-        onClearFilters={() => setFilters(INITIAL_FILTERS)}
-        hasActiveFilters={filters.urgent || filters.pinned || filters.unread}
-      />
+      <NoticeFiltersContext
+        value={{
+          filters,
+          setFilters: (patch) => setFilters({ ...filters, ...patch }),
+          clearFilters: () => setFilters(INITIAL_FILTERS),
+        }}
+      >
+        <NoticeListToolbar
+          noticeCount={notices.length}
+          unreadCount={unreadCount}
+          loading={query.isLoading}
+        />
+        <NoticeList
+          notices={notices}
+          loading={query.isLoading}
+          error={query.error}
+          onRetry={() => void query.refetch()}
+        />
+      </NoticeFiltersContext>
       <NoticeActionBar notices={notices} />
     </div>
   );
