@@ -26,6 +26,8 @@ export default defineConfig({
   },
   jsPlugins: ["eslint-plugin-react-x", "eslint-plugin-react-you-might-not-need-an-effect"],
   rules: {
+    "typescript/no-confusing-void-expression": "off",
+
     "react/react-in-jsx-scope": "off",
     "react/no-unescaped-entities": "off",
 
