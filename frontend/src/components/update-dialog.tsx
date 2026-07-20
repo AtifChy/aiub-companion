@@ -49,12 +49,7 @@ export function UpdateDialog() {
           <AlertDialogCancel disabled={downloading} variant="outline">
             Later
           </AlertDialogCancel>
-          <DownlaodAction
-            downloading={downloading}
-            onClick={() => {
-              install.mutate();
-            }}
-          />
+          <DownlaodAction downloading={downloading} onClick={() => install.mutate()} />
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

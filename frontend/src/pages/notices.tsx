@@ -82,9 +82,9 @@ function NoticeListPanel() {
       <NoticeListToolbar
         filters={filters}
         onFilterChange={setFilters}
-        onFilterClear={() => {
-          setFilters({ ...filters, urgent: false, pinned: false, unread: false });
-        }}
+        onFilterClear={() =>
+          setFilters({ ...filters, urgent: false, pinned: false, unread: false })
+        }
         noticeCount={notices.length}
         unreadCount={unreadCount}
         loading={query.isLoading}
@@ -94,9 +94,7 @@ function NoticeListPanel() {
         loading={query.isLoading}
         error={query.error}
         onRetry={() => void query.refetch()}
-        onClearFilters={() => {
-          setFilters(INITIAL_FILTERS);
-        }}
+        onClearFilters={() => setFilters(INITIAL_FILTERS)}
         hasActiveFilters={filters.urgent || filters.pinned || filters.unread}
       />
       <NoticeActionBar notices={notices} />

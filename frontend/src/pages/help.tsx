@@ -126,9 +126,7 @@ function FAQList({ searchQuery }: { searchQuery: string }) {
             key={faq.category + String(idx)}
             faq={faq}
             expanded={expandedIndex === idx}
-            onExpand={() => {
-              toggleExpand(idx);
-            }}
+            onExpand={() => toggleExpand(idx)}
           />
         ))
       ) : (

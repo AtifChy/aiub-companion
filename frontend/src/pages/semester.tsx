@@ -141,9 +141,7 @@ export default function SemesterPage() {
             <Button
               variant="outline"
               size="icon"
-              onClick={() => {
-                mutate(calendarType);
-              }}
+              onClick={() => mutate(calendarType)}
               disabled={isPending}
             >
               <RefreshCwIcon className={cn("h-4 w-4", isPending && "animate-spin")} />
@@ -211,18 +209,14 @@ export default function SemesterPage() {
           <Button
             variant={view === "timeline" ? "default" : "outline"}
             size="sm"
-            onClick={() => {
-              setView("timeline");
-            }}
+            onClick={() => setView("timeline")}
           >
             Timeline
           </Button>
           <Button
             variant={view === "all" ? "default" : "outline"}
             size="sm"
-            onClick={() => {
-              setView("all");
-            }}
+            onClick={() => setView("all")}
           >
             All Events
           </Button>

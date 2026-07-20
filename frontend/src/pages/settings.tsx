@@ -253,13 +253,7 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
               </SettingRow>
 
               <SettingRow label="Check for Updates" description="Manually check for updates">
-                <Button
-                  variant="outline"
-                  disabled={check.isPending}
-                  onClick={() => {
-                    check.mutate();
-                  }}
-                >
+                <Button variant="outline" disabled={check.isPending} onClick={() => check.mutate()}>
                   {check.isPending ? "Checking..." : "Check Now"}
                 </Button>
               </SettingRow>

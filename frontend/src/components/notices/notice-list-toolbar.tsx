@@ -69,9 +69,7 @@ export function NoticeListToolbar({
           {CATEGORIES.map((cat) => (
             <Badge
               key={cat}
-              onClick={() => {
-                onFilterChange({ ...filters, category: cat });
-              }}
+              onClick={() => onFilterChange({ ...filters, category: cat })}
               variant={filters.category === cat ? "default" : "outline"}
               className={cn(
                 "cursor-pointer font-semibold capitalize",
@@ -107,9 +105,7 @@ export function NoticeListToolbar({
           <AppTooltip content={selectionMode ? "Exit selection" : "Select notices"}>
             <Toggle
               pressed={selectionMode}
-              onPressedChange={() => {
-                setSelectionMode(!selectionMode);
-              }}
+              onPressedChange={() => setSelectionMode(!selectionMode)}
               size={null}
               className="h-auto rounded-md p-0.5 data-[state=on]:text-primary"
             >
@@ -160,9 +156,7 @@ export function NoticeListToolbar({
           <AppTooltip content="Sync notices">
             <Button
               variant="ghost"
-              onClick={() => {
-                sync();
-              }}
+              onClick={() => sync()}
               disabled={syncing}
               className="h-auto rounded-md border-none p-0.5"
             >

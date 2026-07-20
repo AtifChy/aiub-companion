@@ -127,9 +127,7 @@ function NoticeListItem({ notice }: NoticeListItemProps) {
           onClick={(e) => {
             e.preventDefault();
           }}
-          onCheckedChange={() => {
-            toggleChecked(notice.id);
-          }}
+          onCheckedChange={() => toggleChecked(notice.id)}
           className="mt-0.5 mr-2.5 size-3.5"
         />
       )}

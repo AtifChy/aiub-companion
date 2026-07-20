@@ -67,9 +67,7 @@ export function SearchInput({
         (showClearButton ?? true) && (
           <Button
             variant="ghost"
-            onClick={() => {
-              onValueChange("");
-            }}
+            onClick={() => onValueChange("")}
             className="absolute top-1/2 right-2 h-auto -translate-y-1/2 p-0.5 text-muted-foreground hover:text-foreground"
           >
             <XIcon strokeWidth="2.5" className="size-3.5" />
