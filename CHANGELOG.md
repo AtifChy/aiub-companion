@@ -1,3 +1,29 @@
+## [0.5.10] - 2026-07-21
+
+### 🚀 Features
+
+- *(notice)* Add pending notice handling [`8ebb700`](https://github.com/AtifChy/aiub-companion/commit/8ebb700e4a46f032f48f42e9f5488615a5fc9a93)
+- *(notices)* Consume pending notice on load [`c5f11a8`](https://github.com/AtifChy/aiub-companion/commit/c5f11a83544e23dce832e4953ad68793b6e38203)
+- *(notices)* Migrate state to zustand store [`36a3805`](https://github.com/AtifChy/aiub-companion/commit/36a38053ed49783293f84f0f12ee67e18744e3df)
+- Escape key blurs search input [`3808f5d`](https://github.com/AtifChy/aiub-companion/commit/3808f5da5d47dfd5221fb1821ea7a57199b71db2)
+- *(routine)* Improve course search ux and behavior [`7757fbc`](https://github.com/AtifChy/aiub-companion/commit/7757fbcdd7e7ae175de49d976ed2e85338594111)
+
+### 🚜 Refactor
+
+- *(notices)* Rename notice provider to selection provider [`bc61b9a`](https://github.com/AtifChy/aiub-companion/commit/bc61b9a93d17eb68e8e6853a0fadc853c8095a1e)
+- *(notices)* Update import paths [`e309902`](https://github.com/AtifChy/aiub-companion/commit/e3099024ce67fa21eb18a73bd14a23c2a1325d04)
+
+### 🎨 Styling
+
+- Shorten arrow function bodies [`aff8144`](https://github.com/AtifChy/aiub-companion/commit/aff81448aaba7ed82268d3a46a78cc1e4ce54a45)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Bump version to v0.5.10 [`bd7237f`](https://github.com/AtifChy/aiub-companion/commit/bd7237f4246605a99a5ce6e2a1c38184bc8590d4)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.5.5...v0.5.10
+
 ## [0.5.5] - 2026-07-20
 
 ### 🚀 Features
@@ -13,6 +39,10 @@
 - *(notices)* Migrate notice selection to provider pattern [`d5bc07b`](https://github.com/AtifChy/aiub-companion/commit/d5bc07b912389d8e56f8e32e822189f954af6365)
 - *(notices)* Move notice filters to provider [`611de11`](https://github.com/AtifChy/aiub-companion/commit/611de11b2bb5fa449d281df0182292aec7aa559d)
 - *(notices)* Improve notice selection logic [`0ad98d6`](https://github.com/AtifChy/aiub-companion/commit/0ad98d629c0c64bc558f0f3006026a07c64122a0)
+
+### 📚 Documentation
+
+- Update changelog [`aba9eb8`](https://github.com/AtifChy/aiub-companion/commit/aba9eb81c72c450347958d4350ec41726b50945f)
 
 ### 🎨 Styling
 
