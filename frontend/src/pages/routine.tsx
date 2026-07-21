@@ -209,7 +209,7 @@ function CourseSearch() {
   const [search, setSearch] = useState("");
   const searchDebounced = useDebounce(search, 300);
 
-  const [open, setOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   const { data: searchResults, isLoading: isSearching } = useQuery({
     queryKey: ["courses", searchDebounced],
@@ -232,12 +232,14 @@ function CourseSearch() {
     },
   });
 
+  const showPopover = isFocused && search.trim() !== "";
+
   return (
     <div
-      onFocus={() => setOpen(true)}
+      onFocus={() => setIsFocused(true)}
       onBlurCapture={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget)) {
-          setOpen(false);
+          setIsFocused(false);
         }
       }}
       className="relative z-50"
@@ -251,34 +253,35 @@ function CourseSearch() {
         className="[&>div:last-child]:right-3 [&>input]:h-10 [&>input]:pl-9 [&>input]:text-sm [&>input]:shadow-sm [&>svg]:size-4 [&>svg:first-child]:left-3 [&>svg:last-child]:right-3 [&>svg:last-child]:size-5"
       />
 
-      {open && search.trim() !== "" && (
-        <Card
-          className={cn(
-            "absolute mt-2 max-h-80 w-full pt-0 pb-0",
-            "scrollbar-thin scrollbar-thumb-accent overflow-y-auto",
-            "rounded-lg bg-popover/95 shadow-xl backdrop-blur-md",
-            "border border-muted/40",
-            "animate-in duration-200",
+      <Card
+        className={cn(
+          "absolute mt-2 max-h-80 w-full pt-0 pb-0",
+          "scrollbar-thin scrollbar-thumb-accent overflow-y-auto",
+          "rounded-lg bg-popover/95 shadow-xl backdrop-blur-md",
+          "border border-muted/40",
+          "animate-in duration-200",
+          showPopover
+            ? "translate-y-0 opacity-100"
+            : "pointer-events-none -translate-y-4 opacity-0",
+        )}
+      >
+        <div className="flex flex-col">
+          {isSearching ? (
+            <div className="flex h-20 items-center justify-center text-sm text-muted-foreground">
+              <Loader2Icon className="mr-2 size-4 animate-spin" />
+              Searching...
+            </div>
+          ) : searchResults && searchResults.length > 0 ? (
+            searchResults.map((course) => (
+              <SearchResultItem key={course.classID} course={course} onAdd={addCourse} />
+            ))
+          ) : (
+            <div className="flex h-20 items-center justify-center text-sm text-muted-foreground">
+              No matching offered courses found in the database.
+            </div>
           )}
-        >
-          <div className="flex flex-col">
-            {isSearching ? (
-              <div className="flex h-20 items-center justify-center text-sm text-muted-foreground">
-                <Loader2Icon className="mr-2 size-4 animate-spin" />
-                Searching...
-              </div>
-            ) : searchResults && searchResults.length > 0 ? (
-              searchResults.map((course) => (
-                <SearchResultItem key={course.classID} course={course} onAdd={addCourse} />
-              ))
-            ) : (
-              <div className="flex h-20 items-center justify-center text-sm text-muted-foreground">
-                No matching offered courses found in the database.
-              </div>
-            )}
-          </div>
-        </Card>
-      )}
+        </div>
+      </Card>
     </div>
   );
 }
