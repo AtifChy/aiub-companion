@@ -1,3 +1,25 @@
+## [0.5.12] - 2026-07-21
+
+### 🚀 Features
+
+- *(settings)* Migrate to zustand store [`8cc3726`](https://github.com/AtifChy/aiub-companion/commit/8cc3726d13b27e9107b9fc705015c9908b5c522a)
+
+### 🐛 Bug Fixes
+
+- *(routine)* Handle file selection cancellation [`c483cec`](https://github.com/AtifChy/aiub-companion/commit/c483cece260586994db7ffbbabbd2006d2315e3f)
+
+### 🚜 Refactor
+
+- *(notices)* Update notice item click handler [`bbedc5e`](https://github.com/AtifChy/aiub-companion/commit/bbedc5e67fb2aa3aca99eb2f99b2807c2337469e)
+- *(routine)* Improve course search popover logic [`43d17ae`](https://github.com/AtifChy/aiub-companion/commit/43d17ae4a2396a82f2637cf67668a4d73b87a263)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Bump version to v0.5.12 [`5e5b5a3`](https://github.com/AtifChy/aiub-companion/commit/5e5b5a33384f51ee06aea0afdc158158d3800f00)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.5.10...v0.5.12
+
 ## [0.5.10] - 2026-07-21
 
 ### 🚀 Features
@@ -12,6 +34,10 @@
 
 - *(notices)* Rename notice provider to selection provider [`bc61b9a`](https://github.com/AtifChy/aiub-companion/commit/bc61b9a93d17eb68e8e6853a0fadc853c8095a1e)
 - *(notices)* Update import paths [`e309902`](https://github.com/AtifChy/aiub-companion/commit/e3099024ce67fa21eb18a73bd14a23c2a1325d04)
+
+### 📚 Documentation
+
+- Update changelog [`8d5f721`](https://github.com/AtifChy/aiub-companion/commit/8d5f7214e5365c8bf651dffae83469635867914b)
 
 ### 🎨 Styling
 
