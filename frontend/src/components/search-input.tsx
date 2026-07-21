@@ -54,9 +54,7 @@ export function SearchInput({
       <Input
         ref={setRef}
         value={value}
-        onChange={(e) => {
-          onValueChange(e.target.value);
-        }}
+        onChange={(e) => onValueChange(e.target.value)}
         placeholder={placeholder ?? "Search..."}
         autoComplete="off"
         className="pr-7 pl-8 text-xs"

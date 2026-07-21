@@ -118,9 +118,7 @@ export default function RoutinePage() {
       ) : (
         <DayScheduleTimeline
           routineByDay={routineByDay}
-          onRemoveCourse={(classId) => {
-            removeCourse(classId);
-          }}
+          onRemoveCourse={(classId) => removeCourse(classId)}
         />
       )}
     </div>

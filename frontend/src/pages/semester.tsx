@@ -123,9 +123,7 @@ export default function SemesterPage() {
             <Select
               items={CALENDAR_TYPES}
               value={calendarType}
-              onValueChange={(v) => {
-                if (v) setCalendarType(v);
-              }}
+              onValueChange={(v) => v && setCalendarType(v)}
             >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Calendar type" />
