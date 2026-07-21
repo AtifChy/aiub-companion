@@ -1,9 +1,7 @@
-import { type Config } from "@bindings/config";
 import { Service as LogService } from "@bindings/log";
 import { System } from "@wailsio/runtime";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
-import { type Updater } from "use-mutative";
 
 import { AlertDialogDestructive } from "@/components/alert-dialog-destructive";
 import { useSettings } from "@/components/providers/settings-provider";
@@ -44,17 +42,6 @@ const fetchCountItems: Items<number> = [10, 20, 30, 50].map((v) => ({
 
 export default function SettingsPage() {
   const { config, setConfig, resetConfig } = useSettings();
-
-  return <SettingsView config={config} setConfig={setConfig} resetConfig={resetConfig} />;
-}
-
-interface SettingsViewProps {
-  config: Config;
-  setConfig: Updater<Config | undefined>;
-  resetConfig: () => Promise<void>;
-}
-
-function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
   const { setTheme } = useTheme();
   const { check } = useUpdate();
 
@@ -77,10 +64,8 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
                 value={config.appearance.theme}
                 onValueChange={(v) => {
                   setConfig((draft) => {
-                    if (draft) {
-                      draft.appearance.theme = v;
-                      setTheme(v);
-                    }
+                    draft.appearance.theme = v;
+                    setTheme(v);
                   });
                 }}
               />
@@ -93,9 +78,7 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
               <Switch
                 checked={config.notifications.enabled}
                 onCheckedChange={(v) => {
-                  setConfig((draft) => {
-                    if (draft) draft.notifications.enabled = v;
-                  });
+                  setConfig((draft) => (draft.notifications.enabled = v));
                 }}
                 className="cursor-pointer"
               />
@@ -112,9 +95,7 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
                 items={syncIntervalItems}
                 value={config.sync.interval}
                 onValueChange={(v) => {
-                  setConfig((draft) => {
-                    if (draft) draft.sync.interval = v;
-                  });
+                  setConfig((draft) => (draft.sync.interval = v));
                 }}
               />
             </SettingRow>
@@ -127,9 +108,7 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
                 items={fetchCountItems}
                 value={config.sync.fetch_count}
                 onValueChange={(v) => {
-                  setConfig((draft) => {
-                    if (draft) draft.sync.fetch_count = v;
-                  });
+                  setConfig((draft) => (draft.sync.fetch_count = v));
                 }}
               />
             </SettingRow>
@@ -141,9 +120,7 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
               <Switch
                 checked={config.sync.on_startup}
                 onCheckedChange={(v) => {
-                  setConfig((draft) => {
-                    if (draft) draft.sync.on_startup = v;
-                  });
+                  setConfig((draft) => (draft.sync.on_startup = v));
                 }}
                 className="cursor-pointer"
               />
@@ -156,9 +133,7 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
               <Switch
                 checked={config.launch.auto_start}
                 onCheckedChange={(v) => {
-                  setConfig((draft) => {
-                    if (draft) draft.launch.auto_start = v;
-                  });
+                  setConfig((draft) => (draft.launch.auto_start = v));
                 }}
                 className="cursor-pointer"
               />
@@ -171,9 +146,7 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
               <Switch
                 checked={config.launch.start_minimized}
                 onCheckedChange={(v) => {
-                  setConfig((draft) => {
-                    if (draft) draft.launch.start_minimized = v;
-                  });
+                  setConfig((draft) => (draft.launch.start_minimized = v));
                 }}
                 className="cursor-pointer"
               />
@@ -186,9 +159,7 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
               <Switch
                 checked={config.launch.close_to_tray}
                 onCheckedChange={(v) => {
-                  setConfig((draft) => {
-                    if (draft) draft.launch.close_to_tray = v;
-                  });
+                  setConfig((draft) => (draft.launch.close_to_tray = v));
                 }}
                 className="cursor-pointer"
               />
@@ -202,9 +173,7 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
                 disabled={!config.launch.close_to_tray}
                 checked={config.launch.keep_alive}
                 onCheckedChange={(v) => {
-                  setConfig((draft) => {
-                    if (draft) draft.launch.keep_alive = v;
-                  });
+                  setConfig((draft) => (draft.launch.keep_alive = v));
                 }}
                 className="cursor-pointer"
               />
@@ -217,9 +186,7 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
               <Switch
                 checked={config.launch.restore_window}
                 onCheckedChange={(v) => {
-                  setConfig((draft) => {
-                    if (draft) draft.launch.restore_window = v;
-                  });
+                  setConfig((draft) => (draft.launch.restore_window = v));
                 }}
                 className="cursor-pointer"
               />
@@ -229,9 +196,7 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
               <Switch
                 checked={config.launch.sidebar_open}
                 onCheckedChange={(v) => {
-                  setConfig((draft) => {
-                    if (draft) draft.launch.sidebar_open = v;
-                  });
+                  setConfig((draft) => (draft.launch.sidebar_open = v));
                 }}
                 className="cursor-pointer"
               />
@@ -245,9 +210,7 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
                   items={updateIntervalItems}
                   value={config.updates.interval}
                   onValueChange={(v) => {
-                    setConfig((draft) => {
-                      if (draft) draft.updates.interval = v;
-                    });
+                    setConfig((draft) => (draft.updates.interval = v));
                   }}
                 />
               </SettingRow>
@@ -270,9 +233,7 @@ function SettingsView({ config, setConfig, resetConfig }: SettingsViewProps) {
                 items={logLevelItems}
                 value={config.logging.level}
                 onValueChange={(v) => {
-                  setConfig((draft) => {
-                    if (draft) draft.logging.level = v;
-                  });
+                  setConfig((draft) => (draft.logging.level = v));
                 }}
               />
             </SettingRow>
