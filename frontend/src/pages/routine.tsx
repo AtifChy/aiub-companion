@@ -71,9 +71,12 @@ export default function RoutinePage() {
         importCourses(path);
       })
       .catch((err: unknown) => {
-        toast.error("Failed to open file dialog", {
-          description: (err as Error).message,
-        });
+        const message = (err as Error).message;
+        if (message.endsWith("cancelled by user")) {
+          toast.warning("File selection cancelled", { description: "No file was selected" });
+        } else {
+          toast.error("Error selecting file", { description: message });
+        }
       });
   };
 
