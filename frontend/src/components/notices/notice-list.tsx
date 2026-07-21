@@ -94,13 +94,21 @@ function NoticeListItem({ notice }: NoticeListItemProps) {
 
   const { togglePin } = useNoticeMutations();
 
+  const handleClick = () => {
+    if (selectionMode) {
+      toggleChecked(notice.id);
+    } else {
+      setSelectedId(notice.id);
+    }
+  };
+
   return (
     <div
-      onClick={() => setSelectedId(notice.id)}
+      onClick={handleClick}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
           e.preventDefault();
-          setSelectedId(notice.id);
+          handleClick();
         }
       }}
       tabIndex={0}
