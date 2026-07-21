@@ -1,5 +1,5 @@
-import type { Notice } from "@bindings/notice";
-import { Browser, Events } from "@wailsio/runtime";
+import { Service, type Notice } from "@bindings/notice";
+import { Browser } from "@wailsio/runtime";
 import {
   CircleCheckBigIcon,
   CircleIcon,
@@ -24,7 +24,10 @@ import {
   NoticeFiltersProvider,
   useNoticeFilters,
 } from "@/components/providers/notice-filters-provider";
-import { NoticeSelectionProvider, useNoticeActive } from "@/components/providers/notice-provider";
+import {
+  NoticeSelectionProvider,
+  useNoticeActive,
+} from "@/components/providers/notice-selection-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
@@ -49,8 +52,13 @@ function NoticesPageInner() {
   const { setSelectedId } = useNoticeActive();
 
   useEffect(() => {
-    const unsubscribe = Events.On("notice:open", (event) => setSelectedId(event.data));
-    return unsubscribe;
+    Service.ConsumePendingNotice()
+      .then(([id, pending]) => {
+        if (pending) setSelectedId(id);
+      })
+      .catch((err: unknown) => {
+        logger.error("Failed to consume pending notice", err);
+      });
   }, [setSelectedId]);
 
   return (
