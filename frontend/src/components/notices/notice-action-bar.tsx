@@ -2,15 +2,14 @@ import type { Notice } from "@bindings/notice";
 import { CircleCheckBigIcon, CircleIcon, PinIcon, PinOffIcon, XIcon } from "lucide-react";
 import { useShallow } from "zustand/shallow";
 
+import { AppTooltip } from "@/components/app-tooltip";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { useNoticeMutations } from "@/hooks/use-notice-mutation";
 import { useNoticeStore } from "@/hooks/use-notice-store";
 import { cn } from "@/lib/utils";
-
-import { AppTooltip } from "../app-tooltip";
-import { Button } from "../ui/button";
-import { Checkbox } from "../ui/checkbox";
-import { Label } from "../ui/label";
-import { Separator } from "../ui/separator";
 
 function deriveNext(
   checkedIds: Set<string>,
