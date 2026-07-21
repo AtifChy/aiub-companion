@@ -1,4 +1,5 @@
 import { Service, type Notice } from "@bindings/notice";
+import { useQueryClient } from "@tanstack/react-query";
 import { Browser } from "@wailsio/runtime";
 import {
   CircleCheckBigIcon,
@@ -12,22 +13,15 @@ import {
   PinIcon,
   PinOffIcon,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
+import { useShallow } from "zustand/shallow";
 
 import { AppTooltip } from "@/components/app-tooltip";
 import { HorizontalScroll } from "@/components/horizontal-scroll";
 import { NoticeActionBar } from "@/components/notices/notice-action-bar";
 import { NoticeList } from "@/components/notices/notice-list";
 import { NoticeListToolbar } from "@/components/notices/notice-list-toolbar";
-import {
-  NoticeFiltersProvider,
-  useNoticeFilters,
-} from "@/components/providers/notice-filters-provider";
-import {
-  NoticeSelectionProvider,
-  useNoticeActive,
-} from "@/components/providers/notice-selection-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
@@ -35,22 +29,46 @@ import { Separator } from "@/components/ui/separator";
 import { Toggle } from "@/components/ui/toggle";
 import { useDelayedLoading } from "@/hooks/use-delayed-loading";
 import { useNoticeMutations } from "@/hooks/use-notice-mutation";
-import { useNoticeDetail, useNoticeList } from "@/hooks/use-notices";
+import { useNoticeStore } from "@/hooks/use-notice-store";
+import { noticeKeys, useNoticeDetail, useNoticeList } from "@/hooks/use-notices";
 import { logger } from "@/lib/logger";
 import { CATEGORY_STYLES, formatDate, type AltCategory } from "@/lib/notices";
 import { cn } from "@/lib/utils";
 
 export default function NoticesPage() {
-  return (
-    <NoticeSelectionProvider>
-      <NoticesPageInner />
-    </NoticeSelectionProvider>
+  const { selectedId, setSelectedId } = useNoticeStore(
+    useShallow((s) => ({ selectedId: s.selectedId, setSelectedId: s.setSelectedId })),
   );
-}
 
-function NoticesPageInner() {
-  const { setSelectedId } = useNoticeActive();
+  const queryClient = useQueryClient();
+  const { toggleRead } = useNoticeMutations();
 
+  // Track the previous ID so we can mark it read when navigating away
+  const previousIdRef = useRef<string | null>(null);
+
+  // Mark the previous notice as read when navigating away from it
+  useEffect(() => {
+    const prevId = previousIdRef.current;
+    if (prevId && prevId !== selectedId) {
+      const prevNotice = queryClient.getQueryData<Notice>(noticeKeys.details(prevId));
+      if (prevNotice && !prevNotice.isRead) {
+        toggleRead({ id: prevId, next: true });
+      }
+    }
+    previousIdRef.current = selectedId;
+
+    return () => {
+      const currId = previousIdRef.current;
+      if (currId) {
+        const currNotice = queryClient.getQueryData<Notice>(noticeKeys.details(currId));
+        if (currNotice && !currNotice.isRead) {
+          toggleRead({ id: currId, next: true });
+        }
+      }
+    };
+  }, [selectedId, queryClient, toggleRead]);
+
+  // Consume any pending notice that was passed to the app via a deep link or notification
   useEffect(() => {
     Service.ConsumePendingNotice()
       .then(([id, pending]) => {
@@ -77,15 +95,7 @@ function NoticesPageInner() {
 }
 
 function NoticeListPanel() {
-  return (
-    <NoticeFiltersProvider>
-      <NoticeListPanelInner />
-    </NoticeFiltersProvider>
-  );
-}
-
-function NoticeListPanelInner() {
-  const { filters } = useNoticeFilters();
+  const filters = useNoticeStore((state) => state.filters);
   const { query } = useNoticeList(filters);
 
   const notices = query.data ?? [];
@@ -110,7 +120,8 @@ function NoticeListPanelInner() {
 }
 
 function DetailPanel() {
-  const { selectedId } = useNoticeActive();
+  const selectedId = useNoticeStore((state) => state.selectedId);
+
   const { query } = useNoticeDetail(selectedId);
   const { toggleRead, togglePin } = useNoticeMutations();
 

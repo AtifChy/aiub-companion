@@ -1,12 +1,12 @@
 import type { Notice } from "@bindings/notice";
 import { CircleIcon, InboxIcon, Loader2Icon, PinIcon, PinOffIcon } from "lucide-react";
+import { useShallow } from "zustand/shallow";
 
-import { useNoticeFilters } from "@/components/providers/notice-filters-provider";
-import { useNoticeActive, useNoticeBulk } from "@/components/providers/notice-selection-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useNoticeMutations } from "@/hooks/use-notice-mutation";
+import { useNoticeStore } from "@/hooks/use-notice-store";
 import { CATEGORY_STYLES, formatDate, type AltCategory } from "@/lib/notices";
 import { cn } from "@/lib/utils";
 
@@ -18,11 +18,10 @@ interface NoticeListProps {
 }
 
 export function NoticeList({ notices, loading, error, onRetry }: NoticeListProps) {
-  const { filters, clearFilters } = useNoticeFilters();
+  const { filters, clearFilters } = useNoticeStore(
+    useShallow((s) => ({ filters: s.filters, clearFilters: s.clearFilters })),
+  );
   const hasActiveFilters = filters.urgent || filters.pinned || filters.unread;
-
-  const { selectedId, setSelectedId } = useNoticeActive();
-  const { selectionMode, checkedIds, toggleChecked } = useNoticeBulk();
 
   if (loading) {
     return (
@@ -72,15 +71,7 @@ export function NoticeList({ notices, loading, error, onRetry }: NoticeListProps
   return (
     <div className="flex-1 scrollbar-thin scrollbar-thumb-accent overflow-y-auto">
       {notices.map((notice) => (
-        <NoticeListItem
-          key={notice.id}
-          notice={notice}
-          selected={selectedId === notice.id}
-          checked={checkedIds.has(notice.id)}
-          selectionMode={selectionMode}
-          onSelect={setSelectedId}
-          onToggleChecked={toggleChecked}
-        />
+        <NoticeListItem key={notice.id} notice={notice} />
       ))}
     </div>
   );
@@ -88,32 +79,28 @@ export function NoticeList({ notices, loading, error, onRetry }: NoticeListProps
 
 interface NoticeListItemProps {
   notice: Notice;
-  selected: boolean;
-  checked: boolean;
-  selectionMode: boolean;
-  onSelect: (id: string) => void;
-  onToggleChecked: (id: string) => void;
 }
 
-function NoticeListItem({
-  notice,
-  selected,
-  checked,
-  selectionMode,
-  onSelect,
-  onToggleChecked,
-}: NoticeListItemProps) {
-  const { togglePin } = useNoticeMutations();
+function NoticeListItem({ notice }: NoticeListItemProps) {
+  const { selected, checked, selectionMode, setSelectedId, toggleChecked } = useNoticeStore(
+    useShallow((s) => ({
+      selected: s.selectedId === notice.id,
+      checked: s.checkedIds.has(notice.id),
+      selectionMode: s.selectionMode,
+      setSelectedId: s.setSelectedId,
+      toggleChecked: s.toggleChecked,
+    })),
+  );
 
-  console.count(`Render ${notice.id}`);
+  const { togglePin } = useNoticeMutations();
 
   return (
     <div
-      onClick={() => onSelect(notice.id)}
+      onClick={() => setSelectedId(notice.id)}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
           e.preventDefault();
-          onSelect(notice.id);
+          setSelectedId(notice.id);
         }
       }}
       tabIndex={0}
@@ -130,7 +117,7 @@ function NoticeListItem({
         <Checkbox
           checked={checked}
           onClick={(e) => e.preventDefault()}
-          onCheckedChange={() => onToggleChecked(notice.id)}
+          onCheckedChange={() => toggleChecked(notice.id)}
           className="mt-0.5 mr-2.5 size-3.5"
         />
       )}

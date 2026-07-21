@@ -6,11 +6,10 @@ import {
   RefreshCwIcon,
   SquareIcon,
 } from "lucide-react";
+import { useShallow } from "zustand/shallow";
 
 import { AppTooltip } from "@/components/app-tooltip";
 import { HorizontalScroll } from "@/components/horizontal-scroll";
-import { useNoticeFilters } from "@/components/providers/notice-filters-provider";
-import { useNoticeBulk } from "@/components/providers/notice-selection-provider";
 import { SearchInput } from "@/components/search-input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,6 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Toggle } from "@/components/ui/toggle";
 import { useSync } from "@/hooks/use-notice-mutation";
+import { useNoticeStore } from "@/hooks/use-notice-store";
 import { CATEGORIES } from "@/lib/notices";
 import { cn } from "@/lib/utils";
 
@@ -52,7 +52,9 @@ export function NoticeListToolbar({ noticeCount, unreadCount, loading }: NoticeL
 }
 
 function NoticeListToolbarSearch() {
-  const { filters, setFilters } = useNoticeFilters();
+  const { filters, setFilters } = useNoticeStore(
+    useShallow((s) => ({ filters: s.filters, setFilters: s.setFilters })),
+  );
 
   return (
     <div className="border-b px-3 py-2.5">
@@ -83,8 +85,14 @@ function NoticeListToolbarSearch() {
 }
 
 function NoticeListToolbarActions({ noticeCount, unreadCount, loading }: NoticeListToolbarProps) {
+  const { selectionMode, setSelectionMode } = useNoticeStore(
+    useShallow((s) => ({
+      selectionMode: s.selectionMode,
+      setSelectionMode: s.setSelectionMode,
+    })),
+  );
+
   const { syncing, sync } = useSync();
-  const { selectionMode, setSelectionMode } = useNoticeBulk();
 
   return (
     <div className="flex items-center justify-between border-b px-2 py-1.5 text-[0.7rem] text-muted-foreground">
@@ -138,7 +146,13 @@ function NoticeListToolbarActions({ noticeCount, unreadCount, loading }: NoticeL
 }
 
 function NoticeListToolbarFilters() {
-  const { filters, setFilters, clearFilters } = useNoticeFilters();
+  const { filters, setFilters, clearFilters } = useNoticeStore(
+    useShallow((s) => ({
+      filters: s.filters,
+      setFilters: s.setFilters,
+      clearFilters: s.clearFilters,
+    })),
+  );
   const hasActiveFilters = filters.urgent || filters.pinned || filters.unread;
 
   return (
