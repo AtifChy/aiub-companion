@@ -40,12 +40,12 @@ export function SearchInput({
       if (event.key === "/" && document.activeElement !== innerRef.current) {
         event.preventDefault();
         innerRef.current?.focus();
+      } else if (event.key === "Escape" && document.activeElement === innerRef.current) {
+        innerRef.current?.blur();
       }
     };
     window.addEventListener("keydown", handler);
-    return () => {
-      window.removeEventListener("keydown", handler);
-    };
+    return () => window.removeEventListener("keydown", handler);
   }, []);
 
   return (
