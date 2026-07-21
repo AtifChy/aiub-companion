@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"sync"
 
 	"aiub-companion/internal/database"
 	"aiub-companion/internal/search"
@@ -17,6 +18,10 @@ type Service struct {
 	db     *database.Service
 	repo   Repository
 	client Client
+
+	pendingID string
+
+	mu sync.Mutex
 }
 
 func NewService(db *database.Service) *Service {
@@ -152,4 +157,25 @@ func (s *Service) ToggleNoticeRead(ctx context.Context, id string, read bool) er
 
 func (s *Service) ClearNotices(ctx context.Context) error {
 	return s.repo.ClearNotices(ctx)
+}
+
+//wails:ignore
+func (s *Service) SetPendingNotice(id string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.pendingID = id
+}
+
+func (s *Service) ConsumePendingNotice() (string, bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	id := s.pendingID
+	if id == "" {
+		return "", false
+	}
+	s.pendingID = ""
+
+	return id, true
 }

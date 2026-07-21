@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"aiub-companion/internal/config"
-	"aiub-companion/internal/desktop"
 	"aiub-companion/internal/event"
 	"aiub-companion/internal/notice"
 
@@ -61,11 +60,9 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 
 		app.Event.Emit(event.EventMainWindowShow)
 
-		// Only works when the window is already open, otherwise it will be ignored.
 		if !strings.HasPrefix(result.Response.ID, "sync-") {
-			if window, ok := app.Window.Get(desktop.MainWindowName); ok {
-				window.EmitEvent(event.EventNoticeOpen, result.Response.ID)
-			}
+			s.notice.SetPendingNotice(result.Response.ID)
+			slog.Info("Opening notice from notification", "id", result.Response.ID)
 		}
 	})
 
