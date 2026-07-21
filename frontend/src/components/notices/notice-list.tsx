@@ -1,9 +1,8 @@
 import type { Notice } from "@bindings/notice";
 import { CircleIcon, InboxIcon, Loader2Icon, PinIcon, PinOffIcon } from "lucide-react";
-import { useRef } from "react";
 
 import { useNoticeFilters } from "@/components/providers/notice-filters-provider";
-import { useNoticeActive, useNoticeBulk } from "@/components/providers/notice-provider";
+import { useNoticeActive, useNoticeBulk } from "@/components/providers/notice-selection-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -24,25 +23,6 @@ export function NoticeList({ notices, loading, error, onRetry }: NoticeListProps
 
   const { selectedId, setSelectedId } = useNoticeActive();
   const { selectionMode, checkedIds, toggleChecked } = useNoticeBulk();
-
-  const previousSelectedRef = useRef<Notice | null>(null);
-  const { toggleRead } = useNoticeMutations();
-
-  const handleSelect = (notice: Notice) => {
-    if (selectionMode) {
-      toggleChecked(notice.id);
-      return;
-    }
-
-    const prev = previousSelectedRef.current;
-
-    if (prev && prev.id !== notice.id && !prev.isRead) {
-      toggleRead({ id: prev.id, next: true });
-    }
-
-    previousSelectedRef.current = notice;
-    setSelectedId(notice.id);
-  };
 
   if (loading) {
     return (
@@ -98,7 +78,7 @@ export function NoticeList({ notices, loading, error, onRetry }: NoticeListProps
           selected={selectedId === notice.id}
           checked={checkedIds.has(notice.id)}
           selectionMode={selectionMode}
-          onSelect={handleSelect}
+          onSelect={setSelectedId}
           onToggleChecked={toggleChecked}
         />
       ))}
@@ -111,7 +91,7 @@ interface NoticeListItemProps {
   selected: boolean;
   checked: boolean;
   selectionMode: boolean;
-  onSelect: (notice: Notice) => void;
+  onSelect: (id: string) => void;
   onToggleChecked: (id: string) => void;
 }
 
@@ -129,11 +109,11 @@ function NoticeListItem({
 
   return (
     <div
-      onClick={() => onSelect(notice)}
+      onClick={() => onSelect(notice.id)}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
           e.preventDefault();
-          onSelect(notice);
+          onSelect(notice.id);
         }
       }}
       tabIndex={0}

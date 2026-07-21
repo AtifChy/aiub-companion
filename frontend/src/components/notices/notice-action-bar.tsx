@@ -1,7 +1,7 @@
 import type { Notice } from "@bindings/notice";
 import { CircleCheckBigIcon, CircleIcon, PinIcon, PinOffIcon, XIcon } from "lucide-react";
 
-import { useNoticeBulk } from "@/components/providers/notice-provider";
+import { useNoticeBulk } from "@/components/providers/notice-selection-provider";
 import { useNoticeMutations } from "@/hooks/use-notice-mutation";
 import { cn } from "@/lib/utils";
 
