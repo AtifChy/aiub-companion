@@ -415,7 +415,7 @@ function CourseCard({ course, schedule, onRemoveCourse }: CourseCardProps) {
         "group relative overflow-hidden border-l-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md",
         isLab ? "border-l-emerald-500" : "border-l-indigo-500",
         status === "ongoing" &&
-          "border-l-emerald-500 bg-emerald-500/5 shadow-md ring-2 shadow-emerald-500/5 ring-emerald-500",
+          "border-transparent bg-emerald-500/5 shadow-md ring-2 shadow-emerald-500/5 ring-emerald-500",
       )}
     >
       {/* Live Status Tracker Pulses */}
@@ -437,12 +437,12 @@ function CourseCard({ course, schedule, onRemoveCourse }: CourseCardProps) {
             {schedule.type}
           </Badge>
           {status === "ongoing" && (
-            <Badge className="border-0 bg-emerald-500 px-1.5 py-0 text-[8px] font-bold tracking-wider text-white uppercase">
+            <Badge className="border-0 bg-emerald-500 px-1.5 py-0 text-[0.5rem] font-bold tracking-wider text-white uppercase">
               Ongoing
             </Badge>
           )}
           {status === "upcoming" && (
-            <Badge className="border-0 bg-amber-500 px-1.5 py-0 text-[8px] font-bold tracking-wider text-white uppercase">
+            <Badge className="border-0 bg-amber-500 px-1.5 py-0 text-[0.5rem] font-bold tracking-wider text-white uppercase">
               Up Next
             </Badge>
           )}
