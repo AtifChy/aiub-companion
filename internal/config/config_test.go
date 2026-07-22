@@ -20,6 +20,7 @@ func TestValidateSchema(t *testing.T) {
 					"on_startup": true
 				},
 				"launch": {
+					"auto_start": false,
 					"start_minimized": true,
 					"close_to_tray": false,
 					"keep_alive": false,

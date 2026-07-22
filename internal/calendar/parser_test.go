@@ -603,6 +603,12 @@ func TestParser_DateRangeRowspanWithEmptyDay(t *testing.T) {
 	}
 
 	// GetNextExam should return Midterm (earlier date)
+	oldTimeNow := timeNow
+	defer func() { timeNow = oldTimeNow }()
+	timeNow = func() time.Time {
+		return time.Date(2026, 7, 10, 0, 0, 0, 0, time.Local)
+	}
+
 	nextExam := calendar.GetNextExam()
 	if nextExam == nil {
 		t.Fatal("GetNextExam() returned nil")
