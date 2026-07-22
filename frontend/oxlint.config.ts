@@ -1,5 +1,5 @@
+import reactDoctor from "eslint-plugin-react-doctor";
 import reactX from "eslint-plugin-react-x";
-import reactYouMightNotNeedAnEffect from "eslint-plugin-react-you-might-not-need-an-effect";
 import { defineConfig } from "oxlint";
 import eslintRecommended from "oxlint-config-presets/@eslint/recommended.json" with { type: "json" };
 import tsStrictTypeChecked from "oxlint-config-presets/@typescript-eslint/strict-type-checked.json" with { type: "json" };
@@ -24,7 +24,7 @@ export default defineConfig({
   categories: {
     correctness: "error",
   },
-  jsPlugins: ["eslint-plugin-react-x", "eslint-plugin-react-you-might-not-need-an-effect"],
+  jsPlugins: ["eslint-plugin-react-x", "eslint-plugin-react-doctor"],
   rules: {
     "typescript/no-confusing-void-expression": "off",
 
@@ -33,7 +33,9 @@ export default defineConfig({
 
     ...reactX.configs["recommended-typescript"].rules,
 
-    ...reactYouMightNotNeedAnEffect.configs.recommended.rules,
+    ...reactDoctor.configs.recommended.rules,
+    "react-doctor/no-locale-format-in-render": "off",
+    "react-doctor/no-unguarded-browser-global-in-render-or-hook-init": "off",
   },
   env: { builtin: true },
   options: {
