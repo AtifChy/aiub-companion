@@ -1,3 +1,27 @@
+## [0.5.15] - 2026-07-22
+
+### 🚀 Features
+
+- *(db:routine)* [**breaking**] Add course details to user routine [`710b5bb`](https://github.com/AtifChy/aiub-companion/commit/710b5bb1afa9805256eff38b88743a946e0cfc09)
+- *(routine)* Handle adding existing course in routine [`1200ebb`](https://github.com/AtifChy/aiub-companion/commit/1200ebb89d19f16fdbbd4e1698bfeed4e4955ec3)
+
+### 🚜 Refactor
+
+- Remove unused cgpa and gpa-trend pages [`cbd23c7`](https://github.com/AtifChy/aiub-companion/commit/cbd23c783bbc521b4535ca8bd4f941c22587a856)
+
+### 🎨 Styling
+
+- *(lint)* Fix linting issues in the codebase [`b43529c`](https://github.com/AtifChy/aiub-companion/commit/b43529cd51e243b1b8dfb4cf2ce13f0b57ca46cb)
+- *(routine)* Update badge text size and remove ongoing border [`4078fc1`](https://github.com/AtifChy/aiub-companion/commit/4078fc13df120348cb386de0f4222fb0a5e2b542)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(lint)* Replace `you-might-not-need-an-effect` with `react-doctor` [`e9197e6`](https://github.com/AtifChy/aiub-companion/commit/e9197e6319b5f8df492d9c56d8870a28c040f00d)
+- *(release)* Bump version to v0.5.15 [`51b6835`](https://github.com/AtifChy/aiub-companion/commit/51b683503c89c805e2f8f28e6d391e8dee6f0755)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.5.12...v0.5.15
+
 ## [0.5.12] - 2026-07-21
 
 ### 🚀 Features
@@ -12,6 +36,10 @@
 
 - *(notices)* Update notice item click handler [`bbedc5e`](https://github.com/AtifChy/aiub-companion/commit/bbedc5e67fb2aa3aca99eb2f99b2807c2337469e)
 - *(routine)* Improve course search popover logic [`43d17ae`](https://github.com/AtifChy/aiub-companion/commit/43d17ae4a2396a82f2637cf67668a4d73b87a263)
+
+### 📚 Documentation
+
+- Update changelog [`3b6e353`](https://github.com/AtifChy/aiub-companion/commit/3b6e353a111caf5305a2a676d771a8a2519ee659)
 
 ### ⚙️ Miscellaneous Tasks
 
