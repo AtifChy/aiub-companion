@@ -71,11 +71,9 @@ export function UpdateProvider({ children }: { children: React.ReactNode }) {
     return unsubscribe;
   }, []);
 
-  return (
-    <UpdateContext value={{ release, dialogOpen, setDialogOpen, check, install }}>
-      {children}
-    </UpdateContext>
-  );
+  const value = { release, dialogOpen, setDialogOpen, check, install };
+
+  return <UpdateContext value={value}>{children}</UpdateContext>;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components

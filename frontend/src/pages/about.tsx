@@ -9,9 +9,10 @@ import { Separator } from "@/components/ui/separator";
 import { WindowControls } from "@/components/window-controls";
 import { logger } from "@/lib/logger";
 
+const year = () => new Date().getFullYear();
+
 export default function AboutPage() {
   const [appInfo, setAppInfo] = useState<BuildInfo | null>(null);
-  const year = () => new Date().getFullYear();
 
   useEffect(() => {
     MetaService.GetBuildInfo()

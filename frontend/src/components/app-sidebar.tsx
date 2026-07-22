@@ -13,9 +13,10 @@ import {
 } from "@/components/ui/sidebar";
 import { AboutPage, SECTIONS } from "@/lib/routes";
 
+const year = () => new Date().getFullYear();
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [appInfo, setAppInfo] = useState<BuildInfo | null>(null);
-  const year = () => new Date().getFullYear();
 
   useEffect(() => {
     MetaService.GetBuildInfo()

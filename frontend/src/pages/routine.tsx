@@ -10,7 +10,7 @@ import {
   Trash2Icon,
   UserIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
 
 import { SearchInput } from "@/components/search-input";
@@ -377,16 +377,19 @@ function DayScheduleTimeline({ routineByDay, onRemoveCourse }: DayScheduleTimeli
             {/* Day Grid Courses */}
             <div className="grid flex-1 grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
               {dayCourses.flatMap((course) =>
-                course.schedules
-                  .filter((schedule) => schedule.day === day)
-                  .map((schedule) => (
-                    <CourseCard
-                      key={`${course.classID}-${schedule.day}-${schedule.startTime}`}
-                      course={course}
-                      schedule={schedule}
-                      onRemoveCourse={onRemoveCourse}
-                    />
-                  )),
+                course.schedules.reduce<ReactNode[]>((acc, schedule) => {
+                  if (schedule.day === day) {
+                    acc.push(
+                      <CourseCard
+                        key={`${course.classID}-${schedule.day}-${schedule.startTime}`}
+                        course={course}
+                        schedule={schedule}
+                        onRemoveCourse={onRemoveCourse}
+                      />,
+                    );
+                  }
+                  return acc;
+                }, []),
               )}
             </div>
           </div>

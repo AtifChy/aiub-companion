@@ -104,6 +104,7 @@ function NoticeListItem({ notice }: NoticeListItemProps) {
 
   return (
     <div
+      role="button"
       onClick={handleClick}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
