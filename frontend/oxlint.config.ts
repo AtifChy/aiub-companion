@@ -1,3 +1,4 @@
+import tanstackQuery from "@tanstack/eslint-plugin-query";
 import reactDoctor from "eslint-plugin-react-doctor";
 import reactX from "eslint-plugin-react-x";
 import { defineConfig } from "oxlint";
@@ -24,7 +25,11 @@ export default defineConfig({
   categories: {
     correctness: "error",
   },
-  jsPlugins: ["eslint-plugin-react-x", "eslint-plugin-react-doctor"],
+  jsPlugins: [
+    "eslint-plugin-react-x",
+    "eslint-plugin-react-doctor",
+    "@tanstack/eslint-plugin-query",
+  ],
   rules: {
     "typescript/no-confusing-void-expression": "off",
 
@@ -36,6 +41,8 @@ export default defineConfig({
     ...reactDoctor.configs.recommended.rules,
     "react-doctor/no-locale-format-in-render": "off",
     "react-doctor/no-unguarded-browser-global-in-render-or-hook-init": "off",
+
+    ...tanstackQuery.configs.recommended.rules,
   },
   env: { builtin: true },
   options: {
