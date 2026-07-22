@@ -3,9 +3,13 @@ package routine
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"aiub-companion/internal/database"
 	"aiub-companion/internal/database/sqlc"
+
+	"modernc.org/sqlite"
+	sqlite3 "modernc.org/sqlite/lib"
 )
 
 type Repository interface {
@@ -121,8 +125,24 @@ func (r *repository) InsertClassSchedule(ctx context.Context, classID string, sc
 	})
 }
 
+var ErrCourseAlreadyExists = errors.New("course already exists in user routine")
+
 func (r *repository) AddToUserRoutine(ctx context.Context, classID string) error {
-	return r.queries.AddToUserRoutine(ctx, classID)
+	if err := r.queries.AddToUserRoutine(ctx, classID); err != nil {
+		sqlErr, ok := errors.AsType[*sqlite.Error](err)
+		if !ok {
+			return err
+		}
+
+		switch sqlErr.Code() {
+		case sqlite3.SQLITE_CONSTRAINT_UNIQUE, sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY:
+			return ErrCourseAlreadyExists
+		default:
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (r *repository) RemoveFromUserRoutine(ctx context.Context, classID string) error {
