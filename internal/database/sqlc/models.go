@@ -58,8 +58,10 @@ type OfferedCourse struct {
 }
 
 type UserRoutine struct {
-	ClassID string
-	AddedAt string
+	ClassID     string
+	CourseCode  sql.NullString
+	CourseTitle string
+	AddedAt     string
 }
 
 type UserState struct {

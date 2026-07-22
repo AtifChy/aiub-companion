@@ -60,6 +60,8 @@ CREATE TABLE IF NOT EXISTS class_schedule (
 
 CREATE TABLE IF NOT EXISTS user_routine (
   class_id TEXT NOT NULL PRIMARY KEY,
+  course_code TEXT UNIQUE,
+  course_title TEXT NOT NULL UNIQUE,
   added_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (class_id) REFERENCES offered_courses (class_id) ON DELETE CASCADE
 ) WITHOUT ROWID;

@@ -12,10 +12,15 @@ import (
 
 const addToUserRoutine = `-- name: AddToUserRoutine :exec
 INSERT INTO
-  user_routine (class_id)
-VALUES
-  (?)
-ON CONFLICT(class_id) DO NOTHING
+  user_routine (class_id, course_code, course_title)
+SELECT
+  o.class_id,
+  o.course_code,
+  o.course_title
+FROM
+  offered_courses o
+WHERE
+  o.class_id = ?
 `
 
 func (q *Queries) AddToUserRoutine(ctx context.Context, classID string) error {
