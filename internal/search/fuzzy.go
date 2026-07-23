@@ -3,13 +3,17 @@ package search
 
 import (
 	"cmp"
+	"math"
 	"slices"
 	"strings"
 
 	"github.com/hbollon/go-edlib"
 )
 
-const similarityThreshold float32 = 0.7
+const (
+	similarityThreshold float32 = 0.7
+	tieBreakerThreshold float64 = 0.05
+)
 
 // FieldFunc is a function type that extracts a string field from an item of type T.
 type FieldFunc[T any] func(T) string
@@ -54,15 +58,15 @@ func FuzzySearch[T any](
 	}
 
 	slices.SortFunc(scored, func(a, b scoreItem[T]) int {
-		if c := cmp.Compare(b.score, a.score); c != 0 {
-			return c
+		if math.Abs(float64(a.score-b.score)) > tieBreakerThreshold {
+			return cmp.Compare(b.score, a.score)
 		}
 
 		if compare != nil {
 			return compare(a.item, b.item)
 		}
 
-		return 0
+		return cmp.Compare(b.score, a.score)
 	})
 
 	result := make([]T, len(scored))
