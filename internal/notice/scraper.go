@@ -4,14 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log/slog"
-	"net"
-	"net/http"
 	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
+
+	"aiub-companion/internal/fetcher"
 
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/wailsapp/wails/v3/pkg/application"
@@ -21,19 +20,19 @@ import (
 const defaultBaseURL = "https://www.aiub.edu"
 
 type scraper struct {
-	client  *http.Client
+	fetcher *fetcher.Fetcher
 	baseURL string
 }
 
 func (s *scraper) ScrapeNotices(ctx context.Context, count int) ([]Notice, error) {
 	url := s.baseURL + "/category/notices?pageNo=1&pageSize=" + strconv.Itoa(count)
 
-	doc, err := s.fetchHTML(ctx, url)
+	doc, err := s.fetcher.FetchHTML(ctx, url)
 	if err != nil {
 		return nil, fmt.Errorf("fetch notices: %w", err)
 	}
 
-	cards := findNodesByClass(doc, "div", "notification")
+	cards := fetcher.FindNodesByClass(doc, "div", "notification")
 
 	notices := make([]Notice, 0, len(cards))
 
@@ -61,19 +60,19 @@ func extractCardFields(card *html.Node) struct{ slug, title, summary, date strin
 	var walk func(*html.Node)
 	walk = func(n *html.Node) {
 		if n.Type == html.ElementNode {
-			cls := getAttr(n, "class")
+			cls := fetcher.GetAttr(n, "class")
 			switch {
 			case f.slug == "" && n.Data == "a":
-				href := getAttr(n, "href")
+				href := fetcher.GetAttr(n, "href")
 				if href != "" && href != "#" && !strings.HasPrefix(href, "javascript:") {
 					f.slug = strings.TrimPrefix(href, "/")
 				}
 			case n.Data == "h2" && strings.Contains(cls, "title"):
-				f.title = getInnerText(n)
+				f.title = fetcher.GetInnerText(n)
 			case n.Data == "p" && strings.Contains(cls, "desc"):
-				f.summary = getInnerText(n)
+				f.summary = fetcher.GetInnerText(n)
 			case n.Data == "div" && strings.Contains(cls, "date-custom"):
-				f.date = getInnerText(n)
+				f.date = fetcher.GetInnerText(n)
 			}
 		}
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
@@ -121,17 +120,17 @@ func isUrgent(title string) bool {
 func (s *scraper) ScrapeNoticeDetails(ctx context.Context, slug string) (NoticeDetails, error) {
 	url := s.baseURL + "/" + slug
 
-	doc, err := s.fetchHTML(ctx, url)
+	doc, err := s.fetcher.FetchHTML(ctx, url)
 	if err != nil {
 		return NoticeDetails{}, fmt.Errorf("fetch notice details: %w", err)
 	}
 
-	contents := findNodesByClass(doc, "div", "question-column")
+	contents := fetcher.FindNodesByClass(doc, "div", "question-column")
 	if len(contents) < 2 {
 		return NoticeDetails{}, errors.New("invalid page structure")
 	}
 
-	title := getInnerText(contents[0])
+	title := fetcher.GetInnerText(contents[0])
 	attachments := s.extractAttachments(contents[1])
 	s.removeAttachments(contents[1])
 	body := s.extractBodyHTML(contents[1])
@@ -148,7 +147,7 @@ func (s *scraper) ScrapeNoticeDetails(ctx context.Context, slug string) (NoticeD
 func (s *scraper) extractBodyHTML(node *html.Node) string {
 	var sb strings.Builder
 	for c := node.FirstChild; c != nil; c = c.NextSibling {
-		if getInnerText(c) != "" {
+		if fetcher.GetInnerText(c) != "" {
 			_ = html.Render(&sb, c)
 		}
 	}
@@ -161,7 +160,7 @@ func (s *scraper) extractAttachments(node *html.Node) []Attachment {
 	var walk func(*html.Node)
 	walk = func(n *html.Node) {
 		if s.isAttachment(n) {
-			href := getAttr(n, "href")
+			href := fetcher.GetAttr(n, "href")
 			clean := strings.ReplaceAll(href, "\\", "/")
 			if !strings.HasPrefix(clean, "http") {
 				clean = s.baseURL + clean
@@ -170,7 +169,7 @@ func (s *scraper) extractAttachments(node *html.Node) []Attachment {
 			base := path.Base(clean)
 			id := strings.TrimSuffix(base, filepath.Ext(base))
 
-			label := strings.TrimSpace(getInnerText(n))
+			label := strings.TrimSpace(fetcher.GetInnerText(n))
 			if label == "" {
 				label = "Document"
 			}
@@ -209,127 +208,8 @@ func (s *scraper) isAttachment(n *html.Node) bool {
 	if n == nil || n.Type != html.ElementNode || n.Data != "a" {
 		return false
 	}
-	href := getAttr(n, "href")
+	href := fetcher.GetAttr(n, "href")
 	clean := strings.ReplaceAll(href, "\\", "/")
 	lower := strings.ToLower(clean)
 	return strings.Contains(lower, "uploads")
-}
-
-func (s *scraper) fetchHTML(ctx context.Context, url string) (*html.Node, error) {
-	const maxAttempts = 5
-	backoff := time.Second
-
-	for attempt := 1; attempt <= maxAttempts; attempt++ {
-		if err := ctx.Err(); err != nil {
-			return nil, err
-		}
-
-		doc, retriable, err := s.fetchWithRetriable(ctx, url)
-		if err == nil {
-			return doc, nil
-		}
-
-		if attempt == maxAttempts || !retriable {
-			if attempt == 1 {
-				return nil, err
-			}
-			return nil, fmt.Errorf("after %d attempts: %w", attempt, err)
-		}
-
-		select {
-		case <-ctx.Done():
-			return nil, ctx.Err()
-		case <-time.After(backoff):
-			backoff *= 2
-		}
-	}
-
-	panic("unreachable")
-}
-
-func (s *scraper) fetchWithRetriable(ctx context.Context, url string) (*html.Node, bool, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, false, fmt.Errorf("new request: %w", err)
-	}
-	req.Header.Set(
-		"User-Agent",
-		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
-	)
-
-	resp, err := s.client.Do(req)
-	if err != nil {
-		if netErr, ok := errors.AsType[net.Error](err); ok && netErr.Timeout() {
-			return nil, true, fmt.Errorf("%s: timeout: %w", url, err)
-		}
-		if dnsErr, ok := errors.AsType[*net.DNSError](err); ok {
-			return nil, true, fmt.Errorf("%s: DNS error: %w", url, dnsErr)
-		}
-		if opErr, ok := errors.AsType[*net.OpError](err); ok {
-			return nil, true, fmt.Errorf("%s: operation error: %w", url, opErr)
-		}
-		return nil, false, fmt.Errorf("%s: %w", url, err)
-	}
-	defer func() {
-		if closeErr := resp.Body.Close(); closeErr != nil {
-			slog.Warn("Failed to close response body", "url", url, "error", closeErr)
-		}
-	}()
-
-	if resp.StatusCode != http.StatusOK {
-		is5xx := resp.StatusCode >= 500 && resp.StatusCode < 600
-		return nil, is5xx, fmt.Errorf("%s: unexpected status %d", url, resp.StatusCode)
-	}
-
-	doc, err := html.Parse(resp.Body)
-	if err != nil {
-		return nil, false, fmt.Errorf("%s: parse HTML: %w", url, err)
-	}
-	return doc, false, nil
-}
-
-func findNodesByClass(n *html.Node, tagName, className string) []*html.Node {
-	var result []*html.Node
-	if n.Type == html.ElementNode && (tagName == "" || n.Data == tagName) {
-		for _, a := range n.Attr {
-			if a.Key != "class" {
-				continue
-			}
-			classes := strings.FieldsSeq(a.Val)
-			for c := range classes {
-				if c == className {
-					result = append(result, n)
-					break
-				}
-			}
-		}
-	}
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		result = append(result, findNodesByClass(c, tagName, className)...)
-	}
-	return result
-}
-
-func getAttr(n *html.Node, key string) string {
-	for _, a := range n.Attr {
-		if a.Key == key {
-			return a.Val
-		}
-	}
-	return ""
-}
-
-func getInnerText(n *html.Node) string {
-	var sb strings.Builder
-	var walk func(*html.Node)
-	walk = func(node *html.Node) {
-		if node.Type == html.TextNode {
-			sb.WriteString(node.Data)
-		}
-		for c := node.FirstChild; c != nil; c = c.NextSibling {
-			walk(c)
-		}
-	}
-	walk(n)
-	return strings.TrimSpace(sb.String())
 }
