@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/select";
 import { useDelayedLoading } from "@/hooks/use-delayed-loading";
 import { logger } from "@/lib/logger";
-import { formatEventDate } from "@/lib/semester";
+import { formatEventDate, isEventOngoing } from "@/lib/semester";
 import { cn } from "@/lib/utils";
 
 const CALENDAR_TYPES = [
@@ -65,20 +65,20 @@ export default function SemesterPage() {
   const calendarQuery = useQuery({
     queryKey: calendarKey(calendarType),
     queryFn: async () => {
-      const [calendar, currentWeek, nextExam, upcomingEvents] = await Promise.all([
+      const [calendar, currentWeek, currentOrNextExam, upcomingEvents] = await Promise.all([
         CalendarService.GetAcademicCalendar(calendarType),
         CalendarService.GetCurrentWeek(calendarType),
-        CalendarService.GetNextExam(calendarType),
+        CalendarService.GetCurrentOrNextExam(calendarType),
         CalendarService.GetUpcomingEvents(calendarType, 10),
       ]);
-      return { calendar, currentWeek, nextExam, upcomingEvents };
+      return { calendar, currentWeek, currentOrNextExam, upcomingEvents };
     },
   });
 
   const { data, isLoading } = calendarQuery;
   const calendar = data?.calendar ?? null;
   const currentWeek = data?.currentWeek ?? 0;
-  const nextExam = data?.nextExam ?? null;
+  const currentOrNextExam = data?.currentOrNextExam ?? null;
   const upcomingEvents = data?.upcomingEvents ?? [];
 
   const { mutate, isPending } = useMutation({
@@ -109,6 +109,7 @@ export default function SemesterPage() {
   }
 
   const progress = calendar?.totalWeeks ? (currentWeek / calendar.totalWeeks) * 100 : 0;
+  const isExamOngoing = currentOrNextExam ? isEventOngoing(currentOrNextExam) : false;
 
   return (
     <div className="mr-0.5 h-full animate-in scrollbar-thin scrollbar-thumb-accent scrollbar-gutter-both overflow-auto duration-200 fade-in-10">
@@ -144,7 +145,7 @@ export default function SemesterPage() {
               onClick={() => mutate(calendarType)}
               disabled={isPending}
             >
-              <RefreshCwIcon className={cn("h-4 w-4", isPending && "animate-spin")} />
+              <RefreshCwIcon className={cn("size-4", isPending && "animate-spin")} />
             </Button>
           </div>
         </div>
@@ -157,7 +158,7 @@ export default function SemesterPage() {
               <CalendarDaysIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">Week {currentWeek || "—"}</div>
+              <div className="text-2xl font-bold">Week {currentWeek}</div>
               {calendar?.totalWeeks && (
                 <p className="text-xs text-muted-foreground">
                   of {calendar.totalWeeks} total weeks
@@ -173,20 +174,44 @@ export default function SemesterPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{progress.toFixed(0)}%</div>
-              <Progress value={progress} className="mt-2 h-2 *:bg-accent" />
+              <Progress value={progress} className="mt-2 h-2 *:bg-primary/20" />
             </CardContent>
           </Card>
 
-          <Card>
+          <Card
+            className={cn(
+              "",
+              isExamOngoing && "bg-destructive/5 shadow-md ring-2 ring-destructive/30",
+            )}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Next Exam</CardTitle>
-              <TargetIcon className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">
+                {isExamOngoing ? "Ongoing Exam" : "Next Exam"}
+              </CardTitle>
+              <div className="relative">
+                <TargetIcon
+                  className={cn(
+                    "size-4 text-muted-foreground",
+                    isExamOngoing && "text-destructive",
+                  )}
+                />
+                {isExamOngoing && (
+                  <span className="absolute top-0 right-0 size-4">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-60" />
+                    <span className="relative inline-flex size-4 rounded-full bg-destructive opacity-30" />
+                  </span>
+                )}
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{nextExam ? nextExam.title : "—"}</div>
-              {nextExam?.date && (
+              <div className="text-2xl font-bold">
+                {currentOrNextExam ? currentOrNextExam.title : "—"}
+              </div>
+              {currentOrNextExam?.date && (
                 <p className="text-xs text-muted-foreground">
-                  {nextExam.date.toLocaleDateString(undefined, { dateStyle: "medium" })}
+                  {isExamOngoing
+                    ? `until ${currentOrNextExam.endDate?.toLocaleDateString(undefined, { dateStyle: "long" }) ?? "—"}`
+                    : `on ${currentOrNextExam.date.toLocaleDateString(undefined, { dateStyle: "long" })}`}
                 </p>
               )}
             </CardContent>
