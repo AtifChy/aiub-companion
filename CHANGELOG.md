@@ -1,3 +1,53 @@
+## [0.6.0] - 2026-07-23
+
+### 🚀 Features
+
+- *(deps)* Add tanstack query eslint plugin [`a9f2f6d`](https://github.com/AtifChy/aiub-companion/commit/a9f2f6da38c218589faa1379aa9fa3d748a68d1c)
+- *(fetcher)* Add html fetching and dom parsing utilities [`24dc8b0`](https://github.com/AtifChy/aiub-companion/commit/24dc8b00c628c20c45bc22345779b30a56c07413)
+- *(tz)* Add Asia/Dhaka timezone [`a627db1`](https://github.com/AtifChy/aiub-companion/commit/a627db1daefb81337371e9e7f41965cddeda54ec)
+- *(fuzzy)* Add tie-breaker threshold for search [`1aec0c7`](https://github.com/AtifChy/aiub-companion/commit/1aec0c749e54db6da9b81026277be5c58cd215a0)
+- *(calendar)* Get current or next exam [`c8205dc`](https://github.com/AtifChy/aiub-companion/commit/c8205dc367b5fb134c4fcdc97dd52adbc0602a16)
+- *(semester)* Add ongoing exam status detection [`2edfefc`](https://github.com/AtifChy/aiub-companion/commit/2edfefcdc0b0fc3c08dc7e4452a0dc08029109fa)
+
+### 🐛 Bug Fixes
+
+- *(fetcher)* Handle nil node inputs gracefully [`0084b45`](https://github.com/AtifChy/aiub-companion/commit/0084b4582f149066138dc2191bb31711962dc335)
+- *(notices)* Clear selection on selectionMode [`c69cc4a`](https://github.com/AtifChy/aiub-companion/commit/c69cc4a39a58588696eb08bed26a0742fd0f8c14)
+- *(settings)* Unable to change settings [`551dc88`](https://github.com/AtifChy/aiub-companion/commit/551dc88ff58c8f654848b9b6e00f5e72e7ccc1b3)
+- *(tz)* Embed `tzdata` for time zones [`ff336ff`](https://github.com/AtifChy/aiub-companion/commit/ff336ffa3495cb8feed26f30a4a8ef644135caf9)
+
+### 🚜 Refactor
+
+- *(calendar)* Use common fetcher utilities [`b9b4357`](https://github.com/AtifChy/aiub-companion/commit/b9b4357745675d915f973ef90e04394aa33f9327)
+- *(notice)* Use common fetcher package [`ea00700`](https://github.com/AtifChy/aiub-companion/commit/ea0070068ce0cf1bddec36da83fc40c849b9c9ea)
+- *(notices)* Rewrite read logic effects [`0e93d7b`](https://github.com/AtifChy/aiub-companion/commit/0e93d7b8c315d8c378fc2c785071f19ec4e385cc)
+- *(db)* Update schema to use datetime and date types [`8cdf52b`](https://github.com/AtifChy/aiub-companion/commit/8cdf52bc1122e23ee885131e3692e0eebde7da8f)
+- Use tz.Dhaka for timezone [`c425907`](https://github.com/AtifChy/aiub-companion/commit/c42590732d7e207de4ec17e146fc6d9f2fe518d3)
+- Use time.Time for dates [`0db9690`](https://github.com/AtifChy/aiub-companion/commit/0db9690509c99543ec6ba4c6c73faa6e54c540b9)
+- Use `toLocaleDateString` for date formatting [`64868f1`](https://github.com/AtifChy/aiub-companion/commit/64868f12b36d9eeb1243e96fb984e41c4774b10a)
+- Remove unused date formatter and tests [`090b657`](https://github.com/AtifChy/aiub-companion/commit/090b6570c878a99defc2b4ce48f5a46278ed3285)
+- *(fuzzy)* Adjust tie breaker threshold [`c97de01`](https://github.com/AtifChy/aiub-companion/commit/c97de01223b1d5d254a1ff493163565053110f3c)
+- *(semester)* Use calendarKey helper function [`85734f9`](https://github.com/AtifChy/aiub-companion/commit/85734f94c33382053c80b35745ecc846f34bd3d9)
+- *(notices)* Make the download btn container clickable [`715a44d`](https://github.com/AtifChy/aiub-companion/commit/715a44d3348af9276e80affeb74af45d4f5e8f66)
+
+### 🎨 Styling
+
+- *(semester)* Update exam date display format [`1b0eb6f`](https://github.com/AtifChy/aiub-companion/commit/1b0eb6f79bfebb03ff9229f42e015ff9c892bc27)
+
+### 🧪 Testing
+
+- Mock time in get next exam test [`5dd69e4`](https://github.com/AtifChy/aiub-companion/commit/5dd69e450c4e9db2a8e8563f13cddad0508d9f97)
+- *(calendar)* Use fetcher in calendar scraper tests [`b56e0b3`](https://github.com/AtifChy/aiub-companion/commit/b56e0b38cdbab984acfd5ed530ee05f8e8322a4d)
+- *(notice)* Refactor scraper tests to use fetcher [`ad0355f`](https://github.com/AtifChy/aiub-companion/commit/ad0355f014034fdcc20c0b2d7a15a1633721b5ec)
+- *(fetcher)* Add fetcher and dom utility tests [`20a7244`](https://github.com/AtifChy/aiub-companion/commit/20a7244ceeaa326812c56e9d3ff9023ce15d6f48)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Bump version to v0.6.0 [`d04b02a`](https://github.com/AtifChy/aiub-companion/commit/d04b02a84cec8fbdce3afdead06b259fb4c890f9)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.5.15...v0.6.0
+
 ## [0.5.15] - 2026-07-22
 
 ### 🚀 Features
@@ -8,6 +58,10 @@
 ### 🚜 Refactor
 
 - Remove unused cgpa and gpa-trend pages [`cbd23c7`](https://github.com/AtifChy/aiub-companion/commit/cbd23c783bbc521b4535ca8bd4f941c22587a856)
+
+### 📚 Documentation
+
+- Update changelog [`2edcc63`](https://github.com/AtifChy/aiub-companion/commit/2edcc630ab7b8c58b6f9dc04b2b2e87c7b688fd3)
 
 ### 🎨 Styling
 
