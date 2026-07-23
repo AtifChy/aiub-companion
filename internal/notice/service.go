@@ -1,7 +1,6 @@
 package notice
 
 import (
-	"cmp"
 	"context"
 	"fmt"
 	"slices"
@@ -88,7 +87,7 @@ func (s *Service) GetNotices(ctx context.Context, filter Filter) ([]Notice, erro
 		notices = search.FuzzySearch(
 			notices,
 			query,
-			func(a, b Notice) int { return cmp.Compare(b.PostedDate, a.PostedDate) },
+			func(a, b Notice) int { return b.PostedDate.Compare(a.PostedDate) },
 			fields...,
 		)
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"path"
 	"path/filepath"
 	"strconv"
@@ -14,7 +15,6 @@ import (
 	"aiub-companion/internal/tz"
 
 	"github.com/microcosm-cc/bluemonday"
-	"github.com/wailsapp/wails/v3/pkg/application"
 	"golang.org/x/net/html"
 )
 
@@ -84,14 +84,14 @@ func extractCardFields(card *html.Node) struct{ slug, title, summary, date strin
 	return f
 }
 
-func parseDate(slug, raw string) string {
+func parseDate(slug, raw string) time.Time {
 	text := strings.Join(strings.Fields(raw), " ")
 	date, err := time.ParseInLocation("2 Jan 2006", text, tz.Dhaka)
 	if err != nil {
-		application.Get().Logger.Warn("Failed to parse date, defaulting to current date", "slug", slug, "raw", raw, "error", err)
-		return time.Now().Format(time.DateOnly)
+		slog.Warn("Failed to parse date, defaulting to current date", "slug", slug, "raw", raw, "error", err)
+		return time.Now().UTC()
 	}
-	return date.Format(time.DateOnly)
+	return date.UTC()
 }
 
 func isUrgent(title string) bool {

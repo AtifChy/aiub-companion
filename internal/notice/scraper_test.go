@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"aiub-companion/internal/fetcher"
+	"aiub-companion/internal/tz"
 
 	"golang.org/x/net/html"
 )
@@ -246,7 +247,7 @@ func TestScrapeNotices_ReturnsCorrectNotices(t *testing.T) {
 	if notices[0].Category != "exam" {
 		t.Errorf("expected category 'exam', got %q", notices[0].Category)
 	}
-	if notices[0].PostedDate != "2025-05-12" {
+	if notices[0].PostedDate.In(tz.Dhaka).Format(time.DateOnly) != "2025-05-12" {
 		t.Errorf("expected posted_date '2025-05-12', got %q", notices[0].PostedDate)
 	}
 	if notices[0].Summary != "Check your exam schedule here." {

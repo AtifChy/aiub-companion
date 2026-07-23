@@ -34,10 +34,7 @@ func (r *repository) GetCalendarCache(ctx context.Context, calType CalendarType)
 		return nil, err
 	}
 
-	scrapedAt, err := time.Parse(time.DateTime, row.ScrapedAt)
-	if err != nil {
-		return nil, fmt.Errorf("parse scraped_at: %w", err)
-	} else if time.Since(scrapedAt) > r.cacheTTL {
+	if time.Since(row.ScrapedAt) > r.cacheTTL {
 		return nil, errors.New("cache expired")
 	}
 
