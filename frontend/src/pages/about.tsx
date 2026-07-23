@@ -49,7 +49,10 @@ export default function AboutPage() {
             Built on{" "}
             {isNaN(new Date(appInfo?.build_time ?? "").getTime())
               ? "N/A"
-              : new Date(appInfo?.build_time ?? "").toLocaleString()}
+              : new Date(appInfo?.build_time ?? "").toLocaleString(undefined, {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })}
           </span>
 
           <div className="mt-4 flex items-center gap-1 text-xs text-muted-foreground">
