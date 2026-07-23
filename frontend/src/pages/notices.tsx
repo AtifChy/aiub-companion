@@ -32,7 +32,7 @@ import { useNoticeMutations } from "@/hooks/use-notice-mutation";
 import { useNoticeStore } from "@/hooks/use-notice-store";
 import { noticeKeys, useNoticeDetail, useNoticeList } from "@/hooks/use-notices";
 import { logger } from "@/lib/logger";
-import { CATEGORY_STYLES, formatDate, type AltCategory } from "@/lib/notices";
+import { CATEGORY_STYLES, type AltCategory } from "@/lib/notices";
 import { cn } from "@/lib/utils";
 
 export default function NoticesPage() {
@@ -201,7 +201,9 @@ function DetailPanel({ onToggleRead, onTogglePin }: DetailPanelProps) {
         </HorizontalScroll>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <span className="text-xs text-muted-foreground">{formatDate(notice.postedDate)}</span>
+          <span className="text-xs text-muted-foreground">
+            {notice.postedDate.toLocaleDateString(undefined, { dateStyle: "full" })}
+          </span>
 
           <div className="flex items-center">
             <AppTooltip content={notice.isRead ? "Mark as unread" : "Mark as read"}>

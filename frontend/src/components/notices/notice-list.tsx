@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useNoticeMutations } from "@/hooks/use-notice-mutation";
 import { useNoticeStore } from "@/hooks/use-notice-store";
-import { CATEGORY_STYLES, formatDate, type AltCategory } from "@/lib/notices";
+import { CATEGORY_STYLES, type AltCategory } from "@/lib/notices";
 import { cn } from "@/lib/utils";
 
 interface NoticeListProps {
@@ -172,7 +172,7 @@ function NoticeListItem({ notice }: NoticeListItemProps) {
           </div>
 
           <span className="text-[0.65rem] text-muted-foreground">
-            {formatDate(notice.postedDate)}
+            {notice.postedDate.toLocaleDateString(undefined, { dateStyle: "medium" })}
           </span>
         </div>
 
