@@ -12,7 +12,7 @@ import (
 
 const (
 	similarityThreshold float32 = 0.7
-	tieBreakerThreshold float64 = 0.05
+	tieBreakerThreshold float64 = 0.01
 )
 
 // FieldFunc is a function type that extracts a string field from an item of type T.
