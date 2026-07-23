@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"aiub-companion/internal/fetcher"
+
 	"golang.org/x/net/html"
 )
 
@@ -17,7 +19,7 @@ func parseHTML(p *Parser, content string) (*AcademicCalendar, error) {
 		return nil, fmt.Errorf("parse HTML: %v", err)
 	}
 
-	table := findNode(doc, "table")
+	table := fetcher.FindNodeByTag(doc, "table")
 	if table == nil {
 		return nil, errors.New("no table found in HTML")
 	}

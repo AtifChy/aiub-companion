@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+
+	"aiub-companion/internal/fetcher"
 )
 
 type mockRoundTripper struct {
@@ -57,7 +59,7 @@ func TestScraper_ScrapeCalendar_Success(t *testing.T) {
 		},
 	}
 
-	s := &scraper{client: httpClient}
+	s := &scraper{fetcher: fetcher.New(fetcher.WithHTTPClient(httpClient))}
 
 	t.Run("Standard Calendar", func(t *testing.T) {
 		table, semester, err := s.ScrapeCalendar(context.Background(), CalendarStandard)
@@ -88,7 +90,7 @@ func TestScraper_ScrapeCalendar_Success(t *testing.T) {
 
 func TestScraper_ScrapeCalendar_Errors(t *testing.T) {
 	t.Run("Unsupported Calendar Type", func(t *testing.T) {
-		s := &scraper{client: http.DefaultClient}
+		s := &scraper{fetcher: fetcher.New(fetcher.WithHTTPClient(http.DefaultClient))}
 		_, _, err := s.ScrapeCalendar(context.Background(), CalendarType("invalid"))
 		if err == nil {
 			t.Error("expected error for unsupported calendar type")
@@ -106,7 +108,7 @@ func TestScraper_ScrapeCalendar_Errors(t *testing.T) {
 				},
 			},
 		}
-		s := &scraper{client: httpClient}
+		s := &scraper{fetcher: fetcher.New(fetcher.WithHTTPClient(httpClient))}
 		_, _, err := s.ScrapeCalendar(context.Background(), CalendarStandard)
 		if err == nil {
 			t.Error("expected error for non-200 status code")
@@ -125,7 +127,7 @@ func TestScraper_ScrapeCalendar_Errors(t *testing.T) {
 				},
 			},
 		}
-		s := &scraper{client: httpClient}
+		s := &scraper{fetcher: fetcher.New(fetcher.WithHTTPClient(httpClient))}
 		_, _, err := s.ScrapeCalendar(context.Background(), CalendarStandard)
 		if err == nil {
 			t.Error("expected error when calendar pane is missing")
@@ -144,7 +146,7 @@ func TestScraper_ScrapeCalendar_Errors(t *testing.T) {
 				},
 			},
 		}
-		s := &scraper{client: httpClient}
+		s := &scraper{fetcher: fetcher.New(fetcher.WithHTTPClient(httpClient))}
 		_, _, err := s.ScrapeCalendar(context.Background(), CalendarStandard)
 		if err == nil {
 			t.Error("expected error when table is missing inside calendar pane")
