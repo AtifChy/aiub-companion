@@ -184,7 +184,7 @@ export default function SemesterPage() {
               <div className="text-2xl font-bold">{nextExam ? nextExam.title : "—"}</div>
               {nextExam?.date && (
                 <p className="text-xs text-muted-foreground">
-                  {nextExam.date.toLocaleDateString()}
+                  {nextExam.date.toLocaleDateString(undefined, { dateStyle: "medium" })}
                 </p>
               )}
             </CardContent>
