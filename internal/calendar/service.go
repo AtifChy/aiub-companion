@@ -125,10 +125,10 @@ func (s *Service) GetUpcomingEvents(ctx context.Context, calType CalendarType, l
 	return calendar.GetUpcomingEvents(limit), nil
 }
 
-func (s *Service) GetNextExam(ctx context.Context, calType CalendarType) (*AcademicEvent, error) {
+func (s *Service) GetCurrentOrNextExam(ctx context.Context, calType CalendarType) (*AcademicEvent, error) {
 	calendar, err := s.GetAcademicCalendar(ctx, calType)
 	if err != nil {
 		return nil, err
 	}
-	return calendar.GetNextExam(), nil
+	return calendar.GetCurrentOrNextExam(), nil
 }

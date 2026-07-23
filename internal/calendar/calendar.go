@@ -128,7 +128,7 @@ func (c *AcademicCalendar) GetEventsByCategory(category EventCategory) []Academi
 	return filtered
 }
 
-func (c *AcademicCalendar) GetNextExam() *AcademicEvent {
+func (c *AcademicCalendar) GetCurrentOrNextExam() *AcademicEvent {
 	now := timeNow()
 
 	sorted := make([]AcademicEvent, len(c.Events))
@@ -136,6 +136,12 @@ func (c *AcademicCalendar) GetNextExam() *AcademicEvent {
 	sort.Slice(sorted, func(i, j int) bool {
 		return isBeforeDay(sorted[i].Date, sorted[j].Date)
 	})
+
+	for _, event := range sorted {
+		if event.Category == EventExam && event.IsInRange(now) {
+			return &event
+		}
+	}
 
 	for _, event := range sorted {
 		if event.Category == EventExam && isAfterDay(event.Date, now) {

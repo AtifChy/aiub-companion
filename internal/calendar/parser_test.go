@@ -237,8 +237,10 @@ func TestAcademicCalendar_GetEventsByCategory(t *testing.T) {
 	}
 }
 
-func TestAcademicCalendar_GetNextExam(t *testing.T) {
+func TestAcademicCalendar_GetCurrentOrNextExam(t *testing.T) {
 	now := time.Now()
+
+	ptrTime := func(t time.Time) *time.Time { return &t }
 
 	tests := []struct {
 		name     string
@@ -293,16 +295,23 @@ func TestAcademicCalendar_GetNextExam(t *testing.T) {
 			},
 			expected: "Midterm Exam",
 		},
+		{
+			name: "current date is during an exam",
+			events: []AcademicEvent{
+				{Date: now.Add(-1 * time.Hour), EndDate: ptrTime(now.Add(1 * time.Hour)), Title: "Ongoing Exam", Category: EventExam},
+			},
+			expected: "Ongoing Exam",
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cal := &AcademicCalendar{Events: tt.events}
-			got := cal.GetNextExam()
+			got := cal.GetCurrentOrNextExam()
 			if got == nil && tt.expected != "" {
-				t.Errorf("GetNextExam() = nil, want %s", tt.expected)
+				t.Errorf("GetCurrentOrNextExam() = nil, want %s", tt.expected)
 			} else if got != nil && got.Title != tt.expected {
-				t.Errorf("GetNextExam() = %s, want %s", got.Title, tt.expected)
+				t.Errorf("GetCurrentOrNextExam() = %s, want %s", got.Title, tt.expected)
 			}
 		})
 	}
@@ -394,13 +403,13 @@ func TestParser_RealWorldHTML_DebugExams(t *testing.T) {
 		t.Errorf("Laboratory Midterm exams category = %s, want %s", labMidterm.Category, EventLab)
 	}
 
-	// GetNextExam should return Midterm Exam, not Final Exam
-	nextExam := calendar.GetNextExam()
+	// GetCurrentOrNextExam should return Midterm Exam, not Final Exam
+	nextExam := calendar.GetCurrentOrNextExam()
 	if nextExam == nil {
-		t.Fatal("GetNextExam() returned nil")
+		t.Fatal("GetCurrentOrNextExam() returned nil")
 	}
 	if nextExam.Title != "Midterm Exam" {
-		t.Errorf("GetNextExam() = %s, want Midterm Exam", nextExam.Title)
+		t.Errorf("GetCurrentOrNextExam() = %s, want Midterm Exam", nextExam.Title)
 	}
 }
 
@@ -478,17 +487,17 @@ func TestParser_AIUBExamFormat(t *testing.T) {
 		}
 	}
 
-	// GetNextExam should return the first midterm (earliest date)
-	nextExam := calendar.GetNextExam()
+	// GetCurrentOrNextExam should return the first midterm (earliest date)
+	nextExam := calendar.GetCurrentOrNextExam()
 	if nextExam == nil {
-		t.Fatal("GetNextExam() returned nil")
+		t.Fatal("GetCurrentOrNextExam() returned nil")
 	}
 	if nextExam.Title != "Midterm Exam for uneven sections" {
-		t.Errorf("GetNextExam() = %s, want Midterm Exam for uneven sections", nextExam.Title)
+		t.Errorf("GetCurrentOrNextExam() = %s, want Midterm Exam for uneven sections", nextExam.Title)
 	}
 }
 
-func TestGetNextExam_WithPastExams(t *testing.T) {
+func TestGetCurrentOrNextExam_WithPastExams(t *testing.T) {
 	// Simulate current date being after midterm but before final
 	// We'll use fixed dates relative to "now"
 	now := time.Now()
@@ -500,17 +509,17 @@ func TestGetNextExam_WithPastExams(t *testing.T) {
 	}
 
 	cal := &AcademicCalendar{Events: events}
-	nextExam := cal.GetNextExam()
+	nextExam := cal.GetCurrentOrNextExam()
 
 	if nextExam == nil {
-		t.Fatal("GetNextExam() returned nil")
+		t.Fatal("GetCurrentOrNextExam() returned nil")
 	}
 	if nextExam.Title != "Final Exam" {
-		t.Errorf("GetNextExam() = %s, want Final Exam (midterm should be past)", nextExam.Title)
+		t.Errorf("GetCurrentOrNextExam() = %s, want Final Exam (midterm should be past)", nextExam.Title)
 	}
 }
 
-func TestGetNextExam_AllPast(t *testing.T) {
+func TestGetCurrentOrNextExam_AllPast(t *testing.T) {
 	now := time.Now()
 
 	events := []AcademicEvent{
@@ -519,10 +528,10 @@ func TestGetNextExam_AllPast(t *testing.T) {
 	}
 
 	cal := &AcademicCalendar{Events: events}
-	nextExam := cal.GetNextExam()
+	nextExam := cal.GetCurrentOrNextExam()
 
 	if nextExam != nil {
-		t.Errorf("GetNextExam() = %s, want nil (all exams past)", nextExam.Title)
+		t.Errorf("GetCurrentOrNextExam() = %s, want nil (all exams past)", nextExam.Title)
 	}
 }
 
@@ -605,19 +614,19 @@ func TestParser_DateRangeRowspanWithEmptyDay(t *testing.T) {
 		t.Errorf("Final Exam category = %s, want %s", final.Category, EventExam)
 	}
 
-	// GetNextExam should return Midterm (earlier date)
+	// GetCurrentOrNextExam should return Midterm (earlier date)
 	oldTimeNow := timeNow
 	defer func() { timeNow = oldTimeNow }()
 	timeNow = func() time.Time {
 		return time.Date(2026, 7, 10, 0, 0, 0, 0, tz.Dhaka)
 	}
 
-	nextExam := calendar.GetNextExam()
+	nextExam := calendar.GetCurrentOrNextExam()
 	if nextExam == nil {
-		t.Fatal("GetNextExam() returned nil")
+		t.Fatal("GetCurrentOrNextExam() returned nil")
 	}
 	if nextExam.Title != "Midterm Exam" {
-		t.Errorf("GetNextExam() = %s, want Midterm Exam", nextExam.Title)
+		t.Errorf("GetCurrentOrNextExam() = %s, want Midterm Exam", nextExam.Title)
 	}
 }
 
