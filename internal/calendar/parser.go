@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"aiub-companion/internal/fetcher"
+	"aiub-companion/internal/tz"
 
 	"golang.org/x/net/html"
 )
@@ -37,7 +38,6 @@ var (
 	reWeekNum   = regexp.MustCompile(`(\d+)`)                                                         // Pattern: "Week 1", "Week 2", etc.
 
 	reParagraph = regexp.MustCompile(`<p[^>]*>([\s\S]*?)</p>`) // Pattern to match <p>...</p> blocks
-	reTag       = regexp.MustCompile(`<[^>]*>`)                // Pattern to match HTML tags
 )
 
 type Parser struct {
@@ -306,7 +306,7 @@ func (p *Parser) parseFullDate(text string) (time.Time, bool) {
 		return time.Time{}, false
 	}
 
-	return time.Date(year, month, day, 0, 0, 0, 0, time.Local), true
+	return time.Date(year, month, day, 0, 0, 0, 0, tz.Dhaka), true
 }
 
 func (p *Parser) parseMonthDay(text string) (time.Time, bool) {
@@ -325,7 +325,7 @@ func (p *Parser) parseMonthDay(text string) (time.Time, bool) {
 		return time.Time{}, false
 	}
 
-	return time.Date(p.year, month, day, 0, 0, 0, 0, time.Local), true
+	return time.Date(p.year, month, day, 0, 0, 0, 0, tz.Dhaka), true
 }
 
 func (p *Parser) parseDateRange(text string, month time.Month) (DateParseResult, bool) {
@@ -361,7 +361,7 @@ func (p *Parser) parseDateRange(text string, month time.Month) (DateParseResult,
 	}
 
 	startYear := p.year
-	startDate := time.Date(startYear, startMonth, startDay, 0, 0, 0, 0, time.Local)
+	startDate := time.Date(startYear, startMonth, startDay, 0, 0, 0, 0, tz.Dhaka)
 
 	var endDate time.Time
 	if endMonth != startMonth {
@@ -370,7 +370,7 @@ func (p *Parser) parseDateRange(text string, month time.Month) (DateParseResult,
 		if endMonth < startMonth {
 			endYear++ // Next year
 		}
-		endDate = time.Date(endYear, endMonth, endDay, 0, 0, 0, 0, time.Local)
+		endDate = time.Date(endYear, endMonth, endDay, 0, 0, 0, 0, tz.Dhaka)
 	} else if endDay < startDay {
 		// Cross-month without explicit month
 		nextMonth := startMonth + 1
@@ -379,9 +379,9 @@ func (p *Parser) parseDateRange(text string, month time.Month) (DateParseResult,
 			nextMonth = time.January
 			nextYear++
 		}
-		endDate = time.Date(nextYear, nextMonth, endDay, 0, 0, 0, 0, time.Local)
+		endDate = time.Date(nextYear, nextMonth, endDay, 0, 0, 0, 0, tz.Dhaka)
 	} else {
-		endDate = time.Date(startYear, endMonth, endDay, 0, 0, 0, 0, time.Local)
+		endDate = time.Date(startYear, endMonth, endDay, 0, 0, 0, 0, tz.Dhaka)
 	}
 
 	return DateParseResult{
@@ -409,7 +409,7 @@ func (p *Parser) parseIndividualDates(text string, month time.Month) []time.Time
 		if err != nil || day < 1 || day > 31 {
 			continue
 		}
-		dates = append(dates, time.Date(p.year, month, day, 0, 0, 0, 0, time.Local))
+		dates = append(dates, time.Date(p.year, month, day, 0, 0, 0, 0, tz.Dhaka))
 	}
 
 	return dates

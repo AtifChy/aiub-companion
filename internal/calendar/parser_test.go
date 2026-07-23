@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"aiub-companion/internal/fetcher"
+	"aiub-companion/internal/tz"
 
 	"golang.org/x/net/html"
 )
@@ -77,8 +78,8 @@ func TestAcademicEvent_DaysUntil(t *testing.T) {
 }
 
 func TestAcademicEvent_IsInRange(t *testing.T) {
-	start := time.Date(2026, time.June, 28, 0, 0, 0, 0, time.Local)
-	end := time.Date(2026, time.July, 4, 0, 0, 0, 0, time.Local)
+	start := time.Date(2026, time.June, 28, 0, 0, 0, 0, tz.Dhaka)
+	end := time.Date(2026, time.July, 4, 0, 0, 0, 0, tz.Dhaka)
 
 	tests := []struct {
 		name     string
@@ -87,9 +88,9 @@ func TestAcademicEvent_IsInRange(t *testing.T) {
 	}{
 		{"start date", start, true},
 		{"end date", end, true},
-		{"middle date", time.Date(2026, time.July, 1, 0, 0, 0, 0, time.Local), true},
-		{"before range", time.Date(2026, time.June, 27, 0, 0, 0, 0, time.Local), false},
-		{"after range", time.Date(2026, time.July, 5, 0, 0, 0, 0, time.Local), false},
+		{"middle date", time.Date(2026, time.July, 1, 0, 0, 0, 0, tz.Dhaka), true},
+		{"before range", time.Date(2026, time.June, 27, 0, 0, 0, 0, tz.Dhaka), false},
+		{"after range", time.Date(2026, time.July, 5, 0, 0, 0, 0, tz.Dhaka), false},
 	}
 
 	for _, tt := range tests {
@@ -311,7 +312,7 @@ func TestParser_RealWorldHTML_DebugExams(t *testing.T) {
 	oldTimeNow := timeNow
 	defer func() { timeNow = oldTimeNow }()
 	timeNow = func() time.Time {
-		return time.Date(2026, 7, 10, 0, 0, 0, 0, time.Local)
+		return time.Date(2026, 7, 10, 0, 0, 0, 0, tz.Dhaka)
 	}
 
 	html := `
@@ -407,7 +408,7 @@ func TestParser_AIUBExamFormat(t *testing.T) {
 	oldTimeNow := timeNow
 	defer func() { timeNow = oldTimeNow }()
 	timeNow = func() time.Time {
-		return time.Date(2026, 7, 10, 0, 0, 0, 0, time.Local)
+		return time.Date(2026, 7, 10, 0, 0, 0, 0, tz.Dhaka)
 	}
 
 	// Test with actual AIUB calendar exam format
@@ -608,7 +609,7 @@ func TestParser_DateRangeRowspanWithEmptyDay(t *testing.T) {
 	oldTimeNow := timeNow
 	defer func() { timeNow = oldTimeNow }()
 	timeNow = func() time.Time {
-		return time.Date(2026, 7, 10, 0, 0, 0, 0, time.Local)
+		return time.Date(2026, 7, 10, 0, 0, 0, 0, tz.Dhaka)
 	}
 
 	nextExam := calendar.GetNextExam()
@@ -719,7 +720,7 @@ func TestParser_ParseFullDate(t *testing.T) {
 		expected    time.Time
 		shouldParse bool
 	}{
-		{"full date", "Oct 27, 2026", time.Date(2026, time.October, 27, 0, 0, 0, 0, time.Local), true},
+		{"full date", "Oct 27, 2026", time.Date(2026, time.October, 27, 0, 0, 0, 0, tz.Dhaka), true},
 		{"invalid date", "Invalid 27, 2026", time.Time{}, false},
 		{"partial date", "Oct 27", time.Time{}, false},
 	}
@@ -747,8 +748,8 @@ func TestParser_ParseMonthDay(t *testing.T) {
 		expected    time.Time
 		shouldParse bool
 	}{
-		{"Aug 1", "Aug 1", time.Date(2026, time.August, 1, 0, 0, 0, 0, time.Local), true},
-		{"Sep 27", "Sep 27", time.Date(2026, time.September, 27, 0, 0, 0, 0, time.Local), true},
+		{"Aug 1", "Aug 1", time.Date(2026, time.August, 1, 0, 0, 0, 0, tz.Dhaka), true},
+		{"Sep 27", "Sep 27", time.Date(2026, time.September, 27, 0, 0, 0, 0, tz.Dhaka), true},
 		{"invalid month", "Invalid 1", time.Time{}, false},
 		{"no day", "Aug", time.Time{}, false},
 	}

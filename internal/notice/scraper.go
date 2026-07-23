@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"aiub-companion/internal/fetcher"
+	"aiub-companion/internal/tz"
 
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/wailsapp/wails/v3/pkg/application"
@@ -85,7 +86,7 @@ func extractCardFields(card *html.Node) struct{ slug, title, summary, date strin
 
 func parseDate(slug, raw string) string {
 	text := strings.Join(strings.Fields(raw), " ")
-	date, err := time.Parse("2 Jan 2006", text)
+	date, err := time.ParseInLocation("2 Jan 2006", text, tz.Dhaka)
 	if err != nil {
 		application.Get().Logger.Warn("Failed to parse date, defaulting to current date", "slug", slug, "raw", raw, "error", err)
 		return time.Now().Format(time.DateOnly)

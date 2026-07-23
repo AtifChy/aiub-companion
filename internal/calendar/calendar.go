@@ -4,6 +4,8 @@ package calendar
 import (
 	"sort"
 	"time"
+
+	"aiub-companion/internal/tz"
 )
 
 var timeNow = time.Now
@@ -166,8 +168,8 @@ func isAfterDay(t1, t2 time.Time) bool {
 }
 
 func daysBetween(t1, t2 time.Time) int {
-	start := time.Date(t1.Year(), t1.Month(), t1.Day(), 0, 0, 0, 0, time.Local)
-	end := time.Date(t2.Year(), t2.Month(), t2.Day(), 0, 0, 0, 0, time.Local)
+	start := time.Date(t1.Year(), t1.Month(), t1.Day(), 0, 0, 0, 0, tz.Dhaka)
+	end := time.Date(t2.Year(), t2.Month(), t2.Day(), 0, 0, 0, 0, tz.Dhaka)
 	diff := end.Sub(start)
 
 	days := int(diff.Hours() / 24)
