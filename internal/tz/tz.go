@@ -1,7 +1,10 @@
 // Package tz provides time zone information for the Asia/Dhaka time zone.
 package tz
 
-import "time"
+import (
+	"time"
+	_ "time/tzdata"
+)
 
 var Dhaka *time.Location
 
