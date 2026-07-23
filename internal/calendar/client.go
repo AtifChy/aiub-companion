@@ -2,8 +2,8 @@ package calendar
 
 import (
 	"context"
-	"net/http"
-	"time"
+
+	"aiub-companion/internal/fetcher"
 
 	"golang.org/x/net/html"
 )
@@ -14,6 +14,6 @@ type Client interface {
 
 func NewClient() Client {
 	return &scraper{
-		client: &http.Client{Timeout: 30 * time.Second},
+		fetcher: fetcher.New(),
 	}
 }

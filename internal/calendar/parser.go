@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"aiub-companion/internal/fetcher"
+
 	"golang.org/x/net/html"
 )
 
@@ -77,12 +79,12 @@ type rowspanState struct {
 }
 
 func (p *Parser) parseTable(doc *html.Node) (events []AcademicEvent, weeks []Week, totalWeek int, err error) {
-	table := findNode(doc, "table")
+	table := fetcher.FindNodeByTag(doc, "table")
 	if table == nil {
 		return nil, nil, 0, errors.New("no table found in HTML")
 	}
 
-	tbody := findNode(table, "tbody")
+	tbody := fetcher.FindNodeByTag(table, "tbody")
 	if tbody == nil {
 		tbody = table // If no tbody, use table directly
 	}
@@ -142,14 +144,14 @@ func (p *Parser) parseRow(row *html.Node, state *rowspanState) ([]AcademicEvent,
 		}
 
 		cell := cells[cellIdx]
-		colspan := getAttrInt(cell, "colspan", 1)
-		rowspan := getAttrInt(cell, "rowspan", 1)
-		text := strings.TrimSpace(extractText(cell))
+		colspan := fetcher.GetAttrInt(cell, "colspan", 1)
+		rowspan := fetcher.GetAttrInt(cell, "rowspan", 1)
+		text := fetcher.GetInnerText(cell)
 		text = strings.ReplaceAll(text, "\u00a0", " ") // Replace non-breaking spaces
 
 		// Store the value for this column
 		colValues[colIdx] = text
-		colHTML[colIdx] = extractHTML(cell)
+		colHTML[colIdx] = fetcher.GetInnerHTML(cell)
 
 		// If this cell has rowspan, update the rowspan state
 		if rowspan > 1 {
@@ -474,7 +476,7 @@ func splitEvent(text string) []string {
 
 func cleanTitle(text string) string {
 	text = strings.TrimSpace(text)
-	text = stripTags(text)
+	text = fetcher.StripTags(text)
 	// Remove multiple spaces
 	text = strings.Join(strings.Fields(text), " ")
 	// Remove trailing markers
@@ -510,18 +512,6 @@ func categorizeEvent(title string) EventCategory {
 	return EventAcademic // Default category
 }
 
-func findNode(n *html.Node, tag string) *html.Node {
-	if n.Type == html.ElementNode && n.Data == tag {
-		return n
-	}
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		if result := findNode(c, tag); result != nil {
-			return result
-		}
-	}
-	return nil
-}
-
 func collectCells(row *html.Node) []*html.Node {
 	var cells []*html.Node
 	for c := row.FirstChild; c != nil; c = c.NextSibling {
@@ -530,70 +520,4 @@ func collectCells(row *html.Node) []*html.Node {
 		}
 	}
 	return cells
-}
-
-func extractText(n *html.Node) string {
-	if n == nil {
-		return ""
-	}
-	var sb strings.Builder
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		switch c.Type {
-		case html.TextNode:
-			sb.WriteString(c.Data)
-		case html.ElementNode:
-			sb.WriteString(extractText(c))
-		}
-	}
-	return strings.TrimSpace(sb.String())
-}
-
-func extractHTML(n *html.Node) string {
-	if n == nil {
-		return ""
-	}
-	var sb strings.Builder
-	var render func(*html.Node)
-	render = func(node *html.Node) {
-		switch node.Type {
-		case html.TextNode:
-			sb.WriteString(node.Data)
-		case html.ElementNode:
-			sb.WriteString("<")
-			sb.WriteString(node.Data)
-			for _, attr := range node.Attr {
-				sb.WriteString(" ")
-				sb.WriteString(attr.Key)
-				sb.WriteString(`="`)
-				sb.WriteString(attr.Val)
-				sb.WriteString(`"`)
-			}
-			sb.WriteString(">")
-			for child := node.FirstChild; child != nil; child = child.NextSibling {
-				render(child)
-			}
-			sb.WriteString("</")
-			sb.WriteString(node.Data)
-			sb.WriteString(">")
-		}
-	}
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		render(c)
-	}
-	return sb.String()
-}
-
-func stripTags(html string) string {
-	return reTag.ReplaceAllString(html, "")
-}
-
-func getAttrInt(n *html.Node, attr string, defaultVal int) int {
-	for _, a := range n.Attr {
-		if a.Key == attr {
-			if val, err := strconv.Atoi(a.Val); err == nil {
-				return val
-			}
-		}
-	}
-	return defaultVal
 }
