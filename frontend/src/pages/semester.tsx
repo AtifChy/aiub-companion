@@ -54,6 +54,8 @@ const CATEGORY_ICONS: Record<string, React.ElementType> = {
   break: CalendarDaysIcon,
 };
 
+const calendarKey = (type: CalendarType) => ["calendar", type] as const;
+
 export default function SemesterPage() {
   const queryClient = useQueryClient();
 
@@ -61,7 +63,7 @@ export default function SemesterPage() {
   const [view, setView] = useState<"timeline" | "all">("timeline");
 
   const calendarQuery = useQuery({
-    queryKey: ["calendar", calendarType],
+    queryKey: calendarKey(calendarType),
     queryFn: async () => {
       const [calendar, currentWeek, nextExam, upcomingEvents] = await Promise.all([
         CalendarService.GetAcademicCalendar(calendarType),
@@ -83,7 +85,7 @@ export default function SemesterPage() {
     mutationFn: (type: CalendarType) => CalendarService.RefreshCalendar(type),
     onSuccess: (_, type) => {
       void queryClient.invalidateQueries({
-        queryKey: ["calendar", type],
+        queryKey: calendarKey(type),
       });
       toast.success("Calendar refreshed");
     },
