@@ -12,6 +12,9 @@ var reTag = regexp.MustCompile(`(?i)<[^>]+>`)
 
 // GetAttr retrieves the value of the specified attribute from the HTML node.
 func GetAttr(n *html.Node, key string) string {
+	if n == nil {
+		return ""
+	}
 	for _, attr := range n.Attr {
 		if attr.Key == key {
 			return attr.Val
@@ -22,6 +25,9 @@ func GetAttr(n *html.Node, key string) string {
 
 // GetAttrInt retrieves the integer value of the specified attribute from the HTML node.
 func GetAttrInt(n *html.Node, attr string, defaultValue int) int {
+	if n == nil {
+		return defaultValue
+	}
 	for _, a := range n.Attr {
 		if a.Key == attr {
 			if val, err := strconv.Atoi(a.Val); err == nil {
@@ -34,9 +40,15 @@ func GetAttrInt(n *html.Node, attr string, defaultValue int) int {
 
 // GetInnerText retrieves the concatenated text content of the HTML node and its descendants.
 func GetInnerText(n *html.Node) string {
+	if n == nil {
+		return ""
+	}
 	var sb strings.Builder
 	var walk func(*html.Node)
 	walk = func(node *html.Node) {
+		if n == nil {
+			return
+		}
 		if node.Type == html.TextNode {
 			sb.WriteString(node.Data)
 		}
@@ -50,9 +62,15 @@ func GetInnerText(n *html.Node) string {
 
 // GetInnerHTML retrieves the HTML content of the HTML node and its descendants as a string.
 func GetInnerHTML(n *html.Node) string {
+	if n == nil {
+		return ""
+	}
 	var sb strings.Builder
 	var walk func(*html.Node)
 	walk = func(node *html.Node) {
+		if n == nil {
+			return
+		}
 		switch node.Type {
 		case html.TextNode:
 			sb.WriteString(node.Data)
@@ -88,6 +106,9 @@ func StripTags(s string) string {
 
 // FindNodeByTag searches for the first HTML node with the specified tag name in the subtree rooted at the given node.
 func FindNodeByTag(n *html.Node, tagName string) *html.Node {
+	if n == nil {
+		return nil
+	}
 	if n.Type == html.ElementNode && n.Data == tagName {
 		return n
 	}
@@ -101,6 +122,9 @@ func FindNodeByTag(n *html.Node, tagName string) *html.Node {
 
 // FindNodeByID searches for the first HTML node with the specified ID in the subtree rooted at the given node.
 func FindNodeByID(n *html.Node, id string) *html.Node {
+	if n == nil {
+		return nil
+	}
 	if n.Type == html.ElementNode && GetAttr(n, "id") == id {
 		return n
 	}
@@ -114,6 +138,9 @@ func FindNodeByID(n *html.Node, id string) *html.Node {
 
 // FindNodesByClass searches for all HTML nodes with the specified tag name and class name in the subtree rooted at the given node.
 func FindNodesByClass(n *html.Node, tagName, className string) []*html.Node {
+	if n == nil {
+		return nil
+	}
 	var result []*html.Node
 	if n.Type == html.ElementNode && (tagName == "" || n.Data == tagName) {
 		for _, attr := range n.Attr {
