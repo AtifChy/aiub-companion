@@ -293,7 +293,7 @@ interface AttachmentItemProps {
 }
 
 function AttachmentItem({ attachment }: AttachmentItemProps) {
-  const openUrl = () => {
+  const openURL = () => {
     if (!attachment.url) return;
     Browser.OpenURL(attachment.url).catch((err: unknown) => {
       toast.error("Failed to open attachment URL", {
@@ -303,7 +303,12 @@ function AttachmentItem({ attachment }: AttachmentItemProps) {
   };
 
   return (
-    <div className="flex justify-between rounded border border-border bg-muted/40 px-3 py-2.5 hover:bg-muted">
+    <div
+      role="button"
+      tabIndex={-1}
+      onClick={openURL}
+      className="flex justify-between rounded border border-border bg-muted/40 px-3 py-2.5 hover:bg-muted"
+    >
       <div className="flex min-w-0 items-center gap-2">
         <FileTextIcon className="size-3.5 text-primary" />
         <span className="truncate text-xs font-medium">{attachment.label || "Attachment"}</span>
@@ -313,7 +318,7 @@ function AttachmentItem({ attachment }: AttachmentItemProps) {
           <Button
             variant="ghost"
             className="h-auto p-0.5 hover:text-muted-foreground"
-            onClick={openUrl}
+            onClick={openURL}
           >
             {attachment.localPath ? (
               <ExternalLinkIcon className="size-3.5" />
