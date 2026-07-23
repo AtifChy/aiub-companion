@@ -10,6 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"aiub-companion/internal/fetcher"
+
 	"golang.org/x/net/html"
 )
 
@@ -24,7 +26,9 @@ func newTestScraper(t *testing.T, handler http.Handler) (*scraper, *httptest.Ser
 	t.Helper()
 	srv := httptest.NewServer(handler)
 	s := &scraper{
-		client:  srv.Client(),
+		fetcher: fetcher.New(
+			fetcher.WithHTTPClient(srv.Client()),
+		),
 		baseURL: srv.URL,
 	}
 	return s, srv
@@ -39,7 +43,7 @@ func parseHTML(t *testing.T, s string) *html.Node {
 	return doc
 }
 
-// fetchHTML tests
+// FetchHTML tests
 
 func TestFetchHTML_RetryOn5xxFailure(t *testing.T) {
 	var attempts atomic.Int32
@@ -49,12 +53,11 @@ func TestFetchHTML_RetryOn5xxFailure(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	s := &scraper{
-		client:  srv.Client(),
-		baseURL: srv.URL,
-	}
+	f := fetcher.New(
+		fetcher.WithHTTPClient(srv.Client()),
+	)
 
-	_, err := s.fetchHTML(context.Background(), srv.URL)
+	_, err := f.FetchHTML(context.Background(), srv.URL)
 	if err == nil {
 		t.Fatal("expected error from repeated 503 responses, got nil")
 	}
@@ -79,12 +82,11 @@ func TestFetchHTML_RetryAndRecover(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	s := &scraper{
-		client:  srv.Client(),
-		baseURL: srv.URL,
-	}
+	f := fetcher.New(
+		fetcher.WithHTTPClient(srv.Client()),
+	)
 
-	doc, err := s.fetchHTML(context.Background(), srv.URL)
+	doc, err := f.FetchHTML(context.Background(), srv.URL)
 	if err != nil {
 		t.Fatalf("expected recovery and success on second attempt, got error: %v", err)
 	}
@@ -106,12 +108,11 @@ func TestFetchHTML_NoRetryOn404(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	s := &scraper{
-		client:  srv.Client(),
-		baseURL: srv.URL,
-	}
+	f := fetcher.New(
+		fetcher.WithHTTPClient(srv.Client()),
+	)
 
-	_, err := s.fetchHTML(context.Background(), srv.URL)
+	_, err := f.FetchHTML(context.Background(), srv.URL)
 	if err == nil {
 		t.Fatal("expected error for 404 response, got nil")
 	}
@@ -128,15 +129,14 @@ func TestFetchHTML_ContextCancellation(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	s := &scraper{
-		client:  srv.Client(),
-		baseURL: srv.URL,
-	}
+	f := fetcher.New(
+		fetcher.WithHTTPClient(srv.Client()),
+	)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	time.AfterFunc(1*time.Second, cancel) // Cancel after 1 second
 
-	_, err := s.fetchHTML(ctx, srv.URL)
+	_, err := f.FetchHTML(ctx, srv.URL)
 	if err == nil {
 		t.Fatal("expected error due to context cancellation, got nil")
 	}
@@ -146,13 +146,17 @@ func TestFetchHTML_ContextCancellation(t *testing.T) {
 }
 
 func TestFetchHTML_OK(t *testing.T) {
-	s, srv := newTestScraper(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(`<html><body><p>hello</p></body></html>`))
 	}))
 	defer srv.Close()
 
-	doc, err := s.fetchHTML(context.Background(), srv.URL)
+	f := fetcher.New(
+		fetcher.WithHTTPClient(srv.Client()),
+	)
+
+	doc, err := f.FetchHTML(context.Background(), srv.URL)
 	if err != nil {
 		t.Fatalf("failed to fetch HTML: %v", err)
 	}
@@ -161,7 +165,7 @@ func TestFetchHTML_OK(t *testing.T) {
 	}
 }
 
-// findNodesByClass tests
+// FindNodesByClass tests
 
 func TestFindNodesByClass_MatchesCorrectNodes(t *testing.T) {
 	doc := parseHTML(t, `<html><body>
@@ -170,7 +174,7 @@ func TestFindNodesByClass_MatchesCorrectNodes(t *testing.T) {
 		<div class="other">Third</div>
 	</body></html>`)
 
-	nodes := findNodesByClass(doc, "div", "notification")
+	nodes := fetcher.FindNodesByClass(doc, "div", "notification")
 	if len(nodes) != 2 {
 		t.Errorf("expected 2 nodes, got %d", len(nodes))
 	}
@@ -179,7 +183,7 @@ func TestFindNodesByClass_MatchesCorrectNodes(t *testing.T) {
 func TestFindNodesByClass_NoMatch(t *testing.T) {
 	doc := parseHTML(t, `<html><body><div class="other">Text</div></body></html>`)
 
-	nodes := findNodesByClass(doc, "div", "notification")
+	nodes := fetcher.FindNodesByClass(doc, "div", "notification")
 	if len(nodes) != 0 {
 		t.Errorf("expected 0 nodes, got %d", len(nodes))
 	}
@@ -188,7 +192,7 @@ func TestFindNodesByClass_NoMatch(t *testing.T) {
 func TestFindNodesByClass_WrongTag(t *testing.T) {
 	doc := parseHTML(t, `<html><body><p class="notification">Text</p></body></html>`)
 
-	nodes := findNodesByClass(doc, "div", "notification")
+	nodes := fetcher.FindNodesByClass(doc, "div", "notification")
 	if len(nodes) != 0 {
 		t.Errorf("expected 0 nodes for wrong tag, got %d", len(nodes))
 	}
@@ -198,7 +202,7 @@ func TestFindNodesByClass_PartialClassNameNoMatch(t *testing.T) {
 	// "notif" should NOT match "notification"
 	doc := parseHTML(t, `<html><body><div class="notification">Text</div></body></html>`)
 
-	nodes := findNodesByClass(doc, "div", "notif")
+	nodes := fetcher.FindNodesByClass(doc, "div", "notif")
 	if len(nodes) != 0 {
 		t.Errorf("partial class name should not match, got %d nodes", len(nodes))
 	}
@@ -433,7 +437,7 @@ func TestGetInnerText_NestedElements(t *testing.T) {
 	if pNode == nil {
 		t.Fatal("could not find <p> node")
 	}
-	text := getInnerText(pNode)
+	text := fetcher.GetInnerText(pNode)
 	if text != "Hello World" {
 		t.Errorf("expected 'Hello World', got %q", text)
 	}
@@ -455,7 +459,7 @@ func TestGetInnerText_EmptyNode(t *testing.T) {
 	}
 	find(doc)
 
-	text := getInnerText(pNode)
+	text := fetcher.GetInnerText(pNode)
 	if text != "" {
 		t.Errorf("expected empty string, got %q", text)
 	}
