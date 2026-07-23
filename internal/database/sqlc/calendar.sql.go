@@ -7,6 +7,7 @@ package sqlc
 
 import (
 	"context"
+	"time"
 )
 
 const getCalendarCache = `-- name: GetCalendarCache :one
@@ -18,7 +19,7 @@ LIMIT 1
 
 type GetCalendarCacheRow struct {
 	Data      string
-	ScrapedAt string
+	ScrapedAt time.Time
 }
 
 func (q *Queries) GetCalendarCache(ctx context.Context, calendarType string) (GetCalendarCacheRow, error) {

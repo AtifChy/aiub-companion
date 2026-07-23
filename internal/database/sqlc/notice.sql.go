@@ -8,6 +8,7 @@ package sqlc
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
 const clearNotices = `-- name: ClearNotices :exec
@@ -112,13 +113,13 @@ type GetNoticeWithStateRow struct {
 	Summary     sql.NullString
 	FullTitle   sql.NullString
 	Content     sql.NullString
-	PostedDate  string
+	PostedDate  time.Time
 	Category    string
 	IsCached    int64
 	IsUrgent    int64
 	SourceOrder int64
-	CreatedAt   string
-	UpdatedAt   string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 	IsPinned    int64
 	IsRead      int64
 }
@@ -159,7 +160,7 @@ type InsertNoticeParams struct {
 	ID          string
 	Title       string
 	Summary     sql.NullString
-	PostedDate  string
+	PostedDate  time.Time
 	Category    string
 	IsUrgent    int64
 	SourceOrder int64
@@ -223,7 +224,7 @@ type ListNoticesWithStateRow struct {
 	Summary     sql.NullString
 	FullTitle   sql.NullString
 	Content     sql.NullString
-	PostedDate  string
+	PostedDate  time.Time
 	Category    string
 	IsCached    int64
 	IsUrgent    int64
@@ -347,7 +348,7 @@ WHERE
 type UpdateNoticeParams struct {
 	Title      string
 	Summary    sql.NullString
-	PostedDate string
+	PostedDate time.Time
 	ID         string
 }
 
@@ -408,7 +409,7 @@ type UpsertNoticeParams struct {
 	ID          string
 	Title       string
 	Summary     sql.NullString
-	PostedDate  string
+	PostedDate  time.Time
 	Category    string
 	IsUrgent    int64
 	SourceOrder int64

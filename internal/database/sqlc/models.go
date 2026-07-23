@@ -6,12 +6,13 @@ package sqlc
 
 import (
 	"database/sql"
+	"time"
 )
 
 type CalendarCache struct {
 	CalendarType string
 	Data         string
-	ScrapedAt    string
+	ScrapedAt    time.Time
 }
 
 type ClassSchedule struct {
@@ -30,13 +31,13 @@ type Notice struct {
 	Summary     sql.NullString
 	FullTitle   sql.NullString
 	Content     sql.NullString
-	PostedDate  string
+	PostedDate  time.Time
 	Category    string
 	IsCached    int64
 	IsUrgent    int64
 	SourceOrder int64
-	CreatedAt   string
-	UpdatedAt   string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 type NoticeAttachment struct {
@@ -45,7 +46,7 @@ type NoticeAttachment struct {
 	Label     string
 	Url       string
 	LocalPath sql.NullString
-	CreatedAt string
+	CreatedAt time.Time
 }
 
 type OfferedCourse struct {
@@ -61,13 +62,13 @@ type UserRoutine struct {
 	ClassID     string
 	CourseCode  sql.NullString
 	CourseTitle string
-	AddedAt     string
+	AddedAt     time.Time
 }
 
 type UserState struct {
 	NoticeID   string
 	IsPinned   int64
 	IsRead     int64
-	PinnedAt   sql.NullString
-	LastReadAt sql.NullString
+	PinnedAt   sql.NullTime
+	LastReadAt sql.NullTime
 }
