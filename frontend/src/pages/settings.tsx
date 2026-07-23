@@ -78,7 +78,9 @@ export default function SettingsPage() {
               <Switch
                 checked={config.notifications.enabled}
                 onCheckedChange={(v) => {
-                  setConfig((draft) => (draft.notifications.enabled = v));
+                  setConfig((draft) => {
+                    draft.notifications.enabled = v;
+                  });
                 }}
                 className="cursor-pointer"
               />
@@ -95,7 +97,9 @@ export default function SettingsPage() {
                 items={syncIntervalItems}
                 value={config.sync.interval}
                 onValueChange={(v) => {
-                  setConfig((draft) => (draft.sync.interval = v));
+                  setConfig((draft) => {
+                    draft.sync.interval = v;
+                  });
                 }}
               />
             </SettingRow>
@@ -108,7 +112,9 @@ export default function SettingsPage() {
                 items={fetchCountItems}
                 value={config.sync.fetch_count}
                 onValueChange={(v) => {
-                  setConfig((draft) => (draft.sync.fetch_count = v));
+                  setConfig((draft) => {
+                    draft.sync.fetch_count = v;
+                  });
                 }}
               />
             </SettingRow>
@@ -120,7 +126,9 @@ export default function SettingsPage() {
               <Switch
                 checked={config.sync.on_startup}
                 onCheckedChange={(v) => {
-                  setConfig((draft) => (draft.sync.on_startup = v));
+                  setConfig((draft) => {
+                    draft.sync.on_startup = v;
+                  });
                 }}
                 className="cursor-pointer"
               />
@@ -133,7 +141,9 @@ export default function SettingsPage() {
               <Switch
                 checked={config.launch.auto_start}
                 onCheckedChange={(v) => {
-                  setConfig((draft) => (draft.launch.auto_start = v));
+                  setConfig((draft) => {
+                    draft.launch.auto_start = v;
+                  });
                 }}
                 className="cursor-pointer"
               />
@@ -146,7 +156,9 @@ export default function SettingsPage() {
               <Switch
                 checked={config.launch.start_minimized}
                 onCheckedChange={(v) => {
-                  setConfig((draft) => (draft.launch.start_minimized = v));
+                  setConfig((draft) => {
+                    draft.launch.start_minimized = v;
+                  });
                 }}
                 className="cursor-pointer"
               />
@@ -159,7 +171,9 @@ export default function SettingsPage() {
               <Switch
                 checked={config.launch.close_to_tray}
                 onCheckedChange={(v) => {
-                  setConfig((draft) => (draft.launch.close_to_tray = v));
+                  setConfig((draft) => {
+                    draft.launch.close_to_tray = v;
+                  });
                 }}
                 className="cursor-pointer"
               />
@@ -173,7 +187,9 @@ export default function SettingsPage() {
                 disabled={!config.launch.close_to_tray}
                 checked={config.launch.keep_alive}
                 onCheckedChange={(v) => {
-                  setConfig((draft) => (draft.launch.keep_alive = v));
+                  setConfig((draft) => {
+                    draft.launch.keep_alive = v;
+                  });
                 }}
                 className="cursor-pointer"
               />
@@ -186,7 +202,9 @@ export default function SettingsPage() {
               <Switch
                 checked={config.launch.restore_window}
                 onCheckedChange={(v) => {
-                  setConfig((draft) => (draft.launch.restore_window = v));
+                  setConfig((draft) => {
+                    draft.launch.restore_window = v;
+                  });
                 }}
                 className="cursor-pointer"
               />
@@ -196,7 +214,9 @@ export default function SettingsPage() {
               <Switch
                 checked={config.launch.sidebar_open}
                 onCheckedChange={(v) => {
-                  setConfig((draft) => (draft.launch.sidebar_open = v));
+                  setConfig((draft) => {
+                    draft.launch.sidebar_open = v;
+                  });
                 }}
                 className="cursor-pointer"
               />
@@ -210,7 +230,9 @@ export default function SettingsPage() {
                   items={updateIntervalItems}
                   value={config.updates.interval}
                   onValueChange={(v) => {
-                    setConfig((draft) => (draft.updates.interval = v));
+                    setConfig((draft) => {
+                      draft.updates.interval = v;
+                    });
                   }}
                 />
               </SettingRow>
@@ -233,7 +255,9 @@ export default function SettingsPage() {
                 items={logLevelItems}
                 value={config.logging.level}
                 onValueChange={(v) => {
-                  setConfig((draft) => (draft.logging.level = v));
+                  setConfig((draft) => {
+                    draft.logging.level = v;
+                  });
                 }}
               />
             </SettingRow>
