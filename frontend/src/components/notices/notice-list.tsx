@@ -96,6 +96,7 @@ function NoticeListItem({ notice }: NoticeListItemProps) {
 
   const handleClick = () => {
     if (selectionMode) {
+      setSelectedId(null);
       toggleChecked(notice.id);
     } else {
       setSelectedId(notice.id);
