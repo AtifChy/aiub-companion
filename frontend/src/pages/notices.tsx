@@ -36,33 +36,33 @@ import { CATEGORY_STYLES, formatDate, type AltCategory } from "@/lib/notices";
 import { cn } from "@/lib/utils";
 
 export default function NoticesPage() {
+  const queryClient = useQueryClient();
+
   const { selectedId, setSelectedId } = useNoticeStore(
-    useShallow((s) => ({ selectedId: s.selectedId, setSelectedId: s.setSelectedId })),
+    useShallow((s) => ({
+      selectedId: s.selectedId,
+      setSelectedId: s.setSelectedId,
+    })),
   );
 
-  const queryClient = useQueryClient();
-  const { toggleRead } = useNoticeMutations();
+  const { toggleRead, togglePin } = useNoticeMutations();
 
-  // Track the previous ID so we can mark it read when navigating away
-  const previousIdRef = useRef<string | null>(null);
+  const manuallyMarkReadRef = useRef<string | null>(null);
 
   // Mark the previous notice as read when navigating away from it
   useEffect(() => {
-    const prevId = previousIdRef.current;
-    if (prevId && prevId !== selectedId) {
-      const prevNotice = queryClient.getQueryData<Notice>(noticeKeys.details(prevId));
-      if (prevNotice && !prevNotice.isRead) {
-        toggleRead({ id: prevId, next: true });
-      }
-    }
-    previousIdRef.current = selectedId;
-
+    const id = selectedId;
     return () => {
-      const currId = previousIdRef.current;
-      if (currId) {
-        const currNotice = queryClient.getQueryData<Notice>(noticeKeys.details(currId));
-        if (currNotice && !currNotice.isRead) {
-          toggleRead({ id: currId, next: true });
+      if (!id) return;
+
+      if (useNoticeStore.getState().selectedId === id) return;
+
+      const notice = queryClient.getQueryData<Notice>(noticeKeys.details(id));
+      if (notice && !notice.isRead) {
+        if (manuallyMarkReadRef.current === id) {
+          manuallyMarkReadRef.current = null;
+        } else {
+          toggleRead({ id, next: true });
         }
       }
     };
@@ -71,13 +71,24 @@ export default function NoticesPage() {
   // Consume any pending notice that was passed to the app via a deep link or notification
   useEffect(() => {
     Service.ConsumePendingNotice()
-      .then(([id, pending]) => {
-        if (pending) setSelectedId(id);
-      })
-      .catch((err: unknown) => {
-        logger.error("Failed to consume pending notice", err);
-      });
+      .then(([id, pending]) => pending && setSelectedId(id))
+      .catch((err: unknown) =>
+        logger.error("Failed to consume pending notice", (err as Error).message),
+      );
   }, [setSelectedId]);
+
+  const handleToggleRead = (id: string, next: boolean) => {
+    if (next) {
+      manuallyMarkReadRef.current = null;
+    } else {
+      manuallyMarkReadRef.current = id;
+    }
+    toggleRead({ id, next });
+  };
+
+  const handleTogglePin = (id: string, next: boolean) => {
+    togglePin({ id, next });
+  };
 
   return (
     <ResizablePanelGroup orientation="horizontal" className="flex h-full">
@@ -88,7 +99,7 @@ export default function NoticesPage() {
       <ResizableHandle withHandle />
 
       <ResizablePanel defaultSize="60%" minSize="30%" className="min-w-0">
-        <DetailPanel />
+        <DetailPanel onToggleRead={handleToggleRead} onTogglePin={handleTogglePin} />
       </ResizablePanel>
     </ResizablePanelGroup>
   );
@@ -101,6 +112,10 @@ function NoticeListPanel() {
   const notices = query.data ?? [];
   const unreadCount = notices.filter((notice) => !notice.isRead).length;
 
+  const handleRetry = () => {
+    void query.refetch();
+  };
+
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden">
       <NoticeListToolbar
@@ -112,18 +127,22 @@ function NoticeListPanel() {
         notices={notices}
         loading={query.isLoading}
         error={query.error}
-        onRetry={() => void query.refetch()}
+        onRetry={handleRetry}
       />
       <NoticeActionBar notices={notices} />
     </div>
   );
 }
 
-function DetailPanel() {
+interface DetailPanelProps {
+  onToggleRead: (id: string, next: boolean) => void;
+  onTogglePin: (id: string, next: boolean) => void;
+}
+
+function DetailPanel({ onToggleRead, onTogglePin }: DetailPanelProps) {
   const selectedId = useNoticeStore((state) => state.selectedId);
 
   const { query } = useNoticeDetail(selectedId);
-  const { toggleRead, togglePin } = useNoticeMutations();
 
   const showLoader = useDelayedLoading(query.isLoading);
 
@@ -188,7 +207,7 @@ function DetailPanel() {
             <AppTooltip content={notice.isRead ? "Mark as unread" : "Mark as read"}>
               <Toggle
                 pressed={notice.isRead}
-                onPressedChange={() => toggleRead({ id: notice.id, next: !notice.isRead })}
+                onPressedChange={() => onToggleRead(notice.id, !notice.isRead)}
                 size="sm"
                 className="aria-pressed:bg-transparent aria-pressed:hover:bg-muted"
               >
@@ -204,7 +223,7 @@ function DetailPanel() {
             <AppTooltip content={notice.isPinned ? "Unpin" : "Pin"}>
               <Toggle
                 pressed={notice.isPinned}
-                onPressedChange={() => togglePin({ id: notice.id, next: !notice.isPinned })}
+                onPressedChange={() => onTogglePin(notice.id, !notice.isPinned)}
                 size="sm"
                 className="aria-pressed:bg-transparent aria-pressed:hover:bg-muted"
               >
