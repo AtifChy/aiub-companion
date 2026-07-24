@@ -3,7 +3,6 @@ package worker
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"strings"
 	"time"
@@ -56,19 +55,7 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 		}
 	})
 
-	s.notification.OnNotificationResponse(func(result notifications.NotificationResult) {
-		if result.Error != nil {
-			slog.Error("Failed to send notification", "error", result.Error)
-			return
-		}
-
-		app.Event.Emit(event.EventMainWindowShow)
-
-		if !strings.HasPrefix(result.Response.ID, "sync-") {
-			s.notice.SetPendingNotice(result.Response.ID)
-			slog.Info("Opening notice from notification", "id", result.Response.ID)
-		}
-	})
+	s.notification.OnNotificationResponse(s.handleNotificationResponse)
 
 	go s.run(ctx)
 
@@ -83,68 +70,14 @@ func (s *Service) ServiceShutdown() error {
 }
 
 func (s *Service) run(ctx context.Context) {
-	app := application.Get()
 	cfg := s.config.GetConfig()
 	interval := time.Duration(cfg.Sync.Interval) * time.Minute
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 
 	doSync := func() {
-		app.Event.Emit(event.EventNoticeSyncing, true)
-		defer func() {
-			time.Sleep(1 * time.Second)
-			app.Event.Emit(event.EventNoticeSyncing, false)
-		}()
-
-		// Background pre-fetch calendar updates
-		go func() {
-			for _, calType := range []calendar.CalendarType{calendar.CalendarStandard, calendar.CalendarLLBBPharm} {
-				_, err := s.calendar.GetAcademicCalendar(ctx, calType)
-				if err != nil {
-					slog.Warn("Background calendar sync failed", "type", calType, "error", err)
-				}
-			}
-		}()
-
-		newNotices, err := s.notice.SyncNotices(ctx, cfg.Sync.FetchCount)
-		if err != nil {
-			slog.Error("Failed to sync notices", "error", err)
-			return
-		}
-
-		count := len(newNotices)
-		if count == 0 {
-			slog.Info("No new notices found")
-			return
-		}
-
-		var id, title, body string
-		if count == 1 {
-			notice := newNotices[0]
-			id = notice.ID
-			title = notice.Title
-			body = notice.Summary
-		} else {
-			plural := "s"
-			if count == 1 {
-				plural = ""
-			}
-			id = fmt.Sprintf("sync-%d", time.Now().Local().UnixMilli())
-			title = fmt.Sprintf("%d new notice%s available", count, plural)
-		}
-
-		err = s.notification.SendNotification(notifications.NotificationOptions{
-			ID:    id,
-			Title: title,
-			Body:  body,
-		})
-		if err != nil {
-			slog.Error("Failed to send notification", "error", err)
-		}
-
-		app.Event.Emit(event.EventNoticeSynced, int(count))
-
-		slog.Info("Synced notices", "count", count)
+		go s.calendar.SyncAll(ctx)
+		s.syncNotices(ctx)
 	}
 
 	if cfg.Sync.OnStartup {
@@ -162,5 +95,56 @@ func (s *Service) run(ctx context.Context) {
 			slog.Info("Worker service shutting down")
 			return
 		}
+	}
+}
+
+func (s *Service) syncNotices(ctx context.Context) {
+	app := application.Get()
+	cfg := s.config.GetConfig()
+
+	app.Event.Emit(event.EventNoticeSyncing, true)
+	defer func() {
+		time.Sleep(1 * time.Second)
+		app.Event.Emit(event.EventNoticeSyncing, false)
+	}()
+
+	newNotices, err := s.notice.SyncNotices(ctx, cfg.Sync.FetchCount)
+	if err != nil {
+		slog.Error("Failed to sync notices", "error", err)
+		return
+	}
+
+	count := len(newNotices)
+	if count == 0 {
+		slog.Info("No new notices found")
+		return
+	}
+
+	payload := notice.BuildNotificationPayload(newNotices)
+	err = s.notification.SendNotification(notifications.NotificationOptions{
+		ID:    payload.ID,
+		Title: payload.Title,
+		Body:  payload.Body,
+	})
+	if err != nil {
+		slog.Error("Failed to send notification", "error", err)
+	}
+
+	app.Event.Emit(event.EventNoticeSynced, int(count))
+	slog.Info("Synced notices", "count", count)
+}
+
+func (s *Service) handleNotificationResponse(result notifications.NotificationResult) {
+	if result.Error != nil {
+		slog.Error("Failed to send notification", "error", result.Error)
+		return
+	}
+
+	application.Get().Event.Emit(event.EventMainWindowShow)
+
+	id := result.Response.ID
+	if !strings.HasPrefix(id, "sync-") {
+		s.notice.SetPendingNotice(id)
+		slog.Info("Opening notice from notification", "id", id)
 	}
 }
