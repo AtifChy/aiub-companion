@@ -2,6 +2,8 @@ package calendar
 
 import (
 	"context"
+	"net/http"
+	"time"
 
 	"aiub-companion/internal/fetcher"
 
@@ -14,6 +16,6 @@ type Client interface {
 
 func NewClient() Client {
 	return &scraper{
-		fetcher: fetcher.New(),
+		fetcher: fetcher.New(fetcher.WithHTTPClient(&http.Client{Timeout: 5 * time.Second})),
 	}
 }
