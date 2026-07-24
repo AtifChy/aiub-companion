@@ -51,7 +51,7 @@ func main() {
 
 	desktopService := desktop.NewService(configService)
 	updaterService := updater.NewService(configService)
-	workerService := worker.NewService(noticeService, configService, notificationService)
+	workerService := worker.NewService(noticeService, calendarService, configService, notificationService)
 
 	loggerService := log.NewService(logger)
 

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"aiub-companion/internal/calendar"
 	"aiub-companion/internal/config"
 	"aiub-companion/internal/event"
 	"aiub-companion/internal/notice"
@@ -24,6 +25,7 @@ func init() {
 
 type Service struct {
 	notice       *notice.Service
+	calendar     *calendar.Service
 	config       *config.Service
 	notification *notifications.NotificationService
 
@@ -31,9 +33,10 @@ type Service struct {
 	cancel     context.CancelFunc
 }
 
-func NewService(notice *notice.Service, config *config.Service, notification *notifications.NotificationService) *Service {
+func NewService(notice *notice.Service, calendar *calendar.Service, config *config.Service, notification *notifications.NotificationService) *Service {
 	return &Service{
 		notice:       notice,
+		calendar:     calendar,
 		config:       config,
 		notification: notification,
 		intervalCh:   make(chan time.Duration, 1),
@@ -86,6 +89,15 @@ func (s *Service) run(ctx context.Context) {
 	defer ticker.Stop()
 
 	doSync := func() {
+		go func() {
+			for _, calType := range []calendar.CalendarType{calendar.CalendarStandard, calendar.CalendarLLBBPharm} {
+				_, err := s.calendar.GetAcademicCalendar(ctx, calType)
+				if err != nil {
+					slog.Warn("Background calendar sync failed", "type", calType, "error", err)
+				}
+			}
+		}()
+
 		newNotices, err := s.notice.SyncNotices(ctx, cfg.Sync.FetchCount)
 		if err != nil {
 			slog.Error("Failed to sync notices", "error", err)
