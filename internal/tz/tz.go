@@ -2,16 +2,20 @@
 package tz
 
 import (
+	_ "embed"
+	"fmt"
 	"time"
-	_ "time/tzdata"
 )
+
+//go:embed zoneinfo/Asia/Dhaka
+var dhakaTZ []byte
 
 var Dhaka *time.Location
 
 func init() {
 	var err error
-	Dhaka, err = time.LoadLocation("Asia/Dhaka")
+	Dhaka, err = time.LoadLocationFromTZData("Asia/Dhaka", dhakaTZ)
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("loading Asia/Dhaka time zone: %w", err))
 	}
 }
