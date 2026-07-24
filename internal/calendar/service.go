@@ -187,3 +187,14 @@ func (s *Service) GetCurrentOrNextExam(ctx context.Context, calType CalendarType
 	}
 	return calendar.GetCurrentOrNextExam(), nil
 }
+
+// SyncAll synchronizes all academic calendar types in background.
+//
+//wails:ignore
+func (s *Service) SyncAll(ctx context.Context) {
+	for _, calType := range []CalendarType{CalendarStandard, CalendarLLBBPharm} {
+		if _, err := s.GetAcademicCalendar(ctx, calType); err != nil {
+			slog.Warn("Background calendar sync failed", "type", calType, "error", err)
+		}
+	}
+}
