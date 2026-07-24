@@ -356,7 +356,7 @@ interface DayScheduleTimelineProps {
 
 function DayScheduleTimeline({ routineByDay, onRemoveCourse }: DayScheduleTimelineProps) {
   return (
-    <div className="flex flex-col gap-8 pb-12">
+    <div className="flex flex-col gap-8">
       {DAYS.map((day) => {
         const dayCourses = routineByDay[day];
         if (!dayCourses || dayCourses.length === 0) return null;

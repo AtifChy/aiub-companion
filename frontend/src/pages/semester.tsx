@@ -25,7 +25,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useDelayedLoading } from "@/hooks/use-delayed-loading";
-import { logger } from "@/lib/logger";
 import { formatEventDate, isEventOngoing } from "@/lib/semester";
 import { cn } from "@/lib/utils";
 
@@ -90,8 +89,7 @@ export default function SemesterPage() {
       toast.success("Calendar refreshed");
     },
     onError: (err) => {
-      logger.error("Failed to refresh calendar", err);
-      toast.error("Failed to refresh calendar", {
+      toast.error("Error refreshing calendar", {
         description: err.message,
       });
     },
