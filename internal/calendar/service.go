@@ -2,6 +2,7 @@ package calendar
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"sync"
@@ -14,6 +15,11 @@ import (
 
 const cacheTTL = 24 * time.Hour
 
+type refreshResult struct {
+	cal *AcademicCalendar
+	err error
+}
+
 type Service struct {
 	db *database.Service
 
@@ -22,6 +28,7 @@ type Service struct {
 
 	cache     map[CalendarType]*AcademicCalendar
 	cacheTime map[CalendarType]time.Time
+	inflight  map[CalendarType]chan refreshResult
 
 	mu sync.RWMutex
 }
@@ -31,6 +38,7 @@ func NewService(db *database.Service) *Service {
 		db:        db,
 		cache:     make(map[CalendarType]*AcademicCalendar),
 		cacheTime: make(map[CalendarType]time.Time),
+		inflight:  make(map[CalendarType]chan refreshResult),
 	}
 }
 
@@ -45,48 +53,95 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 // and finally fetches and parses the calendar if needed.
 func (s *Service) GetAcademicCalendar(ctx context.Context, calType CalendarType) (*AcademicCalendar, error) {
 	s.mu.RLock()
-	if cached, ok := s.cache[calType]; ok && time.Since(s.cacheTime[calType]) < cacheTTL {
-		s.mu.RUnlock()
-		return cached, nil
-	}
+	cached, ok := s.cache[calType]
+	cacheTime := s.cacheTime[calType]
 	s.mu.RUnlock()
 
-	calendar, err := s.repo.GetCalendarCache(ctx, calType)
-	if err == nil {
+	if ok && time.Since(cacheTime) < cacheTTL {
+		return cached, nil
+	}
+
+	calendar, expired, err := s.repo.GetCalendarCache(ctx, calType)
+	if err != nil {
+		slog.Error("get calendar cache: %w", "error", err)
+	} else {
 		s.mu.Lock()
 		s.cache[calType] = calendar
 		s.cacheTime[calType] = calendar.LastUpdated
 		s.mu.Unlock()
+
+		if expired {
+			go func() {
+				if _, err := s.singleFlightRefresh(context.Background(), calType); err != nil {
+					slog.Warn("Failed to refresh calendar in background", "type", calType, "error", err)
+				}
+			}()
+		}
+
 		return calendar, nil
 	}
 
-	return s.refresh(ctx, calType)
+	return s.singleFlightRefresh(ctx, calType)
 }
 
 func (s *Service) RefreshCalendar(ctx context.Context, calType CalendarType) error {
-	_, err := s.refresh(ctx, calType)
+	_, err := s.singleFlightRefresh(ctx, calType)
 	return err
+}
+
+func (s *Service) singleFlightRefresh(ctx context.Context, calType CalendarType) (*AcademicCalendar, error) {
+	s.mu.Lock()
+	if ch, ok := s.inflight[calType]; ok {
+		s.mu.Unlock()
+
+		select {
+		case result, open := <-ch:
+			if !open {
+				s.mu.RLock()
+				defer s.mu.RUnlock()
+				if cached, ok := s.cache[calType]; ok {
+					return cached, nil
+				}
+				return nil, errors.New("calendar refresh channel closed without result")
+			}
+			return result.cal, result.err
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		}
+	}
+
+	ch := make(chan refreshResult, 1)
+	s.inflight[calType] = ch
+	s.mu.Unlock()
+
+	calendar, err := s.refresh(ctx, calType)
+
+	ch <- refreshResult{cal: calendar, err: err}
+	close(ch)
+
+	s.mu.Lock()
+	delete(s.inflight, calType)
+	s.mu.Unlock()
+
+	return calendar, err
 }
 
 func (s *Service) refresh(ctx context.Context, calType CalendarType) (*AcademicCalendar, error) {
 	calendar, err := s.fetchAndParse(ctx, calType)
 	if err != nil {
-		s.mu.RLock()
-		stale := s.cache[calType]
-		s.mu.RUnlock()
-		if stale != nil {
-			return stale, nil
-		}
 		return nil, err
 	}
+
+	now := time.Now()
+	calendar.LastUpdated = now
 
 	if err := s.repo.UpsertCalendarCache(ctx, calType, calendar); err != nil {
 		slog.Warn("Failed to cache calendar", "type", calType, "error", err)
 	}
 
 	s.mu.Lock()
+	s.cacheTime[calType] = now
 	s.cache[calType] = calendar
-	s.cacheTime[calType] = time.Now()
 	s.mu.Unlock()
 
 	return calendar, nil
