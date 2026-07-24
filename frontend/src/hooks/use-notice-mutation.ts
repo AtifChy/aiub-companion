@@ -1,5 +1,7 @@
 import { Notice, Service as NoticeService } from "@bindings/notice";
 import { useMutation, useQueryClient, type QueryClient } from "@tanstack/react-query";
+import { Events } from "@wailsio/runtime";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { useSettings } from "@/components/providers/settings-provider";
@@ -151,6 +153,15 @@ export function useSync() {
   const queryClient = useQueryClient();
   const { config } = useSettings();
 
+  const [backgroundSyncing, setBackgroundSyncing] = useState(false);
+
+  useEffect(() => {
+    const unsubcribe = Events.On("notice:syncing", (e) => {
+      setBackgroundSyncing(e.data);
+    });
+    return unsubcribe;
+  }, []);
+
   const syncMutation = useMutation({
     mutationFn: () => NoticeService.SyncNotices(config.sync.fetch_count),
     onSuccess: (notices) => {
@@ -170,5 +181,8 @@ export function useSync() {
     },
   });
 
-  return { syncing: syncMutation.isPending, sync: syncMutation.mutate };
+  return {
+    syncing: syncMutation.isPending || backgroundSyncing,
+    sync: syncMutation.mutate,
+  };
 }

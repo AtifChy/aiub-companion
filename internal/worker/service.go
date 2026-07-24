@@ -19,6 +19,7 @@ import (
 
 func init() {
 	// Register a custom event whose associated data type is string.
+	application.RegisterEvent[bool](event.EventNoticeSyncing)
 	application.RegisterEvent[int](event.EventNoticeSynced)
 	application.RegisterEvent[string](event.EventNoticeOpen)
 }
@@ -89,6 +90,13 @@ func (s *Service) run(ctx context.Context) {
 	defer ticker.Stop()
 
 	doSync := func() {
+		app.Event.Emit(event.EventNoticeSyncing, true)
+		defer func() {
+			time.Sleep(1 * time.Second)
+			app.Event.Emit(event.EventNoticeSyncing, false)
+		}()
+
+		// Background pre-fetch calendar updates
 		go func() {
 			for _, calType := range []calendar.CalendarType{calendar.CalendarStandard, calendar.CalendarLLBBPharm} {
 				_, err := s.calendar.GetAcademicCalendar(ctx, calType)
