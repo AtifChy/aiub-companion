@@ -1,8 +1,38 @@
+## [0.6.10] - 2026-07-24
+
+### 🚀 Features
+
+- *(calendar)* Add fixed http client timeout [`6902946`](https://github.com/AtifChy/aiub-companion/commit/69029460c7edeb2ca02a986b6f5b5910965e1915)
+- *(calendar)* Implement single-flight caching for calendars [`d77eb6f`](https://github.com/AtifChy/aiub-companion/commit/d77eb6fdbf62cb6959325ed2f1463348f9aa38f2)
+- *(worker)* Add calendar sync to worker service [`f1629c9`](https://github.com/AtifChy/aiub-companion/commit/f1629c923bbc86d4268587d723a2ddd7b777e0a9)
+- *(notices)* Show background sync status [`2056d06`](https://github.com/AtifChy/aiub-companion/commit/2056d065ebb0100721a2e4dfc76208a79b76151a)
+- *(notice)* Add notification payload builder [`570803d`](https://github.com/AtifChy/aiub-companion/commit/570803d76906fb5fccb04b86d1cff4351bf675ea)
+- *(calendar)* Add background sync all calendars [`07f9d98`](https://github.com/AtifChy/aiub-companion/commit/07f9d9805cc5aa05607ef390f5b3e339b081f484)
+
+### 🚜 Refactor
+
+- Code cleanup [`3381aca`](https://github.com/AtifChy/aiub-companion/commit/3381aca98b2bd4a41eb0d9ab45d98952284de4e5)
+- *(calendar)* Update get calendar cache return expiration status [`3caba0f`](https://github.com/AtifChy/aiub-companion/commit/3caba0fd86ae11b2dac3719d54f2b2b5d04111a5)
+- *(notice)* Remove unnecessary http client timeout [`f92e51e`](https://github.com/AtifChy/aiub-companion/commit/f92e51e3bdf4b1573786ea22dd98ebd58c375031)
+- *(calendar)* Remove error wrapping in slog [`0e1d60d`](https://github.com/AtifChy/aiub-companion/commit/0e1d60dc2bfb5ee4f0777904dae9ec65cf6a62f5)
+- *(worker)* Extract notification and sync logic to methods [`d0c84fa`](https://github.com/AtifChy/aiub-companion/commit/d0c84fa24447d2cfe54d22cb219a3b2020330cf7)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Bump version to v0.6.10 [`3188ec6`](https://github.com/AtifChy/aiub-companion/commit/3188ec69d49ec10676646a715b223bcf387a33b4)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.6.1...v0.6.10
+
 ## [0.6.1] - 2026-07-24
 
 ### 🚀 Features
 
 - *(tz)* Embed Dhaka timezone data [`c754eaa`](https://github.com/AtifChy/aiub-companion/commit/c754eaa4f7e05c73adcf279cea0156e92ddad368)
+
+### 📚 Documentation
+
+- Update changelog [`3730ea6`](https://github.com/AtifChy/aiub-companion/commit/3730ea6ce784201761977cf4c1a72f4d473dff31)
 
 ### 🎨 Styling
 
