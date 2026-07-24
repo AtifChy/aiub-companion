@@ -1,3 +1,20 @@
+## [0.6.1] - 2026-07-24
+
+### 🚀 Features
+
+- *(tz)* Embed Dhaka timezone data [`c754eaa`](https://github.com/AtifChy/aiub-companion/commit/c754eaa4f7e05c73adcf279cea0156e92ddad368)
+
+### 🎨 Styling
+
+- *(about)* Format build time display [`1d7b6f9`](https://github.com/AtifChy/aiub-companion/commit/1d7b6f900c470ea0574ebdb74b838731cc9deb68)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Bump version to v0.6.1 [`2c669bb`](https://github.com/AtifChy/aiub-companion/commit/2c669bb95ec5da01916d761788856cc07db41702)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.6.0...v0.6.1
+
 ## [0.6.0] - 2026-07-23
 
 ### 🚀 Features
@@ -29,6 +46,10 @@
 - *(fuzzy)* Adjust tie breaker threshold [`c97de01`](https://github.com/AtifChy/aiub-companion/commit/c97de01223b1d5d254a1ff493163565053110f3c)
 - *(semester)* Use calendarKey helper function [`85734f9`](https://github.com/AtifChy/aiub-companion/commit/85734f94c33382053c80b35745ecc846f34bd3d9)
 - *(notices)* Make the download btn container clickable [`715a44d`](https://github.com/AtifChy/aiub-companion/commit/715a44d3348af9276e80affeb74af45d4f5e8f66)
+
+### 📚 Documentation
+
+- Update changelog [`4099b4d`](https://github.com/AtifChy/aiub-companion/commit/4099b4d4eb90c13b5ceddecbaa4b1f2e58ceb767)
 
 ### 🎨 Styling
 
