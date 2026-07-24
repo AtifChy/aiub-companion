@@ -63,7 +63,7 @@ func (s *Service) GetAcademicCalendar(ctx context.Context, calType CalendarType)
 
 	calendar, expired, err := s.repo.GetCalendarCache(ctx, calType)
 	if err != nil {
-		slog.Error("get calendar cache: %w", "error", err)
+		slog.Error("get calendar cache", "error", err)
 	} else {
 		s.mu.Lock()
 		s.cache[calType] = calendar
