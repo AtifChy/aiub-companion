@@ -20,7 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDebounce } from "@/hooks/use-debounce";
 import { logger } from "@/lib/logger";
 import { DAYS, getCourseStatus, parseTimeToMinutes } from "@/lib/routine";
-import { cn } from "@/lib/utils";
+import { cn, titleCase } from "@/lib/utils";
 
 export default function RoutinePage() {
   const queryClient = useQueryClient();
@@ -465,7 +465,7 @@ function CourseCard({ course, schedule, onRemoveCourse }: CourseCardProps) {
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <MapPinIcon className="size-3.5 text-foreground/60" />
           <span className="truncate">
-            Room {schedule.room} ({course.department})
+            Room {schedule.room} ({titleCase(course.department)})
           </span>
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
