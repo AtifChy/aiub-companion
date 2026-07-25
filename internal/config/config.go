@@ -79,7 +79,7 @@ func defaultConfig() *Config {
 			Interval: "weekly",
 		},
 		Logging: logging{
-			Level: "INFO",
+			Level: "WARN",
 		},
 	}
 }
