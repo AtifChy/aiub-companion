@@ -1,3 +1,25 @@
+## [0.7.0] - 2026-07-25
+
+### 🚀 Features
+
+- *(persist)* Add persist package to manage app state [`c380a55`](https://github.com/AtifChy/aiub-companion/commit/c380a554faefda59756206491e7e05d19d680dc4)
+
+### 🐛 Bug Fixes
+
+- *(config)* Set default logging level to warn [`f941908`](https://github.com/AtifChy/aiub-companion/commit/f941908328d99c0ff8aaa97d2f1e93d169907f68)
+
+### 🚜 Refactor
+
+- Use persist package for state management [`d2d51fd`](https://github.com/AtifChy/aiub-companion/commit/d2d51fddfa9e8f44fa269b3ba7571fc697f9ca52)
+- *(desktop)* Extract quit logic to method [`0e56b65`](https://github.com/AtifChy/aiub-companion/commit/0e56b652eda62b7de27247e8a237149597e29460)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Bump version to v0.7.0 [`464e937`](https://github.com/AtifChy/aiub-companion/commit/464e9375c3f165c201af82188e245851513f4f26)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.6.10...v0.7.0
+
 ## [0.6.10] - 2026-07-24
 
 ### 🚀 Features
@@ -16,6 +38,10 @@
 - *(notice)* Remove unnecessary http client timeout [`f92e51e`](https://github.com/AtifChy/aiub-companion/commit/f92e51e3bdf4b1573786ea22dd98ebd58c375031)
 - *(calendar)* Remove error wrapping in slog [`0e1d60d`](https://github.com/AtifChy/aiub-companion/commit/0e1d60dc2bfb5ee4f0777904dae9ec65cf6a62f5)
 - *(worker)* Extract notification and sync logic to methods [`d0c84fa`](https://github.com/AtifChy/aiub-companion/commit/d0c84fa24447d2cfe54d22cb219a3b2020330cf7)
+
+### 📚 Documentation
+
+- Update changelog [`5608d5f`](https://github.com/AtifChy/aiub-companion/commit/5608d5f0a3d87896e98b55da58ac7ec6372ee0ad)
 
 ### ⚙️ Miscellaneous Tasks
 
