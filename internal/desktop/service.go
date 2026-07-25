@@ -60,6 +60,17 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 	return nil
 }
 
+func (s *Service) Quit() {
+	if s.main != nil {
+		s.main.Close()
+	}
+	if s.about != nil {
+		s.about.SetHideOnClose(false)
+		s.about.Close()
+	}
+	time.AfterFunc(200*time.Millisecond, func() { s.app.Quit() })
+}
+
 func (s *Service) ShowAboutWindow() {
 	s.about.Show()
 }
@@ -113,9 +124,7 @@ func (s *Service) handleClose() {
 		s.about.Close()
 	}
 	if !s.config.GetConfig().Launch.CloseToTray {
-		time.AfterFunc(200*time.Millisecond, func() {
-			s.app.Quit()
-		})
+		s.Quit()
 	}
 }
 
@@ -135,9 +144,7 @@ func (s *Service) setupTray() {
 		s.about.Show()
 	})
 	menu.Add("Quit").OnClick(func(ctx *application.Context) {
-		time.AfterFunc(200*time.Millisecond, func() {
-			s.app.Quit()
-		})
+		s.Quit()
 	})
 
 	systray.SetMenu(menu)
