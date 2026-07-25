@@ -1,7 +1,7 @@
 import { AcademicEvent } from "@bindings/calendar";
 import { describe, expect, it } from "vitest";
 
-import { formatEventDate } from "./semester";
+import { formatEventDate, isEventOngoing } from "./semester";
 
 describe("formatEventDate", () => {
   it("formats a single date correctly in the current year", () => {
@@ -38,5 +38,62 @@ describe("formatEventDate", () => {
     expect(result).toContain("10");
     expect(result).toContain("12");
     expect(result).toContain("–"); // en-dash
+  });
+});
+
+describe("isEventOngoing", () => {
+  it("returns true for an ongoing event", () => {
+    const event = new AcademicEvent();
+    event.date = new Date("2024-06-01T00:00:00Z");
+    event.endDate = new Date("2024-06-10T23:59:59Z");
+
+    const now = new Date("2024-06-05T12:00:00Z");
+    const result = isEventOngoing(event, now);
+
+    expect(result).toBe(true);
+  });
+
+  it("returns false for a past event", () => {
+    const event = new AcademicEvent();
+    event.date = new Date("2024-05-01T00:00:00Z");
+    event.endDate = new Date("2024-05-10T23:59:59Z");
+
+    const now = new Date("2024-06-05T12:00:00Z");
+    const result = isEventOngoing(event, now);
+
+    expect(result).toBe(false);
+  });
+
+  it("returns false for a future event", () => {
+    const event = new AcademicEvent();
+    event.date = new Date("2024-07-01T00:00:00Z");
+    event.endDate = new Date("2024-07-10T23:59:59Z");
+
+    const now = new Date("2024-06-05T12:00:00Z");
+    const result = isEventOngoing(event, now);
+
+    expect(result).toBe(false);
+  });
+
+  it("returns true for an event that starts today", () => {
+    const event = new AcademicEvent();
+    event.date = new Date("2024-06-05T00:00:00Z");
+    event.endDate = new Date("2024-06-10T23:59:59Z");
+
+    const now = new Date("2024-06-05T12:00:00Z");
+    const result = isEventOngoing(event, now);
+
+    expect(result).toBe(true);
+  });
+
+  it("returns true for an event that ends today", () => {
+    const event = new AcademicEvent();
+    event.date = new Date("2024-06-01T00:00:00Z");
+    event.endDate = new Date("2024-06-05T23:59:59Z");
+
+    const now = new Date("2024-06-05T12:00:00Z");
+    const result = isEventOngoing(event, now);
+
+    expect(result).toBe(true);
   });
 });
