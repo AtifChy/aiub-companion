@@ -1,3 +1,30 @@
+## [0.7.10] - 2026-07-25
+
+### 🚀 Features
+
+- Add title case utility function [`534c944`](https://github.com/AtifChy/aiub-companion/commit/534c944cafc9c7194cf40903600884e746f633a6)
+- *(routine)* Add title case to course department [`09fab3a`](https://github.com/AtifChy/aiub-companion/commit/09fab3a02c1e14c916be4bf9f2aebbff30ab5f45)
+
+### 🐛 Bug Fixes
+
+- *(notices)* Correct unclickable notice at the bottom of the list [`56e3ed9`](https://github.com/AtifChy/aiub-companion/commit/56e3ed9697c555aa7b230ef5374b1ccf2611628f)
+- *(notice)* Show full title after fetching details [`af7bbd7`](https://github.com/AtifChy/aiub-companion/commit/af7bbd7a583c9f8b6cf3bf42cec596cd96ff5999)
+
+### 🎨 Styling
+
+- *(notice)* Update notice list text truncation [`31632c6`](https://github.com/AtifChy/aiub-companion/commit/31632c6595cc5388618065c7bb1b3a2dd2d9d421)
+
+### 🧪 Testing
+
+- *(semester)* Add is event ongoing tests [`ed70626`](https://github.com/AtifChy/aiub-companion/commit/ed706260847029c5d140c974c1023b9440da04fb)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Bump version to v0.7.10 [`2c5064c`](https://github.com/AtifChy/aiub-companion/commit/2c5064c230733f2c7336a6723cb89ba29d85807e)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.7.0...v0.7.10
+
 ## [0.7.0] - 2026-07-25
 
 ### 🚀 Features
@@ -12,6 +39,10 @@
 
 - Use persist package for state management [`d2d51fd`](https://github.com/AtifChy/aiub-companion/commit/d2d51fddfa9e8f44fa269b3ba7571fc697f9ca52)
 - *(desktop)* Extract quit logic to method [`0e56b65`](https://github.com/AtifChy/aiub-companion/commit/0e56b652eda62b7de27247e8a237149597e29460)
+
+### 📚 Documentation
+
+- Update changelog [`a932f0a`](https://github.com/AtifChy/aiub-companion/commit/a932f0a9239d00b7e37530abc3ec1c710c06b884)
 
 ### ⚙️ Miscellaneous Tasks
 
