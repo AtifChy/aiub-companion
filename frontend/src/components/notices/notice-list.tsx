@@ -178,7 +178,7 @@ function NoticeListItem({ notice }: NoticeListItemProps) {
 
         <p
           className={cn(
-            "line-clamp-1 text-sm leading-snug",
+            "truncate text-sm leading-snug text-nowrap",
             notice.isRead ? "font-medium text-muted-foreground" : "font-semibold text-foreground",
           )}
         >
@@ -186,7 +186,9 @@ function NoticeListItem({ notice }: NoticeListItemProps) {
         </p>
 
         {notice.summary && (
-          <p className="line-clamp-2 text-[0.7rem] text-muted-foreground">{notice.summary}</p>
+          <p className="truncate text-[0.7rem] text-nowrap text-muted-foreground">
+            {notice.summary}
+          </p>
         )}
       </div>
     </div>
