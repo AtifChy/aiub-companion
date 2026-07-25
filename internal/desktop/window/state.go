@@ -1,14 +1,8 @@
 package window
 
-import (
-	"encoding/json"
-	"errors"
-	"fmt"
-	"os"
-	"path/filepath"
+import "aiub-companion/internal/persist"
 
-	"aiub-companion/internal/meta"
-)
+const filename = "window.json"
 
 // windowState holds the last known state of a window.
 type windowState struct {
@@ -19,8 +13,8 @@ type windowState struct {
 	Maximized bool `json:"maximized"`
 }
 
-type AppState struct {
-	Window map[string]windowState `json:"window"`
+type state struct {
+	Windows map[string]windowState `json:"window"`
 }
 
 func defaultState() windowState {
@@ -34,63 +28,39 @@ func defaultState() windowState {
 }
 
 func loadState(name string) (windowState, error) {
-	path, err := statePath()
+	path, err := persist.Path(filename)
 	if err != nil {
-		return windowState{}, fmt.Errorf("determine state path: %w", err)
+		return windowState{}, err
 	}
 
-	data, err := os.ReadFile(path)
+	stored, err := persist.Load[state](path)
 	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return defaultState(), nil // first run
-		}
-		return windowState{}, fmt.Errorf("read window state: %w", err)
+		return windowState{}, err
 	}
 
-	var appState AppState
-	if err := json.Unmarshal(data, &appState); err != nil {
-		return windowState{}, fmt.Errorf("unmarshal state: %w", err)
+	if s, ok := stored.Windows[name]; ok {
+		return s, nil
 	}
 
-	if state, ok := appState.Window[name]; ok {
-		return state, nil
-	}
-
-	return windowState{}, nil
+	return defaultState(), nil
 }
 
-func saveState(name string, state windowState) error {
-	path, err := statePath()
+func saveState(name string, s windowState) error {
+	path, err := persist.Path(filename)
 	if err != nil {
-		return fmt.Errorf("determine state path: %w", err)
+		return err
 	}
 
-	var appState AppState
-	data, err := os.ReadFile(path)
-	if err == nil {
-		_ = json.Unmarshal(data, &appState)
-	}
-	if appState.Window == nil {
-		appState.Window = make(map[string]windowState)
-	}
-
-	appState.Window[name] = state
-
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-		return fmt.Errorf("create state directory: %w", err)
-	}
-
-	data, err = json.MarshalIndent(appState, "", "  ")
+	stored, err := persist.Load[state](path)
 	if err != nil {
-		return fmt.Errorf("marshal state: %w", err)
+		return err
 	}
-	return os.WriteFile(path, data, 0o644)
-}
 
-func statePath() (string, error) {
-	path, err := os.UserConfigDir()
-	if err != nil {
-		return "", err
+	if stored.Windows == nil {
+		stored.Windows = make(map[string]windowState)
 	}
-	return filepath.Join(path, meta.AppName, "state", "window.json"), nil
+
+	stored.Windows[name] = s
+
+	return persist.Save(path, stored)
 }
