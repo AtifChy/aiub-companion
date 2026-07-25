@@ -1,4 +1,4 @@
-import { Service as NoticeService } from "@bindings/notice";
+import { Notice, Service as NoticeService } from "@bindings/notice";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Events } from "@wailsio/runtime";
 import { useEffect } from "react";
@@ -58,11 +58,29 @@ export function useNoticeList(filter: NoticeFilters) {
 }
 
 export function useNoticeDetail(selectedId: string | null) {
+  const queryClient = useQueryClient();
+
   const query = useQuery({
     queryKey: noticeKeys.details(selectedId ?? ""),
     queryFn: () => NoticeService.GetNoticeDetails(selectedId ?? ""),
     enabled: !!selectedId,
   });
+
+  useEffect(() => {
+    const notice = query.data;
+    if (!notice) return;
+
+    queryClient.setQueriesData<Notice[]>({ queryKey: noticeKeys.all }, (old) =>
+      old?.map((n) =>
+        n.id === notice.id && n.fullTitle !== notice.fullTitle
+          ? Object.assign(new Notice(), n, {
+              fullTitle: notice.fullTitle,
+              isCached: notice.isCached,
+            })
+          : n,
+      ),
+    );
+  }, [query.data, queryClient]);
 
   return { query };
 }

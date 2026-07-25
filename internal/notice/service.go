@@ -122,8 +122,7 @@ func (s *Service) populateNoticeCache(ctx context.Context, notice *Notice) error
 	}
 
 	err = s.repo.WithTx(ctx, func(txRepo Repository) error {
-		err := txRepo.UpdateNoticeDetails(ctx, notice.ID, details.FullTitle, details.Content)
-		if err != nil {
+		if err := txRepo.UpdateNoticeDetails(ctx, notice.ID, details.FullTitle, details.Content); err != nil {
 			return fmt.Errorf("update notice details: %w", err)
 		}
 		for i := range details.Attachments {
@@ -139,9 +138,10 @@ func (s *Service) populateNoticeCache(ctx context.Context, notice *Notice) error
 	}
 
 	// Update the notice object in memory
-	notice.Title = details.FullTitle
+	notice.FullTitle = details.FullTitle
 	notice.Content = details.Content
 	notice.Attachments = details.Attachments
+	notice.IsCached = true
 
 	return nil
 }
