@@ -54,15 +54,15 @@ export function NoticeActionBar({ notices }: NoticeActionBarProps) {
   };
 
   return (
-    <div className="absolute inset-x-0 bottom-0 z-10 flex justify-center">
+    <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center">
       <div
         className={cn(
           "mx-3 mb-3 flex w-fit items-center justify-center gap-2 rounded-xl",
           "border bg-background/70 px-3 py-2 shadow-lg backdrop-blur-md",
           "transition-all duration-200 ease-in-out",
           selectionMode
-            ? "translate-y-0 opacity-100"
-            : "pointer-events-none translate-y-4 opacity-0",
+            ? "pointer-events-auto translate-y-0 opacity-100"
+            : "translate-y-4 opacity-0",
         )}
         aria-hidden={!selectionMode}
       >
