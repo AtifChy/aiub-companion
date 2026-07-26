@@ -2,7 +2,7 @@ import { Browser } from "@wailsio/runtime";
 import type React from "react";
 import { toast } from "sonner";
 
-/*
+/**
  * Opens a URL in user's default browser using Wails Browser API.
  */
 export async function openExternalLink(url: string): Promise<void> {
@@ -13,6 +13,11 @@ export async function openExternalLink(url: string): Promise<void> {
   }
 }
 
+/**
+ * Mouse event handler for container elements rendering HTML or Markdown content.
+ * Intercepts anchor tag (`<a>`) clicks to open links via `Browser.OpenURL` instead of
+ * navigating inside Wails webview.
+ */
 export function handleExternalLinkClick(event: React.MouseEvent<HTMLElement>): void {
   const target = event.target as HTMLElement | null;
   const anchor = target?.closest("a");

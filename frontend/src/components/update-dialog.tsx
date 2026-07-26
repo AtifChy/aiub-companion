@@ -15,6 +15,7 @@ import {
   AlertDialogMedia,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { handleExternalLinkClick } from "@/lib/link-handler";
 import { cn } from "@/lib/utils";
 
 export function UpdateDialog() {
@@ -107,11 +108,14 @@ function Markdown({ children }: { children: string }) {
 
   return (
     <div
+      role="document"
       className={cn(
-        "prose prose-sm prose-custom select-text dark:prose-invert",
+        "select-text selection:bg-primary/20",
+        "prose prose-sm prose-custom dark:prose-invert",
         "prose-a:no-underline prose-code:rounded-sm prose-code:bg-primary/10 prose-code:px-1 [&_code]:before:content-none [&_code]:after:content-none",
         "prose-blockquote:text-muted-foreground",
       )}
+      onClick={handleExternalLinkClick}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
