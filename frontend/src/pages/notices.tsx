@@ -1,6 +1,5 @@
 import { Service, type Notice } from "@bindings/notice";
 import { useQueryClient } from "@tanstack/react-query";
-import { Browser } from "@wailsio/runtime";
 import {
   CircleCheckBigIcon,
   CircleIcon,
@@ -14,7 +13,6 @@ import {
   PinOffIcon,
 } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 
 import { AppTooltip } from "@/components/app-tooltip";
@@ -31,9 +29,12 @@ import { useDelayedLoading } from "@/hooks/use-delayed-loading";
 import { useNoticeMutations } from "@/hooks/use-notice-mutation";
 import { useNoticeStore } from "@/hooks/use-notice-store";
 import { noticeKeys, useNoticeDetail, useNoticeList } from "@/hooks/use-notices";
+import { openExternalLink } from "@/lib/link-handler";
 import { logger } from "@/lib/logger";
 import { CATEGORY_STYLES, type AltCategory } from "@/lib/notices";
 import { cn } from "@/lib/utils";
+
+const AIUB_URL = "https://aiub.edu/";
 
 export default function NoticesPage() {
   const queryClient = useQueryClient();
@@ -242,14 +243,7 @@ function DetailPanel({ onToggleRead, onTogglePin }: DetailPanelProps) {
               <Button
                 variant="ghost"
                 className="hover:text-primary"
-                onClick={() =>
-                  void Browser.OpenURL("https://aiub.edu/" + notice.id).catch((err: unknown) => {
-                    logger.error("Failed to open URL", err);
-                    toast.error("Failed to open URL", {
-                      description: (err as Error).message,
-                    });
-                  })
-                }
+                onClick={() => void openExternalLink(AIUB_URL + notice.id)}
               >
                 <ExternalLinkIcon className="size-3.5" />
               </Button>
@@ -295,11 +289,7 @@ interface AttachmentItemProps {
 function AttachmentItem({ attachment }: AttachmentItemProps) {
   const openURL = () => {
     if (!attachment.url) return;
-    Browser.OpenURL(attachment.url).catch((err: unknown) => {
-      toast.error("Failed to open attachment URL", {
-        description: (err as Error).message,
-      });
-    });
+    void openExternalLink(attachment.url);
   };
 
   return (

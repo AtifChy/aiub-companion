@@ -1,4 +1,3 @@
-import { Browser } from "@wailsio/runtime";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
@@ -7,12 +6,12 @@ import {
   HelpCircleIcon,
 } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 
 import { SearchInput } from "@/components/search-input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { openExternalLink } from "@/lib/link-handler";
 
 interface FAQItem {
   question: string;
@@ -183,13 +182,7 @@ function Footer() {
           <Button
             variant="outline"
             className="gap-2"
-            onClick={() => {
-              Browser.OpenURL("https://github.com/atifchy/aiub-companion").catch((err: unknown) =>
-                toast.error(`Failed to open URL`, {
-                  description: err instanceof Error ? err.message : String(err),
-                }),
-              );
-            }}
+            onClick={() => void openExternalLink("https://github.com/atifchy/aiub-companion")}
           >
             <GitBranchIcon className="size-4" />
             GitHub Repository
@@ -198,13 +191,7 @@ function Footer() {
           <Button
             variant="outline"
             className="gap-2"
-            onClick={() => {
-              Browser.OpenURL("https://www.aiub.edu").catch((err: unknown) =>
-                toast.error(`Failed to open URL`, {
-                  description: err instanceof Error ? err.message : String(err),
-                }),
-              );
-            }}
+            onClick={() => void openExternalLink("https://www.aiub.edu")}
           >
             AIUB Website
             <ExternalLinkIcon className="h-3 w-3" />
