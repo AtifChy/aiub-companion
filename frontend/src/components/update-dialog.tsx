@@ -183,13 +183,23 @@ function StateIcon({ state }: { state: UpdatePhase }) {
   }
 }
 
+const renderer = new marked.Renderer();
+const githubCompareRegex = /^https:\/\/github\.com\/[^/]+\/[^/]+\/compare\/([^/]+)\.\.\.([^/]+)$/;
 
+renderer.link = function ({ href, title, tokens }): string {
+  const text = this.parser.parseInline(tokens);
 
+  const match = githubCompareRegex.exec(href);
 
+  if (match && text === href) {
+    return `<a href="${href}"${title ? ` title="${title}"` : ""}><code>${String(match[1])}...${String(match[2])}</code></a>`;
+  }
 
+  return `<a href="${href}"${title ? ` title="${title}"` : ""}>${text}</a>`;
+};
 
 function Markdown({ children }: { children: string }) {
-  const html = DOMPurify.sanitize(marked.parse(children, { async: false }));
+  const html = DOMPurify.sanitize(marked.parse(children, { async: false, renderer }));
 
   return (
     <div
@@ -198,7 +208,7 @@ function Markdown({ children }: { children: string }) {
         "select-text selection:bg-primary/20",
         "prose prose-sm prose-custom dark:prose-invert",
         "prose-a:no-underline prose-code:rounded-sm prose-code:bg-primary/10 prose-code:px-1 [&_code]:before:content-none [&_code]:after:content-none",
-        "prose-blockquote:text-muted-foreground",
+        "prose-blockquote:bg-primary/5 prose-blockquote:py-px prose-blockquote:text-muted-foreground prose-blockquote:not-italic prose-blockquote:[&_p]:before:content-none",
       )}
       onClick={handleExternalLinkClick}
       dangerouslySetInnerHTML={{ __html: html }}
