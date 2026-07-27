@@ -1,3 +1,12 @@
+## [0.7.60] - 2026-07-27
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Bump version to v0.7.60 [`4514e4f`](https://github.com/AtifChy/aiub-companion/commit/4514e4f292251737f70ff2ec87bd527515731980)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.7.50...v0.7.60
+
 ## [0.7.50] - 2026-07-27
 
 ### 🚀 Features
@@ -19,6 +28,10 @@
 
 - Use external link handler [`2088989`](https://github.com/AtifChy/aiub-companion/commit/2088989757eeedc5d9af9ba340de4ba794a44699)
 - *(update)* Rewrite update provider logic [`91267be`](https://github.com/AtifChy/aiub-companion/commit/91267be8479a97b8ad1f106eaac09d90eb57fce4)
+
+### 📚 Documentation
+
+- Update changelog [`3b1630f`](https://github.com/AtifChy/aiub-companion/commit/3b1630f2cce51156f6ccb67e10ac28b62401e6b7)
 
 ### 🎨 Styling
 
