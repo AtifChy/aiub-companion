@@ -60,7 +60,7 @@ const faqs: FAQItem[] = [
 
 export default function HelpPage() {
   return (
-    <div className="mr-0.5 h-full animate-in scrollbar-thin scrollbar-thumb-accent scrollbar-gutter-both space-y-8 overflow-y-auto bg-background p-6 duration-200 fade-in-10 lg:p-10">
+    <div className="mr-0.5 h-full animate-in scrollbar-thin scrollbar-thumb-accent scrollbar-gutter-both space-y-8 overflow-y-auto bg-background p-6 transition-opacity duration-200 fade-in-10 lg:p-10">
       <Header />
       <FAQ />
       <Separator />
@@ -164,7 +164,7 @@ function FAQItem({
         )}
       </button>
       {expanded && (
-        <div className="animate-in px-4 pb-4 text-sm leading-relaxed text-muted-foreground duration-200 fade-in slide-in-from-top-1">
+        <div className="animate-in px-4 pb-4 text-sm leading-relaxed text-muted-foreground transition-transform duration-200 fade-in slide-in-from-top-1">
           {faq.answer}
         </div>
       )}
