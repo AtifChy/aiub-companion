@@ -1,9 +1,0 @@
-minimumReleaseAge: 4320 # 3 days
-minimumReleaseAgeExclude:
-  - "typescript"
-  - "@typescript/typescript-*"
-  - "@wailsio/runtime"
-trustPolicy: no-downgrade
-trustPolicyIgnoreAfter: 525600 # 1 year
-allowBuilds:
-  msw: true

@@ -1,5 +1,6 @@
+import { describe, expect, it } from "bun:test";
+
 import { AcademicEvent } from "@bindings/calendar";
-import { describe, expect, it } from "vitest";
 
 import { formatEventDate, isEventOngoing } from "./semester";
 

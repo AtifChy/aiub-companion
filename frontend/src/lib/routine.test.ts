@@ -1,5 +1,6 @@
+import { describe, expect, it } from "bun:test";
+
 import { Schedule } from "@bindings/routine";
-import { describe, expect, it } from "vitest";
 
 import { getCourseStatus, parseTimeToMinutes } from "./routine";
 
@@ -36,7 +37,7 @@ describe("Routine Utils", () => {
     // Create a fixed reference time for testing: Tuesday at 10:00 AM
     // Using UTC Date constructor can be flaky, so we construct components
     // 2026-07-21 is a Tuesday
-    const testNow = new Date("2026-07-21T10:00:00.000+06:00");
+    const testNow = new Date(2026, 6, 21, 10, 0, 0);
 
     const createSchedule = (day: string, start: string, end: string): Schedule => {
       const schedule = new Schedule();

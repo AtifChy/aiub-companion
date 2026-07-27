@@ -50,14 +50,14 @@ if [ -n "$FRONTEND_FILES" ]; then
     echo "🔍 Checking Frontend files..."
     echo "----------------------------------------"
 
-    # Check if pnpm is installed
-    if ! command -v pnpm >/dev/null 2>&1; then
-        echo "⚠️  pnpm is not installed. Skipping frontend checks."
+    # Check if bun is installed
+    if ! command -v bun >/dev/null 2>&1; then
+        echo "⚠️  bun is not installed. Skipping frontend checks."
     else
         # Run oxfmt check
         echo "Running frontend formatter check (oxfmt)..."
-        if ! pnpm --dir frontend run fmt:check; then
-            echo "❌ Frontend formatting check failed. Run 'pnpm --dir frontend run fmt' to format."
+        if ! bun --cwd=frontend run fmt:check; then
+            echo "❌ Frontend formatting check failed. Run 'bun --cwd=frontend run fmt' to format."
             FAIL=1
         else
             echo "✅ Frontend formatting check passed."
@@ -65,7 +65,7 @@ if [ -n "$FRONTEND_FILES" ]; then
 
         # Run oxlint check
         echo "Running frontend linter (oxlint)..."
-        if ! pnpm --dir frontend run lint; then
+        if ! bun --cwd=frontend run lint; then
             echo "❌ Frontend linting failed. Fix lint errors and try again."
             FAIL=1
         else
@@ -74,7 +74,7 @@ if [ -n "$FRONTEND_FILES" ]; then
 
         # Run Typecheck
         # echo "Running frontend typecheck..."
-        # if ! pnpm --dir frontend run typecheck; then
+        # if ! bun --cwd=frontend run typecheck; then
         #     echo "❌ Frontend typecheck failed. Fix typescript errors and try again."
         #     FAIL=1
         # else
