@@ -1,34 +1,27 @@
-import { Release, Service as UpdaterService } from "@bindings/updater";
+import { Service as UpdaterService } from "@bindings/updater";
 import { useMutation } from "@tanstack/react-query";
-import { Events, Updater } from "@wailsio/runtime";
-import { createContext, use, useEffect, useState } from "react";
+import { createContext, use, useEffect, useRef } from "react";
 import { toast } from "sonner";
 
+import { COUNTDOWN_SECONDS, initUpdateListeners, useUpdateStore } from "@/hooks/use-update-store";
 import { logger } from "@/lib/logger";
 
 interface UpdateContextType {
-  release: Release | null;
-  dialogOpen: boolean;
-  setDialogOpen: (open: boolean) => void;
   check: ReturnType<typeof useCheckMutation>;
+  download: ReturnType<typeof useDownloadMutation>;
   install: ReturnType<typeof useInstallMutation>;
+  runInstall: () => void;
+  cancelCountdown: () => void;
 }
 
 const UpdateContext = createContext<UpdateContextType | null>(null);
 
-function useCheckMutation(
-  setRelease: (release: Release | null) => void,
-  setDialogOpen: (open: boolean) => void,
-) {
+function useCheckMutation() {
   return useMutation({
     mutationFn: UpdaterService.CheckForUpdates,
     onSuccess: (data) => {
-      if (data) {
-        setRelease(data);
-        setDialogOpen(true);
-      } else {
-        toast.info("You are using the latest version.");
-      }
+      if (data) useUpdateStore.getState().openDialog(data);
+      else toast.info("You are using the latest version.");
     },
     onError: (err) => {
       logger.error("Error checking for updates:", err);
@@ -37,50 +30,89 @@ function useCheckMutation(
   });
 }
 
-function useInstallMutation(setDialogOpen: (open: boolean) => void) {
+function useDownloadMutation() {
   return useMutation({
-    mutationFn: async () => {
-      await UpdaterService.DownloadUpdate();
-      await UpdaterService.InstallUpdate();
+    mutationFn: UpdaterService.DownloadUpdate,
+    onError: (err) => {
+      logger.error("Error downloading update:", err);
+      toast.error("Error downloading update. Please try again later.");
     },
+  });
+}
+
+function useInstallMutation() {
+  return useMutation({
+    mutationFn: UpdaterService.InstallUpdate,
     onError: (err) => {
       logger.error("Error installing update:", err);
       toast.error("Error installing update. Please try again later.");
-      setDialogOpen(false);
+      useUpdateStore.getState().closeDialog();
     },
   });
 }
 
 export function UpdateProvider({ children }: { children: React.ReactNode }) {
-  const [release, setRelease] = useState<Release | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const check = useCheckMutation();
+  const download = useDownloadMutation();
+  const install = useInstallMutation();
 
-  const check = useCheckMutation(setRelease, setDialogOpen);
-  const install = useInstallMutation(setDialogOpen);
+  const countdownTimer = useRef<ReturnType<typeof setInterval>>(null);
 
-  useEffect(() => {
-    const unsubscribe = Events.On(Updater.Events.UpdateAvailable, (event) => {
-      const release = event.data;
-      if (!release) return;
-      setRelease({
-        version: release.version,
-        notes: release.notes ?? "",
-      });
-      setDialogOpen(true);
-    });
-    return unsubscribe;
-  }, []);
+  const stopCountdown = () => {
+    if (countdownTimer.current) {
+      clearInterval(countdownTimer.current);
+      countdownTimer.current = null;
+    }
+  };
 
-  const value = { release, dialogOpen, setDialogOpen, check, install };
+  const runInstall = () => {
+    stopCountdown();
+    useUpdateStore.setState({ phaseState: { phase: "installing" } });
+    install.mutate();
+  };
 
-  return <UpdateContext value={value}>{children}</UpdateContext>;
+  const startCountdown = () => {
+    stopCountdown();
+    useUpdateStore.setState({ phaseState: { phase: "ready", countdown: COUNTDOWN_SECONDS } });
+
+    countdownTimer.current = setInterval(() => {
+      const current = useUpdateStore.getState().phaseState;
+      if (current.phase !== "ready") {
+        stopCountdown();
+        return;
+      }
+      if (current.countdown <= 1) runInstall();
+      else
+        useUpdateStore.setState({
+          phaseState: { phase: "ready", countdown: current.countdown - 1 },
+        });
+    }, 1000);
+  };
+
+  const cancelCountdown = () => {
+    stopCountdown();
+    useUpdateStore.setState({ phaseState: { phase: "idle" } });
+  };
+
+  // oxlint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => initUpdateListeners({ onReady: startCountdown, onError: cancelCountdown }), []);
+
+  useEffect(
+    () =>
+      useUpdateStore.subscribe((state) => {
+        if (!state.open || state.phaseState.phase !== "ready") stopCountdown();
+      }),
+    [],
+  );
+
+  const value = () => ({ check, download, install, runInstall, cancelCountdown });
+
+  return <UpdateContext value={value()}>{children}</UpdateContext>;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
 export function useUpdate() {
   const context = use(UpdateContext);
-  if (!context) {
-    throw new Error("useUpdate must be used within an UpdateProvider");
-  }
+  if (!context) throw new Error("useUpdate must be used within an UpdateProvider");
   return context;
 }
