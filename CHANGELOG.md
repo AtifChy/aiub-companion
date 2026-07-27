@@ -1,3 +1,39 @@
+## [0.7.50] - 2026-07-27
+
+### 🚀 Features
+
+- *(frontend)* Add external link handler [`a107600`](https://github.com/AtifChy/aiub-companion/commit/a107600bb3e1d3e9ca52cb216187f13b67967400)
+- *(update)* Handle external links in browser [`e867334`](https://github.com/AtifChy/aiub-companion/commit/e867334c48baeb8c89aa2a82e8013f0e7ce6dd93)
+- *(updater)* Add update store and listeners [`6ad59b5`](https://github.com/AtifChy/aiub-companion/commit/6ad59b5674c08c2c08a9afe7cfd5ce34de75901e)
+- *(updater)* Add http client and checksum asset [`298245d`](https://github.com/AtifChy/aiub-companion/commit/298245d0c086782660be21630c6c30f955c49aff)
+- *(utils)* Add format bytes and speed functions [`e54ae53`](https://github.com/AtifChy/aiub-companion/commit/e54ae538b6f6937a45428b85058544deb2d8b415)
+- *(update)* Add download progress and states [`1942f29`](https://github.com/AtifChy/aiub-companion/commit/1942f29189bc18428de8b3b1b92d7d73ba4d2257)
+- *(update)* Render github compare links as code [`4610cd2`](https://github.com/AtifChy/aiub-companion/commit/4610cd2b7fe43912653c8de341e92273114adedc)
+
+### 💼 Other
+
+- *(pnpm)* Add the mono font package [`dc867aa`](https://github.com/AtifChy/aiub-companion/commit/dc867aaff3caab14f621894310d1cd0f603064ee)
+- *(tsc)* Use `tsc` incremental builds [`df0aa76`](https://github.com/AtifChy/aiub-companion/commit/df0aa76b990787395b097a87326c21c81d6030a6)
+
+### 🚜 Refactor
+
+- Use external link handler [`2088989`](https://github.com/AtifChy/aiub-companion/commit/2088989757eeedc5d9af9ba340de4ba794a44699)
+- *(update)* Rewrite update provider logic [`91267be`](https://github.com/AtifChy/aiub-companion/commit/91267be8479a97b8ad1f106eaac09d90eb57fce4)
+
+### 🎨 Styling
+
+- Remove unused keyframe animation [`ec071c6`](https://github.com/AtifChy/aiub-companion/commit/ec071c6cc2e7cd86e7686f6507977243b2b12566)
+- *(help)* Update transition-opacity and transform [`0491ed3`](https://github.com/AtifChy/aiub-companion/commit/0491ed369fe02d30b724dd5ab08452099850fb95)
+- *(update)* Update install button styling [`96d1553`](https://github.com/AtifChy/aiub-companion/commit/96d1553fd69f2ec299cb3428c942dbb67a325946)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(lint)* Remove `eslint-plugin-react-doctor` rules [`224b013`](https://github.com/AtifChy/aiub-companion/commit/224b0130ac0761e964df8f69c5cea40900575915)
+- *(release)* Bump version to v0.7.50 [`6659a1b`](https://github.com/AtifChy/aiub-companion/commit/6659a1b685880526e99e0531c033e44948eaa262)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.7.10...v0.7.50
+
 ## [0.7.10] - 2026-07-25
 
 ### 🚀 Features
@@ -9,6 +45,10 @@
 
 - *(notices)* Correct unclickable notice at the bottom of the list [`56e3ed9`](https://github.com/AtifChy/aiub-companion/commit/56e3ed9697c555aa7b230ef5374b1ccf2611628f)
 - *(notice)* Show full title after fetching details [`af7bbd7`](https://github.com/AtifChy/aiub-companion/commit/af7bbd7a583c9f8b6cf3bf42cec596cd96ff5999)
+
+### 📚 Documentation
+
+- Update changelog [`6babf06`](https://github.com/AtifChy/aiub-companion/commit/6babf0657cbfa05520dc02b5d2c85763c88d3f9b)
 
 ### 🎨 Styling
 
