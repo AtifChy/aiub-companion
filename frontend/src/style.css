@@ -243,14 +243,3 @@
   --tw-prose-invert-th-borders: var(--border);
   --tw-prose-invert-td-borders: var(--border);
 }
-
-@keyframes marquee {
-  0%,
-  20% {
-    transform: translateX(0%);
-  }
-  80%,
-  100% {
-    transform: translateX(-30%);
-  }
-}
