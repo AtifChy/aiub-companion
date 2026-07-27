@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -58,10 +59,12 @@ func (s *Service) Init(app *application.App) error {
 	}
 
 	gh, err := github.New(github.Config{
-		Repository:   s.githubRepo,
-		Prerelease:   false,
-		Token:        token,
-		AssetMatcher: assetMatcher,
+		Repository:    s.githubRepo,
+		Token:         token,
+		Prerelease:    false,
+		ChecksumAsset: "SHA256SUMS",
+		AssetMatcher:  assetMatcher,
+		HTTPClient:    &http.Client{Timeout: 5 * time.Minute},
 	})
 	if err != nil {
 		return fmt.Errorf("github provider: %w", err)
@@ -76,14 +79,6 @@ func (s *Service) Init(app *application.App) error {
 	if err != nil {
 		return fmt.Errorf("updater init: %w", err)
 	}
-
-	app.Event.On(updater.EventDownloadProgress, func(event *application.CustomEvent) {
-		progress, ok := event.Data.(updater.Progress)
-		if !ok {
-			return
-		}
-		slog.Info(fmt.Sprintf("Download progress: %d/%d bytes (%.0f KB/s)", progress.Written, progress.Total, progress.Rate/1024))
-	})
 
 	app.Event.On(event.EventConfigChanged, func(_ *application.CustomEvent) {
 		s.reloadCh <- struct{}{}
