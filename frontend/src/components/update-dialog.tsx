@@ -1,8 +1,13 @@
-import { Events, Updater } from "@wailsio/runtime";
 import DOMPurify from "dompurify";
-import { DownloadIcon } from "lucide-react";
+import {
+  ArrowDownToLineIcon,
+  CircleCheckBigIcon,
+  DownloadIcon,
+  Loader2Icon,
+  ShieldCheckIcon,
+} from "lucide-react";
 import { marked } from "marked";
-import { useEffect, useState } from "react";
+import { useShallow } from "zustand/shallow";
 
 import { useUpdate } from "@/components/providers/update-provider";
 import {
@@ -15,93 +20,173 @@ import {
   AlertDialogMedia,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Progress } from "@/components/ui/progress";
+import { COUNTDOWN_SECONDS, useUpdateStore, type UpdatePhase } from "@/hooks/use-update-store";
 import { handleExternalLinkClick } from "@/lib/link-handler";
-import { cn } from "@/lib/utils";
+import { cn, formatBytes, formatSpeed } from "@/lib/utils";
 
 export function UpdateDialog() {
-  const { release, dialogOpen, setDialogOpen, install } = useUpdate();
+  const { download, runInstall, cancelCountdown } = useUpdate();
+
+  const { release, dialogOpen, phaseState, closeDialog } = useUpdateStore(
+    useShallow((s) => ({
+      release: s.release,
+      dialogOpen: s.open,
+      phaseState: s.phaseState,
+      closeDialog: s.closeDialog,
+    })),
+  );
 
   if (!release) return null;
 
-  const downloading = install.isPending;
+  const phase = phaseState.phase;
+  const progress = phaseState.phase === "downloading" ? phaseState.progress : null;
+  const countdown = phaseState.phase === "ready" ? phaseState.countdown : COUNTDOWN_SECONDS;
+
+  const handleDownload = () => {
+    useUpdateStore.setState({ phaseState: { phase: "downloading", progress: null } });
+    download.mutate();
+  };
+
+  const percent =
+    progress && progress.total > 0 ? Math.min(100, (progress.written / progress.total) * 100) : 0;
+
+  const isBusy = phase !== "idle" && phase !== "ready";
 
   return (
-    <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+    <AlertDialog open={dialogOpen} onOpenChange={isBusy ? undefined : closeDialog}>
       <AlertDialogContent size="sm" className="min-w-md">
         <AlertDialogHeader>
-          <AlertDialogMedia className="bg-primary/10 text-primary">
-            <DownloadIcon />
+          <AlertDialogMedia
+            className={cn(
+              "transition-colors duration-300",
+              phase === "ready"
+                ? "bg-emerald-500/10 text-emerald-500"
+                : "bg-primary/10 text-primary",
+            )}
+          >
+            <StateIcon state={phase} />
           </AlertDialogMedia>
-          <AlertDialogTitle>Update Available ({release.version})</AlertDialogTitle>
+
+          <AlertDialogTitle>
+            {phase === "idle" && `Update Available (${release.version})`}
+            {phase === "downloading" && `Downloading`}
+            {phase === "verifying" && `Verifying`}
+            {phase === "ready" && `Update Ready to Install`}
+            {phase === "installing" && `Installing`}
+          </AlertDialogTitle>
 
           <div className="flex flex-col gap-2 text-left">
-            <p className="text-sm text-muted-foreground">
-              Would you like to download and install it now?
+            <p className="w-64 text-center text-sm text-muted-foreground">
+              {phase === "idle" &&
+                "A new version is available. Would you like to download and install it now?"}
+              {phase === "downloading" && "Downloading the latest version…"}
+              {phase === "verifying" && "Verifying the downloaded file…"}
+              {phase === "ready" && `Download complete! Installing…`}
+              {phase === "installing" && "Applying update and restarting the application…"}
             </p>
           </div>
         </AlertDialogHeader>
-        {release.notes && (
+
+        {phase === "idle" && release.notes && (
           <div className="mt-2 max-h-80 scrollbar-thin scrollbar-thumb-accent overflow-y-auto rounded-md border bg-background/50 p-3 text-sm text-muted-foreground">
             <span className="mb-1 block font-semibold">Release Notes:</span>
             <Markdown>{release.notes}</Markdown>
           </div>
         )}
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={downloading} variant="outline">
-            Later
-          </AlertDialogCancel>
-          <DownlaodAction downloading={downloading} onClick={() => install.mutate()} />
+
+        {phase === "downloading" && (
+          <div className="mt-2 flex flex-col gap-1.5 rounded-lg border bg-background p-3">
+            <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+              <span>
+                {progress
+                  ? `${formatBytes(progress.written)} / ${formatBytes(progress.total)}`
+                  : "Preparing…"}
+              </span>
+              <span>
+                {progress ? `${percent.toFixed(1)}% · ${formatSpeed(progress.rate)}` : "0%"}
+              </span>
+            </div>
+            <Progress value={percent} className="mt-2 h-2 *:bg-primary/20" />
+          </div>
+        )}
+
+        {phase === "verifying" && (
+          <div className="mt-2 flex items-center gap-2 rounded-lg border bg-background p-3 text-xs font-medium text-muted-foreground">
+            <Loader2Icon className="size-4 animate-spin" />
+            Verifying integrity…
+          </div>
+        )}
+
+        {phase === "ready" && (
+          <div className="mt-2 rounded-lg bg-background">
+            <div className="flex flex-col gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3">
+              <div className="flex items-center justify-between text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                <span>Auto install starts in…</span>
+                <span>{countdown}s remaining</span>
+              </div>
+              <Progress
+                value={(countdown / COUNTDOWN_SECONDS) * 100}
+                className="mt-2 h-2 *:bg-emerald-500/10 [&>[data-slot=progress-track]>[data-slot=progress-indicator]]:bg-emerald-500"
+              />
+            </div>
+          </div>
+        )}
+
+        <AlertDialogFooter className="*:only:col-span-2">
+          {phase === "idle" && (
+            <>
+              <AlertDialogCancel variant="outline">Later</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDownload}>Download</AlertDialogAction>
+            </>
+          )}
+
+          {(phase === "downloading" || phase === "verifying") && (
+            <AlertDialogCancel disabled variant="outline">
+              {phase === "downloading" ? "Downloading…" : "Verifying…"}
+            </AlertDialogCancel>
+          )}
+
+          {phase === "ready" && (
+            <>
+              <AlertDialogCancel variant="outline" onClick={cancelCountdown}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={runInstall}>Install Now</AlertDialogAction>
+            </>
+          )}
+
+          {phase === "installing" && (
+            <AlertDialogAction disabled>
+              <Loader2Icon className="mr-2 size-4 animate-spin" />
+              Installing…
+            </AlertDialogAction>
+          )}
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );
 }
 
-interface DownlaodActionProps {
-  downloading: boolean;
-  onClick: () => void;
+function StateIcon({ state }: { state: UpdatePhase }) {
+  switch (state) {
+    case "idle":
+      return <DownloadIcon />;
+    case "downloading":
+      return <ArrowDownToLineIcon className="translate-y-1 animate-bounce" />;
+    case "verifying":
+      return <ShieldCheckIcon />;
+    case "ready":
+      return <CircleCheckBigIcon />;
+    case "installing":
+      return <Loader2Icon className="animate-spin" />;
+  }
 }
 
-function DownlaodAction({ downloading, onClick }: DownlaodActionProps) {
-  const { percent } = useDownloadProgress();
-  return (
-    <AlertDialogAction
-      disabled={downloading}
-      variant={downloading ? "outline" : "default"}
-      onClick={onClick}
-      className="relative overflow-hidden"
-    >
-      {downloading && (
-        <span
-          className="absolute inset-y-0 left-0 bg-primary transition-all duration-100"
-          style={{ width: `${String(percent)}%` }}
-        />
-      )}
-      <span className="relative z-10">{downloading || "Download & Install"}</span>
-    </AlertDialogAction>
-  );
-}
 
-interface DownloadProgress {
-  written: number;
-  total: number;
-  rate: number;
-}
 
-function useDownloadProgress() {
-  const [progress, setProgress] = useState<DownloadProgress | null>(null);
 
-  useEffect(() => {
-    const unsubscribe = Events.On(Updater.Events.DownloadProgress, (event) => {
-      setProgress(event.data);
-    });
-    return unsubscribe;
-  }, []);
 
-  const percent = progress && progress.total > 0 ? (progress.written / progress.total) * 100 : 0;
-
-  return { percent };
-}
 
 function Markdown({ children }: { children: string }) {
   const html = DOMPurify.sanitize(marked.parse(children, { async: false }));
