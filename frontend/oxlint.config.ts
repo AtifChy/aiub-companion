@@ -1,5 +1,4 @@
 import tanstackQuery from "@tanstack/eslint-plugin-query";
-import reactDoctor from "eslint-plugin-react-doctor";
 import reactX from "eslint-plugin-react-x";
 import { defineConfig } from "oxlint";
 import eslintRecommended from "oxlint-config-presets/@eslint/recommended.json" with { type: "json" };
@@ -25,11 +24,7 @@ export default defineConfig({
   categories: {
     correctness: "error",
   },
-  jsPlugins: [
-    "eslint-plugin-react-x",
-    "eslint-plugin-react-doctor",
-    "@tanstack/eslint-plugin-query",
-  ],
+  jsPlugins: ["eslint-plugin-react-x", "@tanstack/eslint-plugin-query"],
   rules: {
     "typescript/no-confusing-void-expression": "off",
 
@@ -37,10 +32,7 @@ export default defineConfig({
     "react/no-unescaped-entities": "off",
 
     ...reactX.configs["recommended-typescript"].rules,
-
-    ...reactDoctor.configs.recommended.rules,
-    "react-doctor/no-locale-format-in-render": "off",
-    "react-doctor/no-unguarded-browser-global-in-render-or-hook-init": "off",
+    "react-x/exhaustive-deps": "off",
 
     ...tanstackQuery.configs.recommended.rules,
   },
