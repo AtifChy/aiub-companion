@@ -7,7 +7,7 @@ require (
 	github.com/lmittmann/tint v1.2.0
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
-	github.com/wailsapp/wails/v3 v3.0.0-alpha2.117
+	github.com/wailsapp/wails/v3 v3.0.0-alpha2.118
 	github.com/xuri/excelize/v2 v2.11.0
 	golang.org/x/net v0.57.0
 	modernc.org/sqlite v1.54.0
