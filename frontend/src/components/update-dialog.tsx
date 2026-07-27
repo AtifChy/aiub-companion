@@ -152,7 +152,12 @@ export function UpdateDialog() {
               <AlertDialogCancel variant="outline" onClick={cancelCountdown}>
                 Cancel
               </AlertDialogCancel>
-              <AlertDialogAction onClick={runInstall}>Install Now</AlertDialogAction>
+              <AlertDialogAction
+                onClick={runInstall}
+                className="bg-emerald-600 text-background hover:bg-emerald-700"
+              >
+                Install Now
+              </AlertDialogAction>
             </>
           )}
 
