@@ -24,8 +24,8 @@ importers:
         specifier: ^5.101.4
         version: 5.101.4(react@19.2.8)
       '@wailsio/runtime':
-        specifier: 3.0.0-alpha.97
-        version: 3.0.0-alpha.97
+        specifier: 3.0.0-alpha2.117
+        version: 3.0.0-alpha2.117
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -36,7 +36,7 @@ importers:
         specifier: ^3.4.12
         version: 3.4.12
       lucide-react:
-        specifier: ^1.25.0
+        specifier: ^1.26.0
         version: 1.26.0(react@19.2.8)
       marked:
         specifier: ^18.0.7
@@ -57,7 +57,7 @@ importers:
         specifier: ^8.3.0
         version: 8.3.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       shadcn:
-        specifier: ^4.14.0
+        specifier: ^4.14.1
         version: 4.14.1(@typescript/typescript6@6.0.2)
       sonner:
         specifier: ^2.0.7
@@ -127,7 +127,7 @@ importers:
         specifier: ^7.0.2001
         version: 7.0.2001
       react-doctor:
-        specifier: ^0.9.0
+        specifier: ^0.9.1
         version: 0.9.1(@opentelemetry/core@2.10.0(@opentelemetry/api@1.9.1))(@types/react@19.2.17)(eslint@10.7.0(jiti@2.7.0))(oxlint-tsgolint@7.0.2001)
       react-scan:
         specifier: ^0.5.7
@@ -1811,8 +1811,8 @@ packages:
   '@vitest/utils@4.1.10':
     resolution: {integrity: sha512-fy9am/HWxbaGt/Sawrp90vt6Y6jQwf1RX77cz3uwoJwJVMli/e1IEwRPnMNJ7vKfPTwo0diXifkpPvwH9v7nGA==}
 
-  '@wailsio/runtime@3.0.0-alpha.97':
-    resolution: {integrity: sha512-alvEG6B0YqW7AcBcNaUWNMD9q8JWqx5AO6BPOZpijBeq4ZjhQxSom3jvvq8Z1mWSMKPEjSvlFirKIh9NLI3ajA==}
+  '@wailsio/runtime@3.0.0-alpha2.117':
+    resolution: {integrity: sha512-RZr6cncIXjdTbn2IqJ6AZXPm9WooaZEsNlNfaUH+Ru/YlH5sKDDeRdWpbcvsgoMLh4AJ+O8aBzZEiTYWDipGxw==}
 
   accepts@2.0.0:
     resolution: {integrity: sha512-5cvg6CtKwfgdmVqY1WIiXKc3Q1bkRqGLi+2W/6ao+6Y7gu/RCwRuAhGEzh5B4KlszSuTLgZYuqFqo5bImjNKng==}
@@ -5346,7 +5346,7 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.0
 
-  '@wailsio/runtime@3.0.0-alpha.97': {}
+  '@wailsio/runtime@3.0.0-alpha2.117': {}
 
   accepts@2.0.0:
     dependencies:
