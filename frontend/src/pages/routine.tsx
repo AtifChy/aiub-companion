@@ -369,7 +369,10 @@ function DayScheduleTimeline({ routineByDay, onRemoveCourse }: DayScheduleTimeli
             {/* Sticky Side Day Column */}
             <div className="flex shrink-0 items-baseline justify-between gap-1 lg:w-36 lg:flex-col lg:items-start">
               <h2 className="text-lg font-black tracking-tight text-foreground">{day}</h2>
-              <Badge variant="secondary" className="px-2 py-0.5 text-[10px] font-bold">
+              <Badge
+                variant="secondary"
+                className="px-2 py-0.5 text-[10px] font-bold tracking-wide"
+              >
                 {dayCourses.length} {dayCourses.length === 1 ? "Class" : "Classes"}
               </Badge>
             </div>
@@ -433,16 +436,19 @@ function CourseCard({ course, schedule, onRemoveCourse }: CourseCardProps) {
               {course.courseCode}
             </Badge>
           )}
-          <Badge variant="outline" className="-ml-1 px-2 py-0 text-[0.65rem] font-medium">
+          <Badge variant="outline" className="-ml-1 px-2 py-0 text-[0.65rem] font-semibold">
             {schedule.type}
           </Badge>
           {status === "ongoing" && (
-            <Badge className="border-0 bg-emerald-500 px-1.5 py-0 text-[0.5rem] font-bold tracking-wider text-white uppercase">
+            <Badge
+              variant="secondary"
+              className="border-emerald-500/40 bg-emerald-500/10 px-1.5 py-0 text-[0.53rem] font-bold tracking-wider text-emerald-600 uppercase dark:text-emerald-400"
+            >
               Ongoing
             </Badge>
           )}
           {status === "upcoming" && (
-            <Badge className="border-0 bg-amber-500 px-1.5 py-0 text-[0.5rem] font-bold tracking-wider text-white uppercase">
+            <Badge className="border-amber-500/40 bg-amber-500/10 px-1.5 py-0 text-[0.53rem] font-bold tracking-wider text-amber-600 uppercase dark:text-amber-400">
               Up Next
             </Badge>
           )}
