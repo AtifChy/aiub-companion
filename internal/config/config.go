@@ -67,13 +67,13 @@ func defaultConfig() *Config {
 			StartMinimized: false,
 			CloseToTray:    true,
 			KeepAlive:      false,
-			RestoreWindow:  false,
-			SidebarOpen:    true,
+			RestoreWindow:  true,
+			SidebarOpen:    false,
 		},
 		Sync: sync_{
 			Interval:   30,
 			FetchCount: 20,
-			OnStartup:  false,
+			OnStartup:  true,
 		},
 		Updates: updates{
 			Interval: "weekly",
