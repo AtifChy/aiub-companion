@@ -140,11 +140,14 @@ func (s *Service) handleNotificationResponse(result notifications.NotificationRe
 		return
 	}
 
-	application.Get().Event.Emit(event.EventMainWindowShow)
+	app := application.Get()
+
+	app.Event.Emit(event.EventMainWindowShow)
 
 	id := result.Response.ID
 	if !strings.HasPrefix(id, "sync-") {
 		s.notice.SetPendingNotice(id)
+		app.Event.Emit(event.EventNoticeOpen, id)
 		slog.Info("Opening notice from notification", "id", id)
 	}
 }

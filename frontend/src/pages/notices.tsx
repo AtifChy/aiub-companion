@@ -1,5 +1,6 @@
 import { Service, type Notice } from "@bindings/notice";
 import { useQueryClient } from "@tanstack/react-query";
+import { Events } from "@wailsio/runtime";
 import {
   CircleCheckBigIcon,
   CircleIcon,
@@ -71,11 +72,18 @@ export default function NoticesPage() {
 
   // Consume any pending notice that was passed to the app via a deep link or notification
   useEffect(() => {
-    Service.ConsumePendingNotice()
-      .then(([id, pending]) => pending && setSelectedId(id))
-      .catch((err: unknown) =>
-        logger.error("Failed to consume pending notice", (err as Error).message),
-      );
+    const consume = () =>
+      Service.ConsumePendingNotice()
+        .then(([id, pending]) => pending && setSelectedId(id))
+        .catch((err: unknown) =>
+          logger.error("Failed to consume pending notice", (err as Error).message),
+        );
+
+    void consume();
+
+    return Events.On("notice:open", () => {
+      void consume();
+    });
   }, [setSelectedId]);
 
   const handleToggleRead = (id: string, next: boolean) => {

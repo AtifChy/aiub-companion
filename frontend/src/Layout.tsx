@@ -1,6 +1,6 @@
-import { Window } from "@wailsio/runtime";
+import { Events, Window } from "@wailsio/runtime";
 import { Suspense, useEffect, useState } from "react";
-import { matchPath, Outlet, useLocation } from "react-router";
+import { matchPath, Outlet, useLocation, useNavigate } from "react-router";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import Loading from "@/components/loading";
@@ -18,6 +18,14 @@ import { WindowControls } from "@/components/window-controls";
 import { routes } from "@/lib/routes";
 
 export default function Layout() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    return Events.On("notice:open", () => {
+      void navigate("/notices");
+    });
+  }, [navigate]);
+
   return (
     <div className="flex h-screen w-full">
       <AppSidebar />
