@@ -21,8 +21,8 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "src"),
-      "@bindings": path.resolve(__dirname, "bindings/aiub-companion/internal"),
+      "@": path.resolve(import.meta.dirname, "src"),
+      "@bindings": path.resolve(import.meta.dirname, "bindings/aiub-companion/internal"),
     },
   },
   build: {
