@@ -1,4 +1,34 @@
+## [0.8.0] - 2026-07-31
+
+### 🐛 Bug Fixes
+
+- *(notices)* Open notice with notification event [`912b277`](https://github.com/AtifChy/aiub-companion/commit/912b277e84aea2a641ac137072fea945f25e209d)
+
+### 💼 Other
+
+- *(deps)* Migrate package manager from pnpm to bun [`fe4932e`](https://github.com/AtifChy/aiub-companion/commit/fe4932e75508e6fac18f1fd2f1f5df0530e523fc)
+
+### 🚜 Refactor
+
+- *(config)* Update default config values [`c00c5f0`](https://github.com/AtifChy/aiub-companion/commit/c00c5f0dcb60804d63cbac44d0c94b2e8d3c0060)
+
+### 🎨 Styling
+
+- *(routine)* Update badge styles for routine page [`623e54b`](https://github.com/AtifChy/aiub-companion/commit/623e54be7dc7ffa969a14746225709943695ef3e)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(github)* Use bun instead of node and pnpm [`508ed2e`](https://github.com/AtifChy/aiub-companion/commit/508ed2e145b57d13c15ae7b54e2951fbb7e26dff)
+- *(release)* Bump version to v0.8.0 [`293087e`](https://github.com/AtifChy/aiub-companion/commit/293087e3e7cb12bc34ff1811aec98979f00bffa9)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.7.60...v0.8.0
+
 ## [0.7.60] - 2026-07-27
+
+### 📚 Documentation
+
+- Update changelog [`215f293`](https://github.com/AtifChy/aiub-companion/commit/215f293d7cf4a373048d17796beba852e554129f)
 
 ### ⚙️ Miscellaneous Tasks
 
