@@ -76,7 +76,7 @@ func defaultConfig() *Config {
 			OnStartup:  true,
 		},
 		Updates: updates{
-			Interval: "weekly",
+			Interval: "daily",
 		},
 		Logging: logging{
 			Level: "WARN",
