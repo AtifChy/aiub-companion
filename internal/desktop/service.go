@@ -134,7 +134,7 @@ func (s *Service) setupTray() {
 	systray.SetLabel(meta.DisplayName)
 	systray.SetTooltip(meta.DisplayName)
 
-	systray.OnDoubleClick(s.main.Show)
+	systray.OnClick(s.main.Show)
 
 	menu := s.app.NewMenu()
 	menu.Add("Show").OnClick(func(ctx *application.Context) {
