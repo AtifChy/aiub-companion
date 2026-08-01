@@ -1,3 +1,30 @@
+## [0.9.0] - 2026-08-01
+
+### 🚀 Features
+
+- *(window)* Add mutex to prevent race conditions [`0dc5df6`](https://github.com/AtifChy/aiub-companion/commit/0dc5df6e724917a15cfee9d6f54b6dd9ce7e965e)
+
+### 🐛 Bug Fixes
+
+- *(vite)* Vite unsupported config warning [`b4c0d6f`](https://github.com/AtifChy/aiub-companion/commit/b4c0d6f4a22a75c53c3af4de7f11acd2b8231adb)
+
+### 💼 Other
+
+- *(bun)* Add bunfig.toml [`2309713`](https://github.com/AtifChy/aiub-companion/commit/23097139529cc30f9aab99e5e2d6aafa711e6417)
+
+### 🚜 Refactor
+
+- Remove unnecessary asset filter [`6f44080`](https://github.com/AtifChy/aiub-companion/commit/6f4408044b6acc64d816e6d54167d89b01329436)
+- *(desktop)* Change tray double click to single click [`61ce590`](https://github.com/AtifChy/aiub-companion/commit/61ce590da0123b5841ffcdc83b10c448945a3951)
+- *(config)* Change update interval to daily [`cd1f038`](https://github.com/AtifChy/aiub-companion/commit/cd1f0383991948e4544a1615f7771bfb6e606359)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Bump version to v0.9.0 [`6da2366`](https://github.com/AtifChy/aiub-companion/commit/6da236646a0387a67ceff1f66198f29a15eed96d)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.8.0...v0.9.0
+
 ## [0.8.0] - 2026-07-31
 
 ### 🐛 Bug Fixes
@@ -11,6 +38,10 @@
 ### 🚜 Refactor
 
 - *(config)* Update default config values [`c00c5f0`](https://github.com/AtifChy/aiub-companion/commit/c00c5f0dcb60804d63cbac44d0c94b2e8d3c0060)
+
+### 📚 Documentation
+
+- Update changelog [`ce24f79`](https://github.com/AtifChy/aiub-companion/commit/ce24f79e9d463e508686ed9301be5c651bd0c3fa)
 
 ### 🎨 Styling
 
