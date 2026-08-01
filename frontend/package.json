@@ -4,15 +4,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bunx --bun vite",
-    "build:dev": "tsc -b && bunx --bun vite build --minify false --mode development",
-    "build": "tsc -b && bunx --bun vite build --mode production",
-    "fmt": "bunx --bun oxfmt",
-    "fmt:check": "bunx --bun oxfmt --check",
-    "lint": "bunx --bun oxlint",
-    "lint:fix": "bunx --bun oxlint --fix",
-    "preview": "bunx --bun vite preview",
-    "doctor": "bunx --bun react-doctor --yes"
+    "dev": "vite",
+    "build:dev": "tsc -b && vite build --minify false --mode development",
+    "build": "tsc -b && vite build --mode production",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "preview": "vite preview",
+    "doctor": "react-doctor --yes"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
