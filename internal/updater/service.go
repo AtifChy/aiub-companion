@@ -1,3 +1,4 @@
+// Package updater provides functionality for checking for updates and downloading the latest release from GitHub.
 package updater
 
 import (
@@ -7,7 +8,6 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	"aiub-companion/internal/config"
@@ -63,7 +63,6 @@ func (s *Service) Init(app *application.App) error {
 		Token:         token,
 		Prerelease:    false,
 		ChecksumAsset: "SHA256SUMS",
-		AssetMatcher:  assetMatcher,
 		HTTPClient:    &http.Client{Timeout: 5 * time.Minute},
 	})
 	if err != nil {
@@ -85,26 +84,6 @@ func (s *Service) Init(app *application.App) error {
 	})
 
 	return nil
-}
-
-func assetMatcher(req updater.CheckRequest, assets []github.ReleaseAsset) int {
-	var filteredAssets []github.ReleaseAsset
-	originalIndices := make([]int, 0, len(assets))
-
-	for i, asset := range assets {
-		name := strings.ToLower(asset.Name)
-		if strings.Contains(name, "installer") {
-			continue
-		}
-		filteredAssets = append(filteredAssets, asset)
-		originalIndices = append(originalIndices, i)
-	}
-
-	idx := github.DefaultAssetMatcher(req, filteredAssets)
-	if idx == -1 {
-		return -1
-	}
-	return originalIndices[idx]
 }
 
 type Release struct {
