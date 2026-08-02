@@ -105,6 +105,28 @@ export function UpdateProvider({ children }: { children: React.ReactNode }) {
     [],
   );
 
+  useEffect(() => {
+    const checkPending = () => {
+      UpdaterService.GetPendingUpdate()
+        .then((data) => {
+          if (!data) return;
+
+          const { open, dismissedVersion, openDialog } = useUpdateStore.getState();
+          if (!open && data.version !== dismissedVersion) {
+            openDialog(data);
+          }
+        })
+        .catch((err: unknown) => {
+          logger.error("Error getting pending update:", err);
+        });
+    };
+
+    checkPending();
+
+    window.addEventListener("focus", checkPending);
+    return () => window.removeEventListener("focus", checkPending);
+  }, []);
+
   const value = () => ({ check, download, install, runInstall, cancelCountdown });
 
   return <UpdateContext value={value()}>{children}</UpdateContext>;

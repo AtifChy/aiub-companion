@@ -23,6 +23,7 @@ interface UpdateStore {
   release: Release | null;
   open: boolean;
   phaseState: PhaseState;
+  dismissedVersion?: string;
 
   openDialog: (release: Release) => void;
   closeDialog: () => void;
@@ -32,9 +33,14 @@ export const useUpdateStore = create<UpdateStore>((set) => ({
   release: null,
   open: false,
   phaseState: { phase: "idle" },
+  dismissedVersion: undefined,
 
   openDialog: (release) => set({ release, open: true, phaseState: { phase: "idle" } }),
-  closeDialog: () => set({ open: false }),
+  closeDialog: () =>
+    set((state) => ({
+      open: false,
+      dismissedVersion: state.release?.version ?? state.dismissedVersion,
+    })),
 }));
 
 export interface UpdateEventHandlers {
