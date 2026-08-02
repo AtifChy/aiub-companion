@@ -76,8 +76,11 @@ jobs:
       - name: Rename macOS Artifacts
         if: matrix.os == 'darwin'
         run: |
-          mv "bin/${{ github.event.repository.name }}.app" \
-            "bin/${{ github.event.repository.name }}-${{ matrix.os }}-${{ matrix.arch }}.app"
+          ditto -c -k --sequesterRsrc --keepParent \
+            "bin/${{ github.event.repository.name }}.app" \
+            "bin/${{ github.event.repository.name }}-${{ matrix.os }}-${{ matrix.arch }}.zip"
+
+          rm -rf "bin/${{ github.event.repository.name }}.app"
 
       - name: Rename Windows Artifacts
         if: matrix.os == 'windows'
@@ -115,7 +118,7 @@ jobs:
       - name: Upload Workflow Artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ matrix.os }}
+          name: ${{ matrix.os }}-${{ matrix.arch }}
           path: bin/*.*
 
   release:
