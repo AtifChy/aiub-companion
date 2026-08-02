@@ -1,4 +1,19 @@
+## [0.9.3] - 2026-08-02
+
+### ⚙️ Miscellaneous Tasks
+
+- *(ci)* Create dmg and rename macos artifacts [`503b98e`](https://github.com/AtifChy/aiub-companion/commit/503b98e4f31bb7ea82a46239abf47a1649f97fa2)
+- *(ci)* Zip macOS app artifact [`92f4446`](https://github.com/AtifChy/aiub-companion/commit/92f4446eafbbd6bbaddfa16dc6526f48a3708ca1)
+- *(release)* Bump version to v0.9.3 [`7086707`](https://github.com/AtifChy/aiub-companion/commit/708670765033eb93c1393ef16fc76c0b2e935bfd)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.9.2...v0.9.3
+
 ## [0.9.2] - 2026-08-02
+
+### 📚 Documentation
+
+- Update changelog [`db67dbd`](https://github.com/AtifChy/aiub-companion/commit/db67dbd5f037c8004281d7cdddba0dac4ba2a287)
 
 ### ⚙️ Miscellaneous Tasks
 
