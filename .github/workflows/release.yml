@@ -66,13 +66,18 @@ jobs:
         if: matrix.os == 'linux'
         run: wails3 package
 
-      - name: Package macOS App
+      - name: Create DMG for macOS
         if: matrix.os == 'darwin'
         run: |
           hdiutil create -volname "${{ github.event.repository.name }}" \
             -srcfolder "bin/${{ github.event.repository.name }}.app" \
             -ov -format UDZO "bin/${{ github.event.repository.name }}-${{ matrix.os }}-${{ matrix.arch }}.dmg"
-          rm -rf "bin/${{ github.event.repository.name }}.app"
+
+      - name: Rename macOS Artifacts
+        if: matrix.os == 'darwin'
+        run: |
+          mv "bin/${{ github.event.repository.name }}.app" \
+            "bin/${{ github.event.repository.name }}-${{ matrix.os }}-${{ matrix.arch }}.app"
 
       - name: Rename Windows Artifacts
         if: matrix.os == 'windows'
