@@ -99,20 +99,9 @@ jobs:
         run: |
           for file in bin/*; do
             ext="${file##*.}"
-            case "$ext" in
-              AppImage)
-                mv "$file" "bin/${{ github.event.repository.name }}-${{ matrix.os }}-${{ matrix.arch }}.AppImage"
-                ;;
-              deb)
-                mv "$file" "bin/${{ github.event.repository.name }}-${{ matrix.os }}-${{ matrix.arch }}.deb"
-                ;;
-              rpm)
-                mv "$file" "bin/${{ github.event.repository.name }}-${{ matrix.os }}-${{ matrix.arch }}.rpm"
-                ;;
-              zst)
-                mv "$file" "bin/${{ github.event.repository.name }}-${{ matrix.os }}-${{ matrix.arch }}.pkg.tar.zst"
-                ;;
-            esac
+            [[ "$ext" == "zst" ]] && ext="pkg.tar.zst"
+
+            mv $file "bin/${{ github.event.repository.name }}-${{ matrix.os }}-${{ matrix.arch }}.${ext}"
           done
 
       - name: Upload Workflow Artifacts
