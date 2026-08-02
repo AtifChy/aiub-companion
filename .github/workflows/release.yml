@@ -86,13 +86,12 @@ jobs:
         if: matrix.os == 'windows'
         shell: pwsh
         run: |
-          Rename-Item `
-            "bin/${{ github.event.repository.name }}-${{ matrix.arch }}-installer.exe" `
-            "${{ github.event.repository.name }}-${{ matrix.os }}-${{ matrix.arch }}-installer.exe"
+          $name = "${{ github.event.repository.name }}"
+          $os = "${{ matrix.os }}"
+          $arch = "${{ matrix.arch }}"
 
-          Rename-Item `
-            "bin/${{ github.event.repository.name }}.exe" `
-            "${{ github.event.repository.name }}-${{ matrix.os }}-${{ matrix.arch }}.exe"
+          Rename-Item "bin/$name-$arch-installer.exe" "$name-$os-$arch-installer.exe"
+          Rename-Item "bin/$name.exe" "$name-$os-$arch.exe"
 
       - name: Rename Linux Artifacts
         if: matrix.os == 'linux'
