@@ -1,3 +1,18 @@
+## [0.9.1] - 2026-08-02
+
+### 🚀 Features
+
+- *(updater)* Persist pending release information [`064e7bf`](https://github.com/AtifChy/aiub-companion/commit/064e7bf129d40de91f174c7556bdf200bfa2818e)
+- *(updater)* Add auto-check for pending updates [`519f5f2`](https://github.com/AtifChy/aiub-companion/commit/519f5f25a53490515b961181f62bc571ed28ff8f)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(lock)* Update bun lockfile [`afb078e`](https://github.com/AtifChy/aiub-companion/commit/afb078e24d789b0c9aec533bc1d5dd51239be32b)
+- *(release)* Bump version to v0.9.1 [`c9825cc`](https://github.com/AtifChy/aiub-companion/commit/c9825cce06181d4b9223e2fde4955fb7f6f80b08)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.9.0...v0.9.1
+
 ## [0.9.0] - 2026-08-01
 
 ### 🚀 Features
@@ -17,6 +32,10 @@
 - Remove unnecessary asset filter [`6f44080`](https://github.com/AtifChy/aiub-companion/commit/6f4408044b6acc64d816e6d54167d89b01329436)
 - *(desktop)* Change tray double click to single click [`61ce590`](https://github.com/AtifChy/aiub-companion/commit/61ce590da0123b5841ffcdc83b10c448945a3951)
 - *(config)* Change update interval to daily [`cd1f038`](https://github.com/AtifChy/aiub-companion/commit/cd1f0383991948e4544a1615f7771bfb6e606359)
+
+### 📚 Documentation
+
+- Update changelog [`043bb67`](https://github.com/AtifChy/aiub-companion/commit/043bb6714b27962c599b67dd3e29784cfbe28c0f)
 
 ### ⚙️ Miscellaneous Tasks
 
