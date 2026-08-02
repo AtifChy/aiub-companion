@@ -9,7 +9,8 @@ import (
 const filename = "updater.json"
 
 type state struct {
-	LastCheckedAt time.Time `json:"last_checked_at"`
+	LastCheckedAt  time.Time `json:"last_checked_at"`
+	PendingRelease *Release  `json:"pending_release,omitempty"`
 }
 
 func loadState() (state, error) {
