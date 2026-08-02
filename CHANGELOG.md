@@ -1,9 +1,24 @@
+## [0.9.2] - 2026-08-02
+
+### ⚙️ Miscellaneous Tasks
+
+- *(lock)* Update bun lockfile version [`844f86b`](https://github.com/AtifChy/aiub-companion/commit/844f86bc3f86919f38e1772cd4b4209f7e544f98)
+- *(ci)* Add mac support and build arm binaries on release [`bbfb0a6`](https://github.com/AtifChy/aiub-companion/commit/bbfb0a6711a6eca7a6461b6e6d9dd83a092e3574)
+- *(release)* Bump version to v0.9.2 [`9a5316e`](https://github.com/AtifChy/aiub-companion/commit/9a5316e0aad89219415a3fd64c1cc3dd214db66e)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.9.1...v0.9.2
+
 ## [0.9.1] - 2026-08-02
 
 ### 🚀 Features
 
 - *(updater)* Persist pending release information [`064e7bf`](https://github.com/AtifChy/aiub-companion/commit/064e7bf129d40de91f174c7556bdf200bfa2818e)
 - *(updater)* Add auto-check for pending updates [`519f5f2`](https://github.com/AtifChy/aiub-companion/commit/519f5f25a53490515b961181f62bc571ed28ff8f)
+
+### 📚 Documentation
+
+- Update changelog [`eff461c`](https://github.com/AtifChy/aiub-companion/commit/eff461caf548bf48d7f5aab54d694fd4973677b6)
 
 ### ⚙️ Miscellaneous Tasks
 
