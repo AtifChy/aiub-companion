@@ -4,6 +4,9 @@
 @import "@fontsource-variable/outfit";
 @import "@fontsource-variable/jetbrains-mono";
 
+@import "./themes/claude.css";
+@import "./themes/supabase.css";
+@import "./themes/t3chat.css";
 @import "./themes/default.css";
 
 @plugin "@tailwindcss/typography";
