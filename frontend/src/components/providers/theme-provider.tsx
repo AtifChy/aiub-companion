@@ -1,4 +1,5 @@
 import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { useEffect } from "react";
 
 import { useSettings } from "@/components/providers/settings-provider";
 
@@ -12,6 +13,11 @@ interface ThemeProviderProps {
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const { config } = useSettings();
   const theme = config.appearance.theme as Theme;
+  const colorscheme = "default";
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", colorscheme);
+  }, []);
 
   return (
     <NextThemesProvider attribute="class" defaultTheme={theme} enableSystem>

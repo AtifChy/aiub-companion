@@ -3,7 +3,7 @@
   "ignorePatterns": ["src/components/ui/**"],
   "sortImports": true,
   "sortTailwindcss": {
-    "stylesheet": "src/style.css",
+    "stylesheet": "src/styles/globals.css",
     "functions": ["clsx", "cn"]
   }
 }
