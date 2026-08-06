@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 import { AlertDialogDestructive } from "@/components/alert-dialog-destructive";
 import { useSettings } from "@/components/providers/settings-provider";
-import { type Theme } from "@/components/providers/theme-provider";
+import { type Color } from "@/components/providers/theme-provider";
 import { useUpdate } from "@/components/providers/update-provider";
 import { SettingsCard } from "@/components/settings/settings-card";
 import { SettingRow } from "@/components/settings/settings-row";
@@ -15,8 +15,8 @@ import { Switch } from "@/components/ui/switch";
 
 type Items<T extends string | number> = { value: T; label: string }[];
 
-const themeItems: Items<Theme> = ["light", "dark", "system"].map((v) => ({
-  value: v as Theme,
+const ColorItems: Items<Color> = ["light", "dark", "system"].map((v) => ({
+  value: v as Color,
   label: v.charAt(0).toUpperCase() + v.slice(1),
 }));
 
@@ -58,13 +58,13 @@ export default function SettingsPage() {
         <div className="grid gap-6">
           {/*Appearance*/}
           <SettingsCard title="Appearance">
-            <SettingRow label="Theme" description="Select your prefered color theme">
+            <SettingRow label="Color" description="Select your prefered color">
               <SettingSelect
-                items={themeItems}
-                value={config.appearance.theme}
+                items={ColorItems}
+                value={config.appearance.color}
                 onValueChange={(v) => {
                   setConfig((draft) => {
-                    draft.appearance.theme = v;
+                    draft.appearance.color = v;
                     setTheme(v);
                   });
                 }}

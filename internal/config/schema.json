@@ -36,18 +36,22 @@
     },
     "appearance": {
       "properties": {
-        "theme": {
+        "color": {
           "type": "string",
           "enum": [
             "light",
             "dark",
             "system"
           ]
+        },
+        "theme": {
+          "type": "string"
         }
       },
       "additionalProperties": false,
       "type": "object",
       "required": [
+        "color",
         "theme"
       ]
     },

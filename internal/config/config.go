@@ -24,7 +24,8 @@ type Config struct {
 }
 
 type appearance struct {
-	Theme string `json:"theme" jsonschema:"enum=light,enum=dark,enum=system"`
+	Color string `json:"color" jsonschema:"enum=light,enum=dark,enum=system"`
+	Theme string `json:"theme"`
 }
 
 type notification struct {
@@ -57,7 +58,8 @@ type logging struct {
 func defaultConfig() *Config {
 	return &Config{
 		Appearance: appearance{
-			Theme: "system",
+			Color: "system",
+			Theme: "default",
 		},
 		Notifications: notification{
 			Enabled: true,

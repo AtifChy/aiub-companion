@@ -3,24 +3,23 @@ import { useEffect } from "react";
 
 import { useSettings } from "@/components/providers/settings-provider";
 
-export type Theme = "dark" | "light" | "system";
+export type Color = "dark" | "light" | "system";
 
 interface ThemeProviderProps {
   children: React.ReactNode;
-  defaultTheme?: Theme;
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const { config } = useSettings();
-  const theme = config.appearance.theme as Theme;
-  const colorscheme = "default";
+  const color = config.appearance.color as Color;
+  const theme = config.appearance.theme || "default";
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", colorscheme);
-  }, []);
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
 
   return (
-    <NextThemesProvider attribute="class" defaultTheme={theme} enableSystem>
+    <NextThemesProvider attribute="class" defaultTheme={color} enableSystem>
       {children}
     </NextThemesProvider>
   );
