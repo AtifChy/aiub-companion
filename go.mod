@@ -6,12 +6,12 @@ require (
 	github.com/hbollon/go-edlib v1.7.0
 	github.com/lmittmann/tint v1.2.0
 	github.com/microcosm-cc/bluemonday v1.0.27
-	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
-	github.com/wailsapp/wails/v3 v3.0.0-beta.2
+	github.com/santhosh-tekuri/jsonschema/v6 v6.0.3
+	github.com/wailsapp/wails/v3 v3.0.0-beta.4
 	github.com/xuri/excelize/v2 v2.11.0
 	golang.org/x/mod v0.38.0
 	golang.org/x/net v0.57.0
-	modernc.org/sqlite v1.55.0
+	modernc.org/sqlite v1.56.0
 )
 
 require (
@@ -45,9 +45,9 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	golang.org/x/crypto v0.54.0 // indirect
 	golang.org/x/sys v0.47.0
-	modernc.org/libc v1.74.4 // indirect
+	modernc.org/libc v1.75.1 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
-	modernc.org/memory v1.11.0 // indirect
+	modernc.org/memory v1.12.0 // indirect
 )
 
 tool github.com/invopop/jsonschema
