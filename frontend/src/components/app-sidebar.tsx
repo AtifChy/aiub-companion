@@ -36,7 +36,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           size="lg"
           className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
         >
-          <div className="flex size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-sidebar-primary/80 text-sidebar-primary-foreground">
             <CommandIcon size="6" />
           </div>
           <div className="flex flex-col gap-0.5 truncate leading-none group-data-[collapsible=icon]:hidden">

@@ -29,9 +29,7 @@ type Service struct {
 }
 
 func NewService(config *config.Service) *Service {
-	return &Service{
-		config: config,
-	}
+	return &Service{config: config}
 }
 
 func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptions) error {
