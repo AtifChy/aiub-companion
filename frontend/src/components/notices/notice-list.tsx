@@ -185,11 +185,9 @@ function NoticeListItem({ notice }: NoticeListItemProps) {
           {notice.fullTitle || notice.title}
         </p>
 
-        {notice.summary && (
-          <p className="truncate text-[0.7rem] text-nowrap text-muted-foreground">
-            {notice.summary}
-          </p>
-        )}
+        <p className="truncate text-[0.7rem] text-nowrap text-muted-foreground">
+          {notice.summary || "Please Click Here for More Details"}
+        </p>
       </div>
     </div>
   );
