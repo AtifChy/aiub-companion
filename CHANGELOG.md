@@ -1,3 +1,17 @@
+## [0.10.1] - 2026-08-16
+
+### 🐛 Bug Fixes
+
+- *(config)* Typo with warn log level [`de4f236`](https://github.com/AtifChy/aiub-companion/commit/de4f23607854e0f31fbdfea23903022ac0fdc972)
+- *(window)* Nil window handle after close [`b493a3f`](https://github.com/AtifChy/aiub-companion/commit/b493a3f7fdcc0adc4e296efe1497adc57603c19a)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Bump version to v0.10.1 [`b20b14f`](https://github.com/AtifChy/aiub-companion/commit/b20b14f6bb62cf7df5ba3db6dd3fcdf13c1a6b3b)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.10.0...v0.10.1
+
 ## [0.10.0] - 2026-08-16
 
 ### 🚀 Features
@@ -23,6 +37,7 @@
 ### 📚 Documentation
 
 - Update readme [`c587912`](https://github.com/AtifChy/aiub-companion/commit/c587912fc320412ae72551e6ef1f06e1aa63577d)
+- Update changelog [`6f89d5a`](https://github.com/AtifChy/aiub-companion/commit/6f89d5a22a3e2698b5f930e2ef31ea1410988d8e)
 
 ### ⚙️ Miscellaneous Tasks
 
