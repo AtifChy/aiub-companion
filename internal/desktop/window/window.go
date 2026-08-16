@@ -100,11 +100,14 @@ func (w *Window) Hide() {
 func (w *Window) Close() {
 	w.mu.Lock()
 	handle := w.handle
-	w.handle = nil
 	w.mu.Unlock()
 
 	if handle != nil {
 		handle.Close()
+
+		w.mu.Lock()
+		w.handle = nil
+		w.mu.Unlock()
 	}
 }
 

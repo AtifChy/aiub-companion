@@ -123,6 +123,7 @@ func (s *Service) handleClose() {
 	} else {
 		s.about.Close()
 	}
+
 	if !s.config.GetConfig().Launch.CloseToTray {
 		s.Quit()
 	}
