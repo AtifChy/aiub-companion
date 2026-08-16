@@ -1,4 +1,4 @@
-import { Service, type Notice } from "@bindings/notice";
+import { Service as NoticeService, type Notice } from "@bindings/notice";
 import { useQueryClient } from "@tanstack/react-query";
 import { Events } from "@wailsio/runtime";
 import {
@@ -70,10 +70,16 @@ export default function NoticesPage() {
     };
   }, [selectedId, queryClient, toggleRead]);
 
+  // Sync the currently selected notice with the backend
+  // so that it can be marked as read when the app is closed
+  useEffect(() => {
+    void NoticeService.SetViewingNotice(selectedId ?? "");
+  }, [selectedId]);
+
   // Consume any pending notice that was passed to the app via a deep link or notification
   useEffect(() => {
     const consume = () =>
-      Service.ConsumePendingNotice()
+      NoticeService.ConsumePendingNotice()
         .then(([id, pending]) => pending && setSelectedId(id))
         .catch((err: unknown) =>
           logger.error("Failed to consume pending notice", (err as Error).message),

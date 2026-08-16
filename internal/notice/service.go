@@ -3,11 +3,13 @@ package notice
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"slices"
 	"strings"
 	"sync"
 
 	"aiub-companion/internal/database"
+	"aiub-companion/internal/event"
 	"aiub-companion/internal/search"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
@@ -19,6 +21,7 @@ type Service struct {
 	client Client
 
 	pendingNoticeID string
+	viewingNoticeID string
 
 	mu sync.Mutex
 }
@@ -30,6 +33,14 @@ func NewService(db *database.Service) *Service {
 func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptions) error {
 	s.repo = NewRepository(s.db.DB())
 	s.client = NewClient()
+
+	app := application.Get()
+	app.Event.On(event.EventMainWindowClosing, func(_ *application.CustomEvent) {
+		if err := s.markViewingNoticeAsRead(ctx); err != nil {
+			slog.Error("Failed to mark viewing notice as read", "error", err)
+		}
+	})
+
 	return nil
 }
 
@@ -177,4 +188,24 @@ func (s *Service) ConsumePendingNotice() (string, bool) {
 	s.pendingNoticeID = ""
 
 	return id, true
+}
+
+func (s *Service) SetViewingNotice(id string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.viewingNoticeID = id
+}
+
+func (s *Service) markViewingNoticeAsRead(ctx context.Context) error {
+	s.mu.Lock()
+	id := s.viewingNoticeID
+	s.viewingNoticeID = ""
+	s.mu.Unlock()
+
+	if id == "" {
+		return nil
+	}
+
+	return s.repo.SetReadState(ctx, id, true)
 }
