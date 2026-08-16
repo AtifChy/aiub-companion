@@ -5,13 +5,14 @@ import { toast } from "sonner";
 
 import { AlertDialogDestructive } from "@/components/alert-dialog-destructive";
 import { useSettings } from "@/components/providers/settings-provider";
-import { type Color } from "@/components/providers/theme-provider";
 import { useUpdate } from "@/components/providers/update-provider";
 import { SettingsCard } from "@/components/settings/settings-card";
 import { SettingRow } from "@/components/settings/settings-row";
 import { SettingSelect } from "@/components/settings/settings-select";
+import { ThemePicker } from "@/components/settings/theme-picker";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import type { Color } from "@/lib/themes";
 
 type Items<T extends string | number> = { value: T; label: string }[];
 
@@ -58,6 +59,17 @@ export default function SettingsPage() {
         <div className="grid gap-6">
           {/*Appearance*/}
           <SettingsCard title="Appearance">
+            <SettingRow label="Theme" description="Choose a color palette" orientation="vertical">
+              <ThemePicker
+                selectedTheme={config.appearance.theme}
+                onSelectTheme={(v) => {
+                  setConfig((draft) => {
+                    draft.appearance.theme = v;
+                  });
+                }}
+              />
+            </SettingRow>
+
             <SettingRow label="Color" description="Select your prefered color">
               <SettingSelect
                 items={ColorItems}
