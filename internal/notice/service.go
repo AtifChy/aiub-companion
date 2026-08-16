@@ -18,7 +18,7 @@ type Service struct {
 	repo   Repository
 	client Client
 
-	pendingID string
+	pendingNoticeID string
 
 	mu sync.Mutex
 }
@@ -163,18 +163,18 @@ func (s *Service) SetPendingNotice(id string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	s.pendingID = id
+	s.pendingNoticeID = id
 }
 
 func (s *Service) ConsumePendingNotice() (string, bool) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	id := s.pendingID
+	id := s.pendingNoticeID
 	if id == "" {
 		return "", false
 	}
-	s.pendingID = ""
+	s.pendingNoticeID = ""
 
 	return id, true
 }
