@@ -2,8 +2,7 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { useEffect } from "react";
 
 import { useSettings } from "@/components/providers/settings-provider";
-
-export type Color = "dark" | "light" | "system";
+import type { Color } from "@/lib/themes";
 
 interface ThemeProviderProps {
   children: React.ReactNode;
