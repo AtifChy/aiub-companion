@@ -116,6 +116,8 @@ func (s *Service) onApplicationStarted(_ *application.ApplicationEvent) {
 }
 
 func (s *Service) handleClose() {
+	s.app.Event.Emit(event.EventMainWindowClosing)
+
 	if s.main.HideOnClose() {
 		s.about.Hide()
 	} else {

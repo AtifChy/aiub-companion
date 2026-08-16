@@ -9,5 +9,6 @@ const (
 
 	EventNoticeOpen = "notice:open"
 
-	EventMainWindowShow = "main-window:show"
+	EventMainWindowShow    = "main-window:show"
+	EventMainWindowClosing = "main-window:closing"
 )
