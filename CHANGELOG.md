@@ -1,4 +1,45 @@
+## [0.10.0] - 2026-08-16
+
+### 🚀 Features
+
+- *(style)* Add new themes claude, supabase, and t3chat [`f45d5c1`](https://github.com/AtifChy/aiub-companion/commit/f45d5c1cab14ab5b669f978c5b1e5d7feee1aede)
+- *(settings)* Add orientation to settings row [`40db696`](https://github.com/AtifChy/aiub-companion/commit/40db69656b3f62a7579236d7bad39117c4999896)
+- *(themes)* Extract theme types and data [`6f1f509`](https://github.com/AtifChy/aiub-companion/commit/6f1f509fe6faecd1bc3047315999c6f01b0c0291)
+- *(settings)* Add theme picker component [`17ce139`](https://github.com/AtifChy/aiub-companion/commit/17ce13988539cda7d46c6aaeb5ea1ddae2a96dd2)
+- *(event)* Emit main window closing event [`5df9252`](https://github.com/AtifChy/aiub-companion/commit/5df9252765bc665f6c03c051e388e0446c3b15c5)
+- *(notices)* Sync viewing notice with backend & mark as read on close [`97fdc35`](https://github.com/AtifChy/aiub-companion/commit/97fdc35ebba908a3164588c50457d5800f7df4af)
+
+### 🐛 Bug Fixes
+
+- *(notices)* Display default summary text [`005773f`](https://github.com/AtifChy/aiub-companion/commit/005773ff0db0ea965dce33706a8cb1a52d872132)
+- *(release)* Fix artifact naming for linux [`7bc289f`](https://github.com/AtifChy/aiub-companion/commit/7bc289f099b09061470bced2200fc61258bbdf7e)
+
+### 🚜 Refactor
+
+- *(style)* Move colors to default theme file [`b8975aa`](https://github.com/AtifChy/aiub-companion/commit/b8975aa24f76ca53ad3faef7d3d960d174995d38)
+- *(theme)* [**breaking**] Rename theme to color and use theme identifier for schemes [`60ecf5d`](https://github.com/AtifChy/aiub-companion/commit/60ecf5d0bd77bc849d3224705b23099d0477590c)
+- *(notice)* Rename pendingID to pendingNoticeID [`6fb680a`](https://github.com/AtifChy/aiub-companion/commit/6fb680ad6fa68dbdd845c6b7473cd7729d834974)
+
+### 📚 Documentation
+
+- Update readme [`c587912`](https://github.com/AtifChy/aiub-companion/commit/c587912fc320412ae72551e6ef1f06e1aa63577d)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(ci)* Simplify linux artifact naming [`771d17e`](https://github.com/AtifChy/aiub-companion/commit/771d17eaa4e574d6086a9d85351368464964b591)
+- *(ci)* Simplify windows artifact renaming [`acc640d`](https://github.com/AtifChy/aiub-companion/commit/acc640d81ec94479214f7aac077a669be524ccb3)
+- *(ci)* Use env var for commit message [`b987882`](https://github.com/AtifChy/aiub-companion/commit/b9878823ef37439ab2944942acc1fb2bb143e7e2)
+- Code cleanup and refactoring [`255697c`](https://github.com/AtifChy/aiub-companion/commit/255697cc451e53db5108c4a9373a888580fcaf99)
+- *(release)* Bump version to v0.10.0 [`d6c0588`](https://github.com/AtifChy/aiub-companion/commit/d6c05886419d43f6a24b23726b29c0e5ee59b739)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.9.3...v0.10.0
+
 ## [0.9.3] - 2026-08-02
+
+### 📚 Documentation
+
+- Update changelog [`8508984`](https://github.com/AtifChy/aiub-companion/commit/8508984c45a6fae27c8042cb645a9fbfc43e64ef)
 
 ### ⚙️ Miscellaneous Tasks
 
