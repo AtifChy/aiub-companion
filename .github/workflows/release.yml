@@ -97,10 +97,19 @@ jobs:
         if: matrix.os == 'linux'
         run: |
           for file in bin/*; do
-            ext="${file##*.}"
-            [[ "$ext" == "zst" ]] && ext="pkg.tar.zst"
+            filename=$(basename -- "$file")
 
-            mv $file "bin/${{ github.event.repository.name }}-${{ matrix.os }}-${{ matrix.arch }}.${ext}"
+            if [[ "$filename" == *.pkg.tar.zst ]]; then
+              ext="pkg.tar.zst"
+            elif [[ "$filename" == *.* ]]; then
+              ext="${filename##*.}"
+            else
+              ext=""
+            fi
+
+            [[ -n "$ext" ]] && ext=".$ext"
+
+            mv "$file" "bin/${{ github.event.repository.name }}-${{ matrix.os }}-${{ matrix.arch }}${ext}"
           done
 
       - name: Upload Workflow Artifacts
