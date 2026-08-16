@@ -21,7 +21,7 @@ const ColorItems: Items<Color> = ["light", "dark", "system"].map((v) => ({
   label: v.charAt(0).toUpperCase() + v.slice(1),
 }));
 
-const logLevelItems: Items<string> = ["DEBUG", "INFO", "WARNING", "ERROR"].map((v) => ({
+const logLevelItems: Items<string> = ["DEBUG", "INFO", "WARN", "ERROR"].map((v) => ({
   value: v,
   label: v.charAt(0) + v.slice(1).toLowerCase(),
 }));
