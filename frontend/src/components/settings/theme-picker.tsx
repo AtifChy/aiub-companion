@@ -68,14 +68,15 @@ export function ThemePicker({ selectedTheme, onSelectTheme }: ThemePickerProps) 
             onClick={() => onSelectTheme(theme.id)}
             className={cn(
               "flex items-center gap-3 overflow-hidden rounded-xl border p-3 transition-all",
+              "outline-none focus-visible:border focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/50",
               "hover:bg-accent/30",
               isSelected
-                ? "border-primary ring-2 ring-primary/40"
-                : "border-border/60 bg-card/40 hover:border-border",
+                ? "border-primary/60 ring-1 ring-ring/50"
+                : "border-border bg-background/40 hover:border-border",
             )}
           >
             <div
-              className="flex h-9 w-11 shrink-0 items-center justify-center gap-1 rounded-lg border"
+              className="flex h-9 w-11 shrink-0 items-center justify-center gap-1 rounded-lg border shadow-md"
               style={{ backgroundColor: colors?.background }}
             >
               <div
@@ -92,7 +93,7 @@ export function ThemePicker({ selectedTheme, onSelectTheme }: ThemePickerProps) 
             <span
               className={cn(
                 "text-sm font-medium text-nowrap",
-                isSelected ? "text-primary/90" : "text-muted-foreground",
+                isSelected ? "text-primary" : "text-muted-foreground",
               )}
             >
               {theme.label}
