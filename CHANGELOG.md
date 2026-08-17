@@ -1,9 +1,31 @@
+## [0.10.2] - 2026-08-17
+
+### 🚀 Features
+
+- *(theme)* Persist and sync theme with local storage [`0fce530`](https://github.com/AtifChy/aiub-companion/commit/0fce530a21f760483771fa61c42e2e235ac0e8ac)
+
+### 🐛 Bug Fixes
+
+- *(theme-picker)* Batch color map update and use `useLayoutEffect` [`86560e6`](https://github.com/AtifChy/aiub-companion/commit/86560e60720b63f4cc48f2b7e116b8978767c8ed)
+- *(desktop)* Always close about window [`c0558fa`](https://github.com/AtifChy/aiub-companion/commit/c0558faa13ba2ec5d50e3462ad40f1d4e70bb506)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Bump version to v0.10.2 [`0bf1db1`](https://github.com/AtifChy/aiub-companion/commit/0bf1db1bae1f479d99a8d362a790c516c8ab65ca)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.10.1...v0.10.2
+
 ## [0.10.1] - 2026-08-16
 
 ### 🐛 Bug Fixes
 
 - *(config)* Typo with warn log level [`de4f236`](https://github.com/AtifChy/aiub-companion/commit/de4f23607854e0f31fbdfea23903022ac0fdc972)
 - *(window)* Nil window handle after close [`b493a3f`](https://github.com/AtifChy/aiub-companion/commit/b493a3f7fdcc0adc4e296efe1497adc57603c19a)
+
+### 📚 Documentation
+
+- Update changelog [`4a011b1`](https://github.com/AtifChy/aiub-companion/commit/4a011b159f2b005814417a3eb1268377816e1c77)
 
 ### ⚙️ Miscellaneous Tasks
 
