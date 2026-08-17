@@ -94,7 +94,6 @@ func (s *Service) onApplicationStarted(_ *application.ApplicationEvent) {
 	})
 
 	s.about = window.NewWindow(s.app, window.WindowOptions{
-		HideOnClose: true,
 		WebviewWindowOptions: application.WebviewWindowOptions{
 			Name:                AboutWindowName,
 			Title:               "About " + meta.DisplayName,
@@ -118,11 +117,7 @@ func (s *Service) onApplicationStarted(_ *application.ApplicationEvent) {
 func (s *Service) handleClose() {
 	s.app.Event.Emit(event.EventMainWindowClosing)
 
-	if s.main.HideOnClose() {
-		s.about.Hide()
-	} else {
-		s.about.Close()
-	}
+	s.about.Close()
 
 	if !s.config.GetConfig().Launch.CloseToTray {
 		s.Quit()
