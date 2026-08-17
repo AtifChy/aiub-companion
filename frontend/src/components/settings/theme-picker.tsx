@@ -1,5 +1,5 @@
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
 import { THEMES, type ThemeEntry } from "@/lib/themes";
 import { cn } from "@/lib/utils";
@@ -17,38 +17,31 @@ function useThemePreviewColors(themes: ThemeEntry[]): ThemeMap {
   const [colorMap, setColorMap] = useState<ThemeMap>(new Map());
   const { resolvedTheme } = useTheme();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const probe = document.createElement("div");
     probe.style.position = "absolute";
     probe.style.visibility = "hidden";
     probe.style.pointerEvents = "none";
     document.body.appendChild(probe);
 
-    const isDark = resolvedTheme === "dark";
+    if (resolvedTheme === "dark") probe.classList.add("dark");
+
     const map: ThemeMap = new Map();
-
-    if (isDark) {
-      probe.classList.add("dark");
-    }
-
     for (const theme of themes) {
       probe.setAttribute("data-theme", theme.id);
-
       const style = getComputedStyle(probe);
+
       map.set(theme.id, {
         primary: style.getPropertyValue("--primary").trim(),
         secondary: style.getPropertyValue("--secondary").trim(),
         accent: style.getPropertyValue("--accent").trim(),
         background: style.getPropertyValue("--background").trim(),
       });
-
-      // oxlint-disable-next-line react-you-might-not-need-an-effect/no-adjust-state-on-prop-change
-      setColorMap(map);
     }
 
-    return () => {
-      probe.remove();
-    };
+    // oxlint-disable-next-line react-you-might-not-need-an-effect/no-adjust-state-on-prop-change
+    setColorMap(map);
+    probe.remove();
   }, [resolvedTheme, themes]);
 
   return colorMap;
