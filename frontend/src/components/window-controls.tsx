@@ -72,7 +72,7 @@ export function WindowControls({
         className={cn(
           "flex size-7 items-center justify-center rounded-sm transition-colors",
           "bg-transparent hover:text-destructive dark:bg-transparent dark:hover:text-destructive",
-          focused ? "text-foreground" : "text-muted-foreground",
+          focused ? "text-foreground focus-visible:border-destructive" : "text-muted-foreground",
         )}
       >
         <XIcon strokeWidth={1.5} className="size-4" />
