@@ -1,5 +1,5 @@
 import { Service as ConfigService, type Config } from "@bindings/config";
-import { type Draft, create as mutativeCreate } from "mutative";
+import { create as mutativeCreate, type Draft } from "mutative";
 import { toast } from "sonner";
 import { create } from "zustand";
 
