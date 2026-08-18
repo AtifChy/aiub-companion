@@ -14,8 +14,5 @@ func getDefaultLevel() slog.Level {
 }
 
 func getHandler(_ *os.File, level *slog.LevelVar) slog.Handler {
-	return tint.NewHandler(os.Stdout, &tint.Options{
-		Level:     level,
-		AddSource: true,
-	})
+	return tint.NewTextHandler(os.Stdout, &tint.Options{Level: level, AddSource: true})
 }
