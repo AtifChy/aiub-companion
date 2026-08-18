@@ -30,10 +30,9 @@ var appIcon []byte
 
 func main() {
 	// Setup structured logging with slog and our custom log package.
-	logger, err := log.SetupLogger()
+	logger, err := log.NewLogger()
 	if err != nil {
-		slog.Error("Failed to setup logger", "error", err)
-		os.Exit(1)
+		panic(err)
 	}
 	slog.SetDefault(logger.Logger)
 	defer func() { _ = logger.Close() }()
@@ -53,7 +52,7 @@ func main() {
 	updaterService := updater.NewService(configService)
 	workerService := worker.NewService(noticeService, calendarService, configService, notificationService)
 
-	loggerService := log.NewService(logger)
+	loggerService := log.NewService(logger, configService)
 
 	// Create a new Wails application by providing the necessary options.
 	app := application.New(application.Options{
@@ -62,9 +61,9 @@ func main() {
 		Icon:        appIcon,
 		Services: []application.Service{
 			// Core
+			application.NewService(configService),
 			application.NewService(loggerService),
 			application.NewService(databaseService),
-			application.NewService(configService),
 
 			// Independent
 			application.NewService(metaService),
