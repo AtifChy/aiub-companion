@@ -1,4 +1,4 @@
-:root[data-theme="github"] {
+[data-theme="github"] {
   --radius: 0.5rem;
   --background: oklch(1 0 180);
   --foreground: oklch(0.277 0.011 248.24);
@@ -50,7 +50,8 @@
   --spacing: 0.25rem;
 }
 
-.dark[data-theme="github"] {
+.dark[data-theme="github"],
+.dark [data-theme="github"] {
   --radius: 0.5rem;
   --background: oklch(0.176 0.014 258.357);
   --foreground: oklch(0.857 0.014 247.988);

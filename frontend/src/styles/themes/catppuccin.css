@@ -1,4 +1,4 @@
-:root[data-theme="catppuccin"] {
+[data-theme="catppuccin"] {
   --radius: 0.5rem;
   --background: oklch(0.959 0.006 264.533);
   --foreground: oklch(0.431 0.043 279.511);
@@ -50,7 +50,8 @@
   --spacing: 0.25rem;
 }
 
-.dark[data-theme="catppuccin"] {
+.dark[data-theme="catppuccin"],
+.dark [data-theme="catppuccin"] {
   --radius: 0.5rem;
   --background: oklch(0.244 0.03 283.913);
   --foreground: oklch(0.878 0.043 272.094);
