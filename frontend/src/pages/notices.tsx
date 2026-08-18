@@ -228,7 +228,7 @@ function DetailPanel({ onToggleRead, onTogglePin }: DetailPanelProps) {
                 size="sm"
                 className="aria-pressed:bg-transparent aria-pressed:hover:bg-muted"
               >
-                <div className="flex items-center gap-1 group-aria-pressed/toggle:text-chart-3 hover:text-chart-3/50">
+                <div className="flex items-center gap-1 group-aria-pressed/toggle:text-blue-500 hover:text-blue-500/50">
                   {notice.isRead ? (
                     <CircleCheckBigIcon className="size-3.5" />
                   ) : (
@@ -244,7 +244,7 @@ function DetailPanel({ onToggleRead, onTogglePin }: DetailPanelProps) {
                 size="sm"
                 className="aria-pressed:bg-transparent aria-pressed:hover:bg-muted"
               >
-                <div className="flex items-center gap-1 *:fill-foreground/20 group-aria-pressed/toggle:text-chart-4 hover:text-chart-4/50">
+                <div className="flex items-center gap-1 *:fill-foreground/20 group-aria-pressed/toggle:text-amber-500 hover:text-amber-500/50">
                   {notice.isPinned ? (
                     <PinOffIcon className="size-3.5" />
                   ) : (
@@ -256,7 +256,7 @@ function DetailPanel({ onToggleRead, onTogglePin }: DetailPanelProps) {
             <AppTooltip content="Open in browser">
               <Button
                 variant="ghost"
-                className="hover:text-primary"
+                className="hover:text-primary dark:hover:bg-muted"
                 onClick={() => void openExternalLink(AIUB_URL + notice.id)}
               >
                 <ExternalLinkIcon className="size-3.5" />

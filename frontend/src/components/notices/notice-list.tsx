@@ -159,7 +159,7 @@ function NoticeListItem({ notice }: NoticeListItemProps) {
               className={cn(
                 "h-auto p-0.5 opacity-0 group-hover:opacity-100",
                 notice.isPinned
-                  ? "text-chart-4 opacity-100 hover:text-chart-4/50"
+                  ? "text-amber-500 opacity-100 hover:text-amber-500/50"
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
