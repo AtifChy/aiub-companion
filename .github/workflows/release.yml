@@ -16,7 +16,6 @@ jobs:
     runs-on: ${{ matrix.platform }}
     strategy:
       fail-fast: false
-      max-parallel: 3
       matrix:
         os: [windows, darwin, linux]
         arch: [amd64, arm64]
