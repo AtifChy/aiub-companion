@@ -20,6 +20,7 @@ func NewService(logger *logger.Logger) *Service {
 }
 
 func (s *Service) ServiceStartup(ctx context.Context, _ application.ServerOptions) error {
+func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptions) error {
 	application.Get().Event.On(event.EventConfigChanged, s.onConfigChanged)
 	return nil
 }
