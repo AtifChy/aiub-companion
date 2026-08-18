@@ -92,7 +92,7 @@ export function ThemePicker({ selectedTheme, onSelectTheme }: ThemePickerProps) 
 
             <span
               className={cn(
-                "text-sm font-medium text-nowrap",
+                "text-sm font-medium",
                 isSelected ? "text-primary" : "text-muted-foreground",
               )}
             >
