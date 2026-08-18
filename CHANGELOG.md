@@ -1,3 +1,29 @@
+## [0.10.3] - 2026-08-18
+
+### 🐛 Bug Fixes
+
+- *(notices)* Include category in active filters [`92cfdb7`](https://github.com/AtifChy/aiub-companion/commit/92cfdb782e1dfd5d475615c3c88bd8b40846c491)
+
+### 🚜 Refactor
+
+- *(theme)* Pure css theme picker preview implementation [`2fc1cdc`](https://github.com/AtifChy/aiub-companion/commit/2fc1cdc83ec7572e91f8dca5515be917ab33698e)
+
+### 🎨 Styling
+
+- *(theme-picker)* Update selected theme styles [`b82476e`](https://github.com/AtifChy/aiub-companion/commit/b82476e34a074c87c58685d60c45ee5fe575e5db)
+- *(window-controls)* Add focus-visible border to close button [`16a9e31`](https://github.com/AtifChy/aiub-companion/commit/16a9e3124923fd89579b65ab63fd8d57c436d72e)
+- *(theme)* Changed default theme and added 4 new themes [`72bb636`](https://github.com/AtifChy/aiub-companion/commit/72bb636dd354dc0ecc38830147778ffff2b00486)
+- *(theme)* Update theme selectors for new theme-picker [`46fdaa6`](https://github.com/AtifChy/aiub-companion/commit/46fdaa671395cbe3e9f62db0784db0bd25d10d75)
+- *(notices)* Update notice pin and read colors [`422d0d7`](https://github.com/AtifChy/aiub-companion/commit/422d0d76c621adc697a82ce509fd8130bee8283c)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(build)* Remove redundant node version file [`b8f7f23`](https://github.com/AtifChy/aiub-companion/commit/b8f7f233cf0d1f5b56f48b9d890af8a7fa915c99)
+- *(release)* Bump version to v0.10.3 [`9dce450`](https://github.com/AtifChy/aiub-companion/commit/9dce450748f33efaba06ae2c707a73957f8af361)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.10.2...v0.10.3
+
 ## [0.10.2] - 2026-08-17
 
 ### 🚀 Features
@@ -8,6 +34,10 @@
 
 - *(theme-picker)* Batch color map update and use `useLayoutEffect` [`86560e6`](https://github.com/AtifChy/aiub-companion/commit/86560e60720b63f4cc48f2b7e116b8978767c8ed)
 - *(desktop)* Always close about window [`c0558fa`](https://github.com/AtifChy/aiub-companion/commit/c0558faa13ba2ec5d50e3462ad40f1d4e70bb506)
+
+### 📚 Documentation
+
+- Update changelog [`c505c6a`](https://github.com/AtifChy/aiub-companion/commit/c505c6a049c313309ff8e9401bfe22db193a74b0)
 
 ### ⚙️ Miscellaneous Tasks
 
