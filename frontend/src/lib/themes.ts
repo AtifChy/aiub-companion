@@ -1,5 +1,6 @@
 export type Color = "dark" | "light" | "system";
-export type Theme =
+
+type Theme =
   | "default"
   | "claude"
   | "supabase"
@@ -9,7 +10,7 @@ export type Theme =
   | "caffeine"
   | "catppuccin";
 
-export interface ThemeEntry {
+interface ThemeEntry {
   id: Theme;
   label: string;
 }
