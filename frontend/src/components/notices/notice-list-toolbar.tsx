@@ -153,7 +153,8 @@ function NoticeListToolbarFilters() {
       clearFilters: s.clearFilters,
     })),
   );
-  const hasActiveFilters = filters.urgent || filters.pinned || filters.unread;
+  const hasActiveFilters =
+    filters.category !== "all" || filters.urgent || filters.pinned || filters.unread;
 
   return (
     <DropdownMenu>

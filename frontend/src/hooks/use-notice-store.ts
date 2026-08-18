@@ -70,5 +70,16 @@ export const useNoticeStore = create<NoticeState>((set) => ({
       filters: { ...state.filters, ...patch },
     })),
 
-  clearFilters: () => set({ filters: INITIAL_FILTERS }),
+  clearFilters: () =>
+    set((state) => {
+      const { urgent, pinned, unread } = state.filters;
+
+      if (!urgent && !pinned && !unread) {
+        return { filters: { ...state.filters, ...{ category: "all" } } };
+      }
+
+      return {
+        filters: { ...state.filters, ...{ urgent: false, pinned: false, unread: false } },
+      };
+    }),
 }));
