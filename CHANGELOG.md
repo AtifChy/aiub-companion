@@ -1,3 +1,21 @@
+## [0.11.0] - 2026-08-18
+
+### 🐛 Bug Fixes
+
+- *(log)* Correct service startup options type [`592c1d4`](https://github.com/AtifChy/aiub-companion/commit/592c1d4757cd19330e22c137a97a540c0dc37d39)
+
+### 🚜 Refactor
+
+- *(logger)* Replace deprecated tint handler usage [`b669c31`](https://github.com/AtifChy/aiub-companion/commit/b669c318afafd0b6de06acd628e1654326423271)
+- *(log)* Rewrite logging package [`52f7923`](https://github.com/AtifChy/aiub-companion/commit/52f7923fe9fe67d3064c01c016b5db0543285137)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Bump version to v0.11.0 [`d7d3de3`](https://github.com/AtifChy/aiub-companion/commit/d7d3de3011d63f5575f338a6ae116ae7f53da765)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.10.3...v0.11.0
+
 ## [0.10.3] - 2026-08-18
 
 ### 🐛 Bug Fixes
@@ -7,6 +25,10 @@
 ### 🚜 Refactor
 
 - *(theme)* Pure css theme picker preview implementation [`2fc1cdc`](https://github.com/AtifChy/aiub-companion/commit/2fc1cdc83ec7572e91f8dca5515be917ab33698e)
+
+### 📚 Documentation
+
+- Update changelog [`2ad9085`](https://github.com/AtifChy/aiub-companion/commit/2ad90857c5360baa44f8f5e31fcfc16e086dd832)
 
 ### 🎨 Styling
 
