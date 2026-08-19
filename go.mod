@@ -1,6 +1,6 @@
 module aiub-companion
 
-go 1.26.0
+go 1.26
 
 require (
 	github.com/hbollon/go-edlib v1.7.0
