@@ -410,13 +410,13 @@ interface CourseCardProps {
 
 function CourseCard({ course, schedule, onRemoveCourse }: CourseCardProps) {
   const status = getCourseStatus(schedule);
-  const isLab = schedule.type.toLowerCase().includes("lab");
+  const isLab = schedule.type.toLowerCase() === "lab";
 
   return (
     <Card
       className={cn(
         "group relative overflow-hidden border-l-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md",
-        isLab ? "border-l-emerald-500" : "border-l-indigo-500",
+        isLab ? "border-l-blue-500" : "border-l-indigo-500",
         status === "ongoing" &&
           "border-transparent bg-emerald-500/5 shadow-md ring-2 shadow-emerald-500/5 ring-emerald-500",
       )}
@@ -436,19 +436,22 @@ function CourseCard({ course, schedule, onRemoveCourse }: CourseCardProps) {
               {course.courseCode}
             </Badge>
           )}
-          <Badge variant="outline" className="-ml-1 px-2 py-0 text-[0.65rem] font-semibold">
+          <Badge
+            variant="outline"
+            className="-ml-1 border-primary/40 bg-primary/10 px-1.5 py-0 text-[0.6rem] font-bold text-primary/80 uppercase"
+          >
             {schedule.type}
           </Badge>
           {status === "ongoing" && (
             <Badge
               variant="secondary"
-              className="border-emerald-500/40 bg-emerald-500/10 px-1.5 py-0 text-[0.53rem] font-bold tracking-wider text-emerald-600 uppercase dark:text-emerald-400"
+              className="border-emerald-500/40 bg-emerald-500/10 px-1.5 py-0 text-[0.6rem] font-bold tracking-wider text-emerald-600 uppercase dark:text-emerald-400"
             >
               Ongoing
             </Badge>
           )}
           {status === "upcoming" && (
-            <Badge className="border-amber-500/40 bg-amber-500/10 px-1.5 py-0 text-[0.53rem] font-bold tracking-wider text-amber-600 uppercase dark:text-amber-400">
+            <Badge className="border-amber-500/40 bg-amber-500/10 px-1.5 py-0 text-[0.6rem] font-bold tracking-wider text-amber-600 uppercase dark:text-amber-400">
               Up Next
             </Badge>
           )}
