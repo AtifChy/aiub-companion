@@ -258,7 +258,7 @@ export default function SemesterPage() {
             {view === "timeline" ? (
               <div className="relative space-y-4">
                 {/* Timeline line */}
-                <div className="absolute top-2 bottom-2 left-[11px] w-px bg-border" />
+                <div className="absolute top-4 bottom-8 left-[0.75rem] w-px bg-border" />
 
                 {upcomingEvents.length === 0 ? (
                   <p className="py-8 text-center text-muted-foreground">No upcoming events</p>
@@ -273,7 +273,7 @@ export default function SemesterPage() {
                 {calendar?.events.map((event, idx) => (
                   <div
                     key={event.category + String(idx)}
-                    className="flex items-center justify-between rounded-lg border p-3"
+                    className="flex items-start justify-between rounded-lg border p-3"
                   >
                     <div className="space-y-1">
                       <p className="font-medium">{event.title}</p>
@@ -282,7 +282,7 @@ export default function SemesterPage() {
                     <Badge
                       variant="outline"
                       className={cn(
-                        "capitalize",
+                        "text-[0.6rem] font-bold tracking-wide uppercase",
                         CATEGORY_STYLES[event.category] ??
                           "border-gray-500/20 bg-gray-500/10 text-gray-500",
                       )}
@@ -326,7 +326,10 @@ function EventItem({ event }: { event: AcademicEvent }) {
               {event.week && ` • Week ${String(event.week)}`}
             </p>
           </div>
-          <Badge variant="outline" className={cn("capitalize", style)}>
+          <Badge
+            variant="outline"
+            className={cn("text-[0.6rem] font-bold tracking-wide uppercase", style)}
+          >
             {event.category}
           </Badge>
         </div>
