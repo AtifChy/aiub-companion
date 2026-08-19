@@ -1,3 +1,19 @@
+## [0.11.1] - 2026-08-19
+
+### 🎨 Styling
+
+- *(routine)* Adjust lab badge styling [`7af9684`](https://github.com/AtifChy/aiub-companion/commit/7af9684c38c0c110181aa7c18a9552ab1198ea7b)
+- *(semester)* Adjust timeline and event badge styles [`aba4da4`](https://github.com/AtifChy/aiub-companion/commit/aba4da4841e331eb1d2432bbb7e4b95252093d44)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(ci)* Remove max-parallel from release workflow [`b9ec7ba`](https://github.com/AtifChy/aiub-companion/commit/b9ec7bac9359c34348f97a7024f15b7a6e34c8b3)
+- *(build)* Use go-version-file and update go mod [`c29b865`](https://github.com/AtifChy/aiub-companion/commit/c29b865c0991ed97a9a691e773c49923eba0a260)
+- *(release)* Bump version to v0.11.1 [`a818506`](https://github.com/AtifChy/aiub-companion/commit/a8185065ea95767bd1a364c7f7a856e93b1e2120)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.11.0...v0.11.1
+
 ## [0.11.0] - 2026-08-18
 
 ### 🐛 Bug Fixes
@@ -8,6 +24,10 @@
 
 - *(logger)* Replace deprecated tint handler usage [`b669c31`](https://github.com/AtifChy/aiub-companion/commit/b669c318afafd0b6de06acd628e1654326423271)
 - *(log)* Rewrite logging package [`52f7923`](https://github.com/AtifChy/aiub-companion/commit/52f7923fe9fe67d3064c01c016b5db0543285137)
+
+### 📚 Documentation
+
+- Update changelog [`56d9e88`](https://github.com/AtifChy/aiub-companion/commit/56d9e88ac4efcad785d0853832ee7b427a0cf888)
 
 ### ⚙️ Miscellaneous Tasks
 
