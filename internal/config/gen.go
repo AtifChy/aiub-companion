@@ -3,7 +3,8 @@
 package main
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"log"
 	"os"
 
@@ -15,7 +16,7 @@ import (
 func main() {
 	schema := jsonschema.Reflect(&config.Config{})
 
-	data, err := json.MarshalIndent(schema, "", "  ")
+	data, err := json.Marshal(schema, jsontext.WithIndent("  "))
 	if err != nil {
 		log.Fatalf("failed to marshal schema: %v", err)
 	}

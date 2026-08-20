@@ -4,7 +4,8 @@
 package config
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -107,11 +108,11 @@ func load(path string) (*Config, error) {
 	}
 
 	if err := json.Unmarshal(data, cfg); err != nil {
-		if syntaxErr, ok := errors.AsType[*json.SyntaxError](err); ok {
-			return cfg, fmt.Errorf("invalid JSON syntax at offset %d: %w", syntaxErr.Offset, err)
+		if syntaxErr, ok := errors.AsType[*jsontext.SyntacticError](err); ok {
+			return cfg, fmt.Errorf("invalid JSON syntax at offset %d: %w", syntaxErr.ByteOffset, err)
 		}
-		if typeErr, ok := errors.AsType[*json.UnmarshalTypeError](err); ok {
-			return cfg, fmt.Errorf("invalid JSON type for field %q (expected %s): %w", typeErr.Field, typeErr.Type, err)
+		if semanticErr, ok := errors.AsType[*json.SemanticError](err); ok {
+			return cfg, fmt.Errorf("invalid JSON for %s (expected %s): %w", semanticErr.JSONPointer, semanticErr.GoType, err)
 		}
 		return cfg, fmt.Errorf("unmarshal config: %w", err)
 	}
@@ -124,7 +125,7 @@ func save(path string, cfg *Config) error {
 		return fmt.Errorf("create config directory: %w", err)
 	}
 
-	data, err := json.MarshalIndent(cfg, "", "  ")
+	data, err := json.Marshal(cfg, jsontext.WithIndent("  "))
 	if err != nil {
 		return fmt.Errorf("marshal config: %w", err)
 	}
