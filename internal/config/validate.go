@@ -2,6 +2,7 @@ package config
 
 import (
 	_ "embed"
+	"encoding/json/jsontext"
 	"encoding/json/v2"
 	"errors"
 	"fmt"
@@ -39,7 +40,13 @@ func init() {
 func validate(data []byte) error {
 	var v any
 	if err := json.Unmarshal(data, &v); err != nil {
-		return err
+		if syntaxErr, ok := errors.AsType[*jsontext.SyntacticError](err); ok {
+			return fmt.Errorf("invalid JSON syntax at offset %d: %w", syntaxErr.ByteOffset, err)
+		}
+		if semanticErr, ok := errors.AsType[*json.SemanticError](err); ok {
+			return fmt.Errorf("invalid JSON for %s (expected %s): %w", semanticErr.JSONPointer, semanticErr.GoType, err)
+		}
+		return fmt.Errorf("invalid JSON: %w", err)
 	}
 
 	if err := compiledSchema.Validate(v); err != nil {
