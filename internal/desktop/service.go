@@ -76,35 +76,31 @@ func (s *Service) ShowAboutWindow() {
 func (s *Service) onApplicationStarted(_ *application.ApplicationEvent) {
 	cfg := s.config.GetConfig()
 	s.main = window.NewWindow(s.app, window.WindowOptions{
-		HideOnClose:   cfg.Launch.CloseToTray && cfg.Launch.KeepAlive,
-		RestoreWindow: cfg.Launch.RestoreWindow,
-		WebviewWindowOptions: application.WebviewWindowOptions{
-			Name:             MainWindowName,
-			Title:            meta.DisplayName,
-			Frameless:        true,
-			BackgroundColour: application.NewRGBA(0, 0, 0, 255),
-			URL:              "/",
-			Mac: application.MacWindow{
-				InvisibleTitleBarHeight: 50,
-				Backdrop:                application.MacBackdropTranslucent,
-				TitleBar:                application.MacTitleBarHiddenInset,
-			},
+		HideOnClose:      cfg.Launch.CloseToTray && cfg.Launch.KeepAlive,
+		RestoreWindow:    cfg.Launch.RestoreWindow,
+		Name:             MainWindowName,
+		Title:            meta.DisplayName,
+		Frameless:        true,
+		BackgroundColour: application.NewRGBA(0, 0, 0, 255),
+		URL:              "/",
+		Mac: application.MacWindow{
+			InvisibleTitleBarHeight: 50,
+			Backdrop:                application.MacBackdropTranslucent,
+			TitleBar:                application.MacTitleBarHiddenInset,
 		},
 		OnClose: s.handleClose,
 	})
 
 	s.about = window.NewWindow(s.app, window.WindowOptions{
-		WebviewWindowOptions: application.WebviewWindowOptions{
-			Name:                AboutWindowName,
-			Title:               "About " + meta.DisplayName,
-			Width:               400,
-			Height:              350,
-			Frameless:           true,
-			MinimiseButtonState: application.ButtonDisabled,
-			MaximiseButtonState: application.ButtonDisabled,
-			DisableResize:       true,
-			URL:                 "/#/about",
-		},
+		Name:                AboutWindowName,
+		Title:               "About " + meta.DisplayName,
+		Width:               400,
+		Height:              350,
+		Frameless:           true,
+		MinimiseButtonState: application.ButtonDisabled,
+		MaximiseButtonState: application.ButtonDisabled,
+		DisableResize:       true,
+		URL:                 "/#/about",
 	})
 
 	s.setupTray()

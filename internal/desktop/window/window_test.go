@@ -11,8 +11,8 @@ func TestWindowOptionsAndGettersSetters(t *testing.T) {
 	opts := WindowOptions{
 		HideOnClose:   true,
 		RestoreWindow: true,
+		Name:          "test-window",
 	}
-	opts.Name = "test-window"
 
 	w := NewWindow(app, opts)
 

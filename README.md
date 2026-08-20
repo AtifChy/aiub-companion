@@ -1,6 +1,6 @@
 # 🎓 AIUB Companion
 
-[![Go](https://img.shields.io/badge/Go-1.26-00ADD8?style=flat&logo=go&logoColor=white)](https://go.dev/)
+[![Go](https://img.shields.io/badge/Go-1.27-00ADD8?style=flat&logo=go&logoColor=white)](https://go.dev/)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat&logo=react&logoColor=white)](https://react.dev/)
 [![Wails](https://img.shields.io/badge/Wails-v3--beta-red?style=flat&logo=wails)](https://v3.wails.io/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?style=flat&logo=tailwindcss)](https://tailwindcss.com/)
@@ -40,7 +40,7 @@ Built with Go + Wails v3 on the backend and React 19 + Tailwind CSS v4 on the fr
 
 ## Tech Stack
 
-**Backend (Go 1.26)**
+**Backend (Go 1.27)**
 
 - Wails v3 (beta) for the desktop shell and frontend/backend bridge
 - SQLite via `modernc.org/sqlite` (pure Go, no CGO needed)
@@ -103,7 +103,7 @@ aiub-companion/
 
 ### You'll Need
 
-- [Go 1.26+](https://go.dev/)
+- [Go 1.27+](https://go.dev/)
 - [Bun](https://bun.sh/)
 - [Wails v3 CLI](https://v3.wails.io/): `go install github.com/wailsapp/wails/v3/cmd/wails3@latest`
 - [Task](https://taskfile.dev/): `go install github.com/go-task/task/v3/cmd/task@latest`
