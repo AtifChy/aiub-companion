@@ -2,7 +2,8 @@
 package persist
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"os"
@@ -43,7 +44,7 @@ func Save[T any](path string, v T) error {
 		return fmt.Errorf("create state dir: %w", err)
 	}
 
-	data, err := json.MarshalIndent(v, "", "  ")
+	data, err := json.Marshal(v, jsontext.WithIndent("  "))
 	if err != nil {
 		return fmt.Errorf("marshal state: %w", err)
 	}
