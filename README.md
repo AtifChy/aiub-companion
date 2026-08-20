@@ -64,13 +64,12 @@ Built with Go + Wails v3 on the backend and React 19 + Tailwind CSS v4 on the fr
 
 **Tooling**
 
-- Task (task runner)
 - oxlint + oxfmt (linting and formatting)
 - Docker support for headless server builds
 
 ## Project Structure
 
-```
+```text
 aiub-companion/
 ├── build/                   # Build assets, icons, Docker configs, platform manifests
 ├── frontend/
@@ -106,7 +105,6 @@ aiub-companion/
 - [Go 1.27+](https://go.dev/)
 - [Bun](https://bun.sh/)
 - [Wails v3 CLI](https://v3.wails.io/): `go install github.com/wailsapp/wails/v3/cmd/wails3@latest`
-- [Task](https://taskfile.dev/): `go install github.com/go-task/task/v3/cmd/task@latest`
 
 ### Development
 
@@ -115,17 +113,17 @@ git clone https://github.com/atifchy/aiub-companion.git
 cd aiub-companion
 
 # Start dev mode with hot reload
-task dev
+wails3 dev
 ```
 
 ### Production Build
 
 ```bash
 # Build the desktop binary
-task build
+wails3 build
 
 # Build and package an installer (NSIS on Windows)
-task package
+wails3 package
 ```
 
 Output goes to `bin/`.
