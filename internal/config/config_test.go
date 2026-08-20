@@ -11,7 +11,7 @@ func TestValidateSchema(t *testing.T) {
 		{
 			name: "Valid config",
 			json: `{
-				"appearance": { "theme": "dark" },
+				"appearance": { "theme": "default", "color": "system" },
 				"updates": { "interval": "weekly" },
 				"logging": { "level": "DEBUG" },
 				"sync": {
@@ -34,9 +34,9 @@ func TestValidateSchema(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Invalid theme value",
+			name: "Invalid color value",
 			json: `{
-				"appearance": { "theme": "invalid-theme-value" },
+				"appearance": { "theme": "default", "color": "invalid-color-value" },
 				"updates": { "interval": "weekly" },
 				"logging": { "level": "DEBUG" },
 				"sync": { "interval": 15, "fetch_count": 10, "on_startup": true },
@@ -48,7 +48,7 @@ func TestValidateSchema(t *testing.T) {
 		{
 			name: "Invalid log level",
 			json: `{
-				"appearance": { "theme": "dark" },
+				"appearance": { "theme": "default", "color": "system" },
 				"updates": { "interval": "weekly" },
 				"logging": { "level": "TRACE" },
 				"sync": { "interval": 15, "fetch_count": 10, "on_startup": true },
@@ -60,7 +60,7 @@ func TestValidateSchema(t *testing.T) {
 		{
 			name: "Malformed JSON syntax",
 			json: `{
-				"appearance": { "theme": "dark" },
+				"appearance": { "color": "dark", "theme": "default" },
 			}`,
 			wantErr: true,
 		},
