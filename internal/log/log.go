@@ -13,7 +13,7 @@ import (
 
 type Logger struct {
 	*slog.Logger
-	Level  *slog.LevelVar
+	level  *slog.LevelVar
 	closer io.Closer
 }
 
@@ -28,14 +28,18 @@ func NewLogger() (*Logger, error) {
 
 	return &Logger{
 		Logger: slog.New(handler),
-		Level:  level,
+		level:  level,
 		closer: closer,
 	}, nil
 }
 
+func (l *Logger) Level() slog.Level {
+	return l.level.Level()
+}
+
 // SetLevel sets the logging level at runtime.
 func (l *Logger) SetLevel(level slog.Level) {
-	l.Level.Set(level)
+	l.level.Set(level)
 }
 
 // Close releases underlying resources used by the logger, if any.

@@ -55,6 +55,10 @@ func (s *Service) onConfigChanged(ev *application.CustomEvent) {
 		return
 	}
 
+	if level == s.logger.Level() {
+		return
+	}
+
 	s.logger.SetLevel(level)
 	s.logger.Info("Log level changed", "level", level.String())
 }
