@@ -53,7 +53,7 @@ func defaultConfig() *Config {
 			Interval: UpdateIntervalDaily,
 		},
 		Logging: logging{
-			Level: slog.LevelWarn,
+			Level: LogLevelInfo,
 		},
 	}
 }

@@ -89,6 +89,41 @@ type updates struct {
 	Interval UpdateInterval `json:"interval" jsonschema:"enum=never,enum=daily,enum=weekly,enum=monthly"`
 }
 
+type LogLevel string
+
+const (
+	LogLevelDebug LogLevel = "DEBUG"
+	LogLevelInfo  LogLevel = "INFO"
+	LogLevelWarn  LogLevel = "WARN"
+	LogLevelError LogLevel = "ERROR"
+)
+
+func (l *LogLevel) UnmarshalText(text []byte) error {
+	level := LogLevel(text)
+	switch level {
+	case LogLevelDebug, LogLevelInfo, LogLevelWarn, LogLevelError:
+		*l = level
+		return nil
+	default:
+		return fmt.Errorf("invalid log level value: %s", text)
+	}
+}
+
+func (l LogLevel) ToSlogLevel() slog.Level {
+	switch l {
+	case LogLevelDebug:
+		return slog.LevelDebug
+	case LogLevelInfo:
+		return slog.LevelInfo
+	case LogLevelWarn:
+		return slog.LevelWarn
+	case LogLevelError:
+		return slog.LevelError
+	default:
+		return slog.LevelInfo
+	}
+}
+
 type logging struct {
-	Level slog.Level `json:"level" jsonschema:"enum=DEBUG,enum=INFO,enum=WARN,enum=ERROR"`
+	Level LogLevel `json:"level" jsonschema:"enum=DEBUG,enum=INFO,enum=WARN,enum=ERROR"`
 }

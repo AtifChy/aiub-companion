@@ -30,7 +30,7 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 	application.Get().Event.On(event.EventConfigChanged, s.onConfigChanged)
 
 	if cfg := s.config.GetConfig(); cfg != nil {
-		s.logger.SetLevel(cfg.Logging.Level)
+		s.logger.SetLevel(cfg.Logging.Level.ToSlogLevel())
 	} else {
 		slog.Warn("No config found during log service startup")
 	}
@@ -44,7 +44,7 @@ func (s *Service) onConfigChanged(ev *application.CustomEvent) {
 		return
 	}
 
-	level := cfg.Logging.Level
+	level := cfg.Logging.Level.ToSlogLevel()
 	if level == s.logger.Level() {
 		return
 	}

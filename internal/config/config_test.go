@@ -1,7 +1,6 @@
 package config
 
 import (
-	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
@@ -56,7 +55,7 @@ func TestLoad(t *testing.T) {
 		if cfg.Updates.Interval != "weekly" {
 			t.Errorf("unexpected updates interval: %s", cfg.Updates.Interval)
 		}
-		if cfg.Logging.Level != slog.LevelDebug {
+		if cfg.Logging.Level != LogLevelDebug {
 			t.Errorf("unexpected logging level: %s", cfg.Logging.Level)
 		}
 		if cfg.Sync.Interval != 45 || cfg.Sync.FetchCount != 50 || cfg.Sync.OnStartup != false {
@@ -123,7 +122,7 @@ func TestSaveAndRoundtrip(t *testing.T) {
 			Interval: "monthly",
 		},
 		Logging: logging{
-			Level: slog.LevelInfo,
+			Level: LogLevelInfo,
 		},
 		Sync: syn_{
 			Interval:   60,
