@@ -1,3 +1,4 @@
+import { Color, LogLevel, UpdateInterval } from "@bindings/config";
 import { Service as LogService } from "@bindings/log";
 import { System } from "@wailsio/runtime";
 import { useTheme } from "next-themes";
@@ -12,31 +13,34 @@ import { SettingSelect } from "@/components/settings/settings-select";
 import { ThemePicker } from "@/components/settings/theme-picker";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import type { Color } from "@/lib/themes";
 
-type Items<T extends string | number> = { value: T; label: string }[];
+const colorItems = Object.values(Color)
+  .filter(Boolean)
+  .map((v) => ({
+    value: v,
+    label: v.charAt(0).toUpperCase() + v.slice(1),
+  }));
 
-const ColorItems: Items<Color> = ["light", "dark", "system"].map((v) => ({
-  value: v as Color,
-  label: v.charAt(0).toUpperCase() + v.slice(1),
-}));
+const logLevelItems = Object.values(LogLevel)
+  .filter(Boolean)
+  .map((v) => ({
+    value: v,
+    label: v.charAt(0) + v.slice(1).toLowerCase(),
+  }));
 
-const logLevelItems: Items<string> = ["DEBUG", "INFO", "WARN", "ERROR"].map((v) => ({
-  value: v,
-  label: v.charAt(0) + v.slice(1).toLowerCase(),
-}));
-
-const syncIntervalItems: Items<number> = [30, 60, 120, 180, 360].map((v) => ({
+const syncIntervalItems = [30, 60, 120, 180, 360].map((v) => ({
   value: v,
   label: v >= 60 ? `${String(v / 60)} hour${v === 60 ? "" : "s"}` : `${String(v)} minutes`,
 }));
 
-const updateIntervalItems: Items<string> = ["daily", "weekly", "monthly", "never"].map((v) => ({
-  value: v,
-  label: v.charAt(0).toUpperCase() + v.slice(1),
-}));
+const updateIntervalItems = Object.values(UpdateInterval)
+  .filter(Boolean)
+  .map((v) => ({
+    value: v,
+    label: v.charAt(0).toUpperCase() + v.slice(1),
+  }));
 
-const fetchCountItems: Items<number> = [10, 20, 30, 50].map((v) => ({
+const fetchCountItems = [10, 20, 30, 50].map((v) => ({
   value: v,
   label: `${String(v)} notices`,
 }));
@@ -72,7 +76,7 @@ export default function SettingsPage() {
 
             <SettingRow label="Color" description="Select your prefered color">
               <SettingSelect
-                items={ColorItems}
+                items={colorItems}
                 value={config.appearance.color}
                 onValueChange={(v) => {
                   setConfig((draft) => {
