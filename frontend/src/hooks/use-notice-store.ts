@@ -42,7 +42,7 @@ export const useNoticeStore = create<NoticeState>((set) => ({
   setSelectedId: (id) => set({ selectedId: id }),
 
   setSelectionMode: (enabled) =>
-    set((_) => {
+    set(() => {
       if (!enabled) {
         return { selectionMode: false, checkedIds: new Set() };
       }
