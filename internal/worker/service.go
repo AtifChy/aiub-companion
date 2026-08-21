@@ -108,7 +108,7 @@ func (s *Service) syncNotices(ctx context.Context) {
 		app.Event.Emit(event.EventNoticeSyncing, false)
 	}()
 
-	newNotices, err := s.notice.SyncNotices(ctx, cfg.Sync.FetchCount)
+	newNotices, err := s.notice.SyncNotices(ctx, int(cfg.Sync.FetchCount))
 	if err != nil {
 		slog.Error("Failed to sync notices", "error", err)
 		return

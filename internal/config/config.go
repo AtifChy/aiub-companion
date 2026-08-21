@@ -1,9 +1,10 @@
-//go:generate go run gen.go
+//go:generate go run schema.go
 
 // Package config holds the application configuration.
 package config
 
 import (
+	"encoding"
 	"encoding/json/jsontext"
 	"encoding/json/v2"
 	"errors"
@@ -11,6 +12,8 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"reflect"
+	"strings"
 
 	"aiub-companion/internal/meta"
 )
@@ -19,47 +22,15 @@ type Config struct {
 	Appearance    appearance   `json:"appearance"`
 	Updates       updates      `json:"updates"`
 	Logging       logging      `json:"logging"`
-	Sync          sync_        `json:"sync"`
+	Sync          syn_         `json:"sync"`
 	Launch        launch       `json:"launch"`
 	Notifications notification `json:"notifications"`
-}
-
-type appearance struct {
-	Color string `json:"color" jsonschema:"enum=light,enum=dark,enum=system"`
-	Theme string `json:"theme"`
-}
-
-type notification struct {
-	Enabled bool `json:"enabled"`
-}
-
-type launch struct {
-	AutoStart      bool `json:"auto_start"`
-	StartMinimized bool `json:"start_minimized"`
-	CloseToTray    bool `json:"close_to_tray"`
-	KeepAlive      bool `json:"keep_alive"`
-	RestoreWindow  bool `json:"restore_window"`
-	SidebarOpen    bool `json:"sidebar_open"`
-}
-
-type sync_ struct {
-	Interval   int  `json:"interval"`
-	FetchCount int  `json:"fetch_count"`
-	OnStartup  bool `json:"on_startup"`
-}
-
-type updates struct {
-	Interval string `json:"interval" jsonschema:"enum=never,enum=daily,enum=weekly,enum=monthly"`
-}
-
-type logging struct {
-	Level string `json:"level" jsonschema:"enum=DEBUG,enum=INFO,enum=WARN,enum=ERROR"`
 }
 
 func defaultConfig() *Config {
 	return &Config{
 		Appearance: appearance{
-			Color: "system",
+			Color: ColorSystem,
 			Theme: "default",
 		},
 		Notifications: notification{
@@ -73,16 +44,16 @@ func defaultConfig() *Config {
 			RestoreWindow:  true,
 			SidebarOpen:    false,
 		},
-		Sync: sync_{
+		Sync: syn_{
 			Interval:   30,
 			FetchCount: 20,
 			OnStartup:  true,
 		},
 		Updates: updates{
-			Interval: "daily",
+			Interval: UpdateIntervalDaily,
 		},
 		Logging: logging{
-			Level: "WARN",
+			Level: slog.LevelWarn,
 		},
 	}
 }
@@ -103,21 +74,53 @@ func load(path string) (*Config, error) {
 		return cfg, fmt.Errorf("read config file: %w", err)
 	}
 
-	if err := validate(data); err != nil {
-		return cfg, err
-	}
-
-	if err := json.Unmarshal(data, cfg); err != nil {
-		if syntaxErr, ok := errors.AsType[*jsontext.SyntacticError](err); ok {
-			return cfg, fmt.Errorf("invalid JSON syntax at offset %d: %w", syntaxErr.ByteOffset, err)
-		}
-		if semanticErr, ok := errors.AsType[*json.SemanticError](err); ok {
-			return cfg, fmt.Errorf("invalid JSON for %s (expected %s): %w", semanticErr.JSONPointer, semanticErr.GoType, err)
-		}
-		return cfg, fmt.Errorf("unmarshal config: %w", err)
-	}
+	loadFields(data, cfg)
 
 	return cfg, nil
+}
+
+var (
+	textUnmarshalerType = reflect.TypeFor[encoding.TextUnmarshaler]()
+	jsonUnmarshalerType = reflect.TypeFor[json.Unmarshaler]()
+)
+
+func loadFields(raw jsontext.Value, dst any) {
+	if len(raw) == 0 {
+		return
+	}
+
+	var fields map[string]jsontext.Value
+	if err := json.Unmarshal(raw, &fields); err != nil {
+		slog.Warn("Invalid section", "type", reflect.TypeOf(dst).Elem().Name(), "error", err)
+		return
+	}
+
+	rv := reflect.ValueOf(dst).Elem()
+	rt := rv.Type()
+
+	for sf := range rt.Fields() {
+		tag, _, _ := strings.Cut(sf.Tag.Get("json"), ",")
+		if tag == "" || tag == "-" {
+			continue
+		}
+		rawField, ok := fields[tag]
+		if !ok {
+			continue
+		}
+
+		fv := rv.FieldByIndex(sf.Index)
+		fvPtr := fv.Addr()
+		hasOwnDecoder := fvPtr.Type().Implements(jsonUnmarshalerType) || fvPtr.Type().Implements(textUnmarshalerType)
+
+		if fv.Kind() == reflect.Struct && !hasOwnDecoder {
+			loadFields(rawField, fvPtr.Interface())
+			continue
+		}
+
+		if err := json.Unmarshal(rawField, fvPtr.Interface()); err != nil {
+			slog.Warn("Invalid field", "type", rt.Name(), "field", tag, "error", err)
+		}
+	}
 }
 
 func save(path string, cfg *Config) error {

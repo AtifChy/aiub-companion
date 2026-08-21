@@ -218,11 +218,11 @@ func (s *Service) scheduleLoop(ctx context.Context) {
 func (s *Service) checkInterval() time.Duration {
 	cfg := s.config.GetConfig()
 	switch cfg.Updates.Interval {
-	case "daily":
+	case config.UpdateIntervalDaily:
 		return 24 * time.Hour
-	case "weekly":
+	case config.UpdateIntervalWeekly:
 		return 7 * 24 * time.Hour
-	case "monthly":
+	case config.UpdateIntervalMonthly:
 		return 30 * 24 * time.Hour
 	default:
 		return 0

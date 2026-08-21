@@ -14,7 +14,7 @@
           "$ref": "#/$defs/logging"
         },
         "sync": {
-          "$ref": "#/$defs/sync_"
+          "$ref": "#/$defs/syn_"
         },
         "launch": {
           "$ref": "#/$defs/launch"
@@ -90,13 +90,7 @@
     "logging": {
       "properties": {
         "level": {
-          "type": "string",
-          "enum": [
-            "DEBUG",
-            "INFO",
-            "WARN",
-            "ERROR"
-          ]
+          "type": "integer"
         }
       },
       "additionalProperties": false,
@@ -117,7 +111,7 @@
         "enabled"
       ]
     },
-    "sync_": {
+    "syn_": {
       "properties": {
         "interval": {
           "type": "integer"
