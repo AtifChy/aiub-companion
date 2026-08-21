@@ -1,99 +1,21 @@
 package config
 
 import (
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 )
 
-func TestValidateSchema(t *testing.T) {
-	tests := []struct {
-		name    string
-		json    string
-		wantErr bool
-	}{
-		{
-			name: "Valid config",
-			json: `{
-				"appearance": { "theme": "default", "color": "system" },
-				"updates": { "interval": "weekly" },
-				"logging": { "level": "DEBUG" },
-				"sync": {
-					"interval": 15,
-					"fetch_count": 10,
-					"on_startup": true
-				},
-				"launch": {
-					"auto_start": false,
-					"start_minimized": true,
-					"close_to_tray": false,
-					"keep_alive": false,
-					"restore_window": false,
-					"sidebar_open": true
-				},
-				"notifications": {
-					"enabled": true
-				}
-			}`,
-			wantErr: false,
-		},
-		{
-			name: "Invalid color value",
-			json: `{
-				"appearance": { "theme": "default", "color": "invalid-color-value" },
-				"updates": { "interval": "weekly" },
-				"logging": { "level": "DEBUG" },
-				"sync": { "interval": 15, "fetch_count": 10, "on_startup": true },
-				"launch": { "start_minimized": true, "close_to_tray": false, "keep_alive": false, "restore_window": false, "sidebar_open": true },
-				"notifications": { "enabled": true }
-			}`,
-			wantErr: true,
-		},
-		{
-			name: "Invalid log level",
-			json: `{
-				"appearance": { "theme": "default", "color": "system" },
-				"updates": { "interval": "weekly" },
-				"logging": { "level": "TRACE" },
-				"sync": { "interval": 15, "fetch_count": 10, "on_startup": true },
-				"launch": { "start_minimized": true, "close_to_tray": false, "keep_alive": false, "restore_window": false, "sidebar_open": true },
-				"notifications": { "enabled": true }
-			}`,
-			wantErr: true,
-		},
-		{
-			name: "Malformed JSON syntax",
-			json: `{
-				"appearance": { "theme": "default", "color": "system" },
-				"updates": { "interval": "weekly" },
-				"logging": { "level": "TRACE" },
-				"sync": { "interval": 15, "fetch_count": 10, "on_startup": true },
-				"launch": { "start_minimized": true, "close_to_tray": false, "keep_alive": false, "restore_window": false, "sidebar_open": true },
-				"notifications": { "enabled": true }
-			}`,
-			wantErr: true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := validate([]byte(tt.json))
-			if (err != nil) != tt.wantErr {
-				t.Errorf("validate() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func TestLoad(t *testing.T) {
 	t.Run("Non-existent file returns default config", func(t *testing.T) {
 		tempDir := t.TempDir()
-		nonExistentPath := filepath.Join(tempDir, "nonexistent.json")
+		nonExistentPath := filepath.Join(tempDir, "does-not-exist.json")
 
 		cfg, err := load(nonExistentPath)
 		if err != nil {
-			t.Fatalf("expected no error for non-existent file, got: %v", err)
+			t.Fatalf("expected no error for non-existent file, got %v", err)
 		}
 		expected := defaultConfig()
 		if *cfg != *expected {
@@ -134,7 +56,7 @@ func TestLoad(t *testing.T) {
 		if cfg.Updates.Interval != "weekly" {
 			t.Errorf("unexpected updates interval: %s", cfg.Updates.Interval)
 		}
-		if cfg.Logging.Level != "DEBUG" {
+		if cfg.Logging.Level != slog.LevelDebug {
 			t.Errorf("unexpected logging level: %s", cfg.Logging.Level)
 		}
 		if cfg.Sync.Interval != 45 || cfg.Sync.FetchCount != 50 || cfg.Sync.OnStartup != false {
@@ -148,53 +70,42 @@ func TestLoad(t *testing.T) {
 		}
 	})
 
-	t.Run("Invalid JSON syntax returns syntactic error", func(t *testing.T) {
+	t.Run("Schema violation preserves valid settings and loads without fatal failure", func(t *testing.T) {
 		tempDir := t.TempDir()
 		configPath := filepath.Join(tempDir, "config.json")
-		invalidJSON := `{
-			"appearance": { "color": "dark",
-		}`
-		if err := os.WriteFile(configPath, []byte(invalidJSON), 0o644); err != nil {
-			t.Fatalf("failed to write config file: %v", err)
-		}
-
-		_, err := load(configPath)
-		if err == nil {
-			t.Fatal("expected syntax error, got nil")
-		}
-		if !strings.Contains(err.Error(), "invalid JSON syntax") && !strings.Contains(err.Error(), "syntax") {
-			t.Errorf("expected syntax error message, got %v", err)
-		}
-	})
-
-	t.Run("Schema validation failure returns error", func(t *testing.T) {
-		tempDir := t.TempDir()
-		configPath := filepath.Join(tempDir, "config.json")
-		invalidEnumJSON := `{
-			"appearance": { "color": "invalid_color", "theme": "default" },
+		schemaViolationJSON := `{
+			"appearance": { "color": "invalid_color", "theme": "dracula" },
 			"updates": { "interval": "weekly" },
 			"logging": { "level": "DEBUG" },
 			"sync": { "interval": 15, "fetch_count": 10, "on_startup": true },
 			"launch": {
-				"auto_start": false,
+				"auto_start": true,
 				"start_minimized": true,
 				"close_to_tray": false,
-				"keep_alive": false,
+				"keep_alive": true,
 				"restore_window": false,
 				"sidebar_open": true
 			},
-			"notifications": { "enabled": true }
+			"notifications": { "enabled": false }
 		}`
-		if err := os.WriteFile(configPath, []byte(invalidEnumJSON), 0o644); err != nil {
+		if err := os.WriteFile(configPath, []byte(schemaViolationJSON), 0o644); err != nil {
 			t.Fatalf("failed to write config file: %v", err)
 		}
 
-		_, err := load(configPath)
-		if err == nil {
-			t.Fatal("expected validation error, got nil")
+		cfg, err := load(configPath)
+		if err != nil {
+			t.Fatalf("expected load to succeed with warning, got error: %v", err)
 		}
-		if !strings.Contains(err.Error(), "invalid config") {
-			t.Errorf("expected schema validation error, got: %v", err)
+
+		// Valid fields preserved
+		if cfg.Appearance.Theme != "dracula" {
+			t.Errorf("expected theme 'dracula' to be preserved, got %s", cfg.Appearance.Theme)
+		}
+		if !cfg.Launch.AutoStart || !cfg.Launch.StartMinimized || cfg.Launch.CloseToTray || !cfg.Launch.KeepAlive || cfg.Launch.RestoreWindow || !cfg.Launch.SidebarOpen {
+			t.Errorf("expected launch settings to be preserved, got %+v", cfg.Launch)
+		}
+		if cfg.Notifications.Enabled {
+			t.Errorf("expected notifications enabled=false to be preserved")
 		}
 	})
 }
@@ -212,9 +123,9 @@ func TestSaveAndRoundtrip(t *testing.T) {
 			Interval: "monthly",
 		},
 		Logging: logging{
-			Level: "INFO",
+			Level: slog.LevelInfo,
 		},
-		Sync: sync_{
+		Sync: syn_{
 			Interval:   60,
 			FetchCount: 100,
 			OnStartup:  false,
