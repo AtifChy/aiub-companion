@@ -2,13 +2,12 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { useEffect } from "react";
 
 import { useSettings } from "@/components/providers/settings-provider";
-import type { Color } from "@/lib/themes";
 
 const THEME_STORAGE_KEY = "data-theme";
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const { config } = useSettings();
-  const color = config.appearance.color as Color;
+  const color = config.appearance.color;
   const theme = config.appearance.theme || "default";
 
   useEffect(() => {

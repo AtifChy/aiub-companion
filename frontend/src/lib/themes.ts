@@ -1,5 +1,3 @@
-export type Color = "dark" | "light" | "system";
-
 type Theme =
   | "default"
   | "claude"
