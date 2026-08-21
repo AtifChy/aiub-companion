@@ -1,4 +1,49 @@
+## [0.12.0] - 2026-08-21
+
+### 🚀 Features
+
+- *(config)* Add custom log level type [`38d9f28`](https://github.com/AtifChy/aiub-companion/commit/38d9f28a12b526229bd70f3ce7ecea7bf5d7b842)
+
+### 🐛 Bug Fixes
+
+- *(config)* Update log level only when necessary [`6cd601d`](https://github.com/AtifChy/aiub-companion/commit/6cd601d1f1d3df3ff12272be2b7a949c4033f011)
+- *(config/validate)* Improve JSON validation error messages [`921a818`](https://github.com/AtifChy/aiub-companion/commit/921a818a22049429a8f18ea77da2eb30dce91885)
+
+### 💼 Other
+
+- *(config)* Update tests for new validation logic [`e74fd5a`](https://github.com/AtifChy/aiub-companion/commit/e74fd5a6803214c49c2729d0cee3b59190df8d34)
+
+### 🚜 Refactor
+
+- Migrate project to go 1.27 [`0dba0ca`](https://github.com/AtifChy/aiub-companion/commit/0dba0ca34c62dafdee4e1ff49f909a3442d7851b)
+- *(config)* Migrate to encoding/json/v2 [`039a057`](https://github.com/AtifChy/aiub-companion/commit/039a057ee54d9df413a8118fc30d1b91b38fbc28)
+- *(calendar,persist)* Migrate to encoding/json/v2 [`71ea019`](https://github.com/AtifChy/aiub-companion/commit/71ea019d8ef3be16f2491cdbd9d835824784679e)
+- *(config)* Rewrite config validation logic [`a57f6c1`](https://github.com/AtifChy/aiub-companion/commit/a57f6c14b6deb03e38ecae2f20c4f28462d51b49)
+- *(theme)* Remove unused color type import [`d670edb`](https://github.com/AtifChy/aiub-companion/commit/d670edbc829c51144a79d8e6c73348a140f9c711)
+- *(settings)* Use enum values for items [`b38503e`](https://github.com/AtifChy/aiub-companion/commit/b38503ed80a8abd24f23cdb808a274892be220ae)
+
+### 📚 Documentation
+
+- Update build instructions [`661d253`](https://github.com/AtifChy/aiub-companion/commit/661d25374f713451d76bc260da6cad42cd8a6ae7)
+
+### 🧪 Testing
+
+- *(config)* Fix and update config test cases [`78a201e`](https://github.com/AtifChy/aiub-companion/commit/78a201e643fcedb258fb88660d09a37c7aaa3e95)
+- *(config)* Add load and save tests [`3948bc2`](https://github.com/AtifChy/aiub-companion/commit/3948bc22da3616bec6a3d6632491835a133dced0)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(go.mod)* Update go.mod due to go 1.27 [`b97644c`](https://github.com/AtifChy/aiub-companion/commit/b97644cd73098e2794858a968792ee7f3833b05d)
+- *(release)* Bump version to v0.12.0 [`f31419a`](https://github.com/AtifChy/aiub-companion/commit/f31419afd9b75311c23c824cd762dc334603fdc2)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.11.1...v0.12.0
+
 ## [0.11.1] - 2026-08-19
+
+### 📚 Documentation
+
+- Update changelog [`a7eca96`](https://github.com/AtifChy/aiub-companion/commit/a7eca96d7edf895f4d238ba2c477f59dfe479806)
 
 ### 🎨 Styling
 
