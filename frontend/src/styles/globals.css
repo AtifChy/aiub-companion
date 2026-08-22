@@ -110,6 +110,30 @@
   --wails-draggable: no-drag;
 }
 
+@utility wails-app-drag {
+  app-region: drag;
+}
+
+@utility wails-app-no-drag {
+  app-region: no-drag;
+}
+
+@utility wails-caption {
+  --wails-non-client-region: caption;
+}
+
+@utility wails-btn-maximize {
+  --wails-non-client-region: maximize;
+}
+
+@utility wails-btn-minimize {
+  --wails-non-client-region: minimize;
+}
+
+@utility wails-btn-close {
+  --wails-non-client-region: close;
+}
+
 @utility prose-custom {
   --tw-prose-body: var(--foreground);
   --tw-prose-headings: var(--foreground);

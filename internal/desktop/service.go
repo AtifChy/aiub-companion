@@ -83,6 +83,10 @@ func (s *Service) onApplicationStarted(_ *application.ApplicationEvent) {
 		Frameless:        true,
 		BackgroundColour: application.NewRGBA(0, 0, 0, 255),
 		URL:              "/",
+		Windows: application.WindowsWindow{
+			NonClientRegionSupport:     true,
+			WebView2CompositionHosting: true,
+		},
 		Mac: application.MacWindow{
 			InvisibleTitleBarHeight: 50,
 			Backdrop:                application.MacBackdropTranslucent,
