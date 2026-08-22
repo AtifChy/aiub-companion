@@ -42,7 +42,7 @@ func (s *Service) ServiceStartup(ctx context.Context, _ application.ServiceOptio
 
 	app.Event.On(event.EventConfigChanged, func(e *application.CustomEvent) {
 		if cfg, ok := e.Data.(config.Config); ok {
-			s.main.SetHideOnClose(cfg.Launch.CloseToTray && cfg.Launch.KeepAlive)
+			s.main.SetHideOnClose(s.hideOnClose(&cfg))
 			s.main.SetRestoreWindow(cfg.Launch.RestoreWindow)
 		}
 	})
@@ -63,7 +63,6 @@ func (s *Service) Quit() {
 		s.main.Close()
 	}
 	if s.about != nil {
-		s.about.SetHideOnClose(false)
 		s.about.Close()
 	}
 	time.AfterFunc(200*time.Millisecond, func() { s.app.Quit() })
@@ -76,7 +75,7 @@ func (s *Service) ShowAboutWindow() {
 func (s *Service) onApplicationStarted(_ *application.ApplicationEvent) {
 	cfg := s.config.GetConfig()
 	s.main = window.NewWindow(s.app, window.WindowOptions{
-		HideOnClose:      cfg.Launch.CloseToTray && cfg.Launch.KeepAlive,
+		HideOnClose:      s.hideOnClose(cfg),
 		RestoreWindow:    cfg.Launch.RestoreWindow,
 		Name:             MainWindowName,
 		Title:            meta.DisplayName,
@@ -116,6 +115,10 @@ func (s *Service) onApplicationStarted(_ *application.ApplicationEvent) {
 	if !cfg.Launch.StartMinimized {
 		s.main.Show()
 	}
+}
+
+func (s *Service) hideOnClose(cfg *config.Config) bool {
+	return cfg.Launch.CloseToTray && cfg.Launch.KeepAlive
 }
 
 func (s *Service) handleClose() {
