@@ -25,6 +25,7 @@ export default defineConfig({
   jsPlugins: ["eslint-plugin-react-you-might-not-need-an-effect", "@tanstack/eslint-plugin-query"],
   rules: {
     "typescript/no-confusing-void-expression": "off",
+    "typescript/prefer-nullish-coalescing": "off",
 
     "react/react-in-jsx-scope": "off",
     "react/no-unescaped-entities": "off",

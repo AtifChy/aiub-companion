@@ -45,7 +45,9 @@ export function HorizontalScroll({ children, className }: HorizontalScrollProps)
       const maxScroll = container.scrollWidth - container.clientWidth;
       targetScrollLeft.current = Math.max(0, Math.min(maxScroll, targetScrollLeft.current + delta));
 
-      animationFrame.current ??= requestAnimationFrame(animate);
+      if (animationFrame.current === null) {
+        animationFrame.current = requestAnimationFrame(animate);
+      }
 
       container.scrollLeft += delta;
     };
