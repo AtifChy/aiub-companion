@@ -116,6 +116,7 @@ func (w *Window) Close() {
 // onClose is called from the WindowClosing event hook.
 func (w *Window) onClose(e *application.WindowEvent) {
 	w.mu.Lock()
+	handle := w.handle
 	onClose := w.opts.OnClose
 	hideOnClose := w.opts.HideOnClose
 	w.mu.Unlock()
@@ -126,8 +127,8 @@ func (w *Window) onClose(e *application.WindowEvent) {
 
 	if hideOnClose {
 		e.Cancel()
-		if w.handle != nil {
-			w.handle.Hide()
+		if handle != nil {
+			handle.Hide()
 		}
 	} else {
 		w.mu.Lock()
