@@ -187,28 +187,31 @@ func (w *Window) setupStateTracking() {
 	})
 
 	w.handle.OnWindowEvent(events.Common.WindowDidResize, func(e *application.WindowEvent) {
-		w.mu.Lock()
-
-		if !w.state.Maximized {
-			w.state.Width, w.state.Height = w.handle.Size()
-			w.mu.Unlock()
-
-			w.scheduleSaveState()
-		} else {
-			w.mu.Unlock()
+		if w.handle.IsMaximised() {
+			return
 		}
+
+		w.mu.Lock()
+		w.state.Width, w.state.Height = w.handle.Size()
+		w.mu.Unlock()
+
+		w.scheduleSaveState()
 	})
 	w.handle.OnWindowEvent(events.Common.WindowDidMove, func(e *application.WindowEvent) {
-		w.mu.Lock()
-
-		if !w.state.Maximized {
-			w.state.X, w.state.Y = w.handle.Position()
-			w.mu.Unlock()
-
-			w.scheduleSaveState()
-		} else {
-			w.mu.Unlock()
+		if w.handle.IsMaximised() {
+			return
 		}
+
+		w.mu.Lock()
+		w.state.X, w.state.Y = w.handle.Position()
+
+		if w.state.Maximized != w.handle.IsMaximised() {
+			w.state.Maximized = w.handle.IsMaximised()
+			w.app.Event.Emit(event.EventWindowMaximized, w.state.Maximized)
+		}
+		w.mu.Unlock()
+
+		w.scheduleSaveState()
 	})
 }
 
