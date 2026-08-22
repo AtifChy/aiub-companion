@@ -1,4 +1,4 @@
-import { Events, Window } from "@wailsio/runtime";
+import { Events, System, Window } from "@wailsio/runtime";
 import { Suspense, useEffect, useState } from "react";
 import { matchPath, Outlet, useLocation, useNavigate } from "react-router";
 
@@ -58,8 +58,8 @@ function Header() {
     <header
       onDoubleClick={() => void Window.ToggleMaximise()}
       className={cn(
-        "wails-drag",
         "sticky top-0 z-50 flex h-11 shrink-0 items-center gap-2 border-b p-2 transition-[width,height] ease-linear",
+        System.IsWindows() ? "wails-app-drag" : "wails-drag",
       )}
     >
       <SidebarTrigger />

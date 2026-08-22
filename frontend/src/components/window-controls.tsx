@@ -1,3 +1,4 @@
+import { System } from "@wailsio/runtime";
 import { CopyIcon, MinusIcon, SquareIcon, XIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -37,7 +38,12 @@ export function WindowControls({
   }, []);
 
   return (
-    <div className={cn("wails-no-drag", "ml-auto flex items-center gap-1")}>
+    <div
+      className={cn(
+        "ml-auto flex items-center gap-1",
+        System.IsWindows() ? "wails-app-no-drag" : "wails-no-drag",
+      )}
+    >
       {onMinimize && (
         <Button
           onClick={onMinimize}
