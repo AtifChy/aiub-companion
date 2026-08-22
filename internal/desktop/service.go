@@ -105,6 +105,10 @@ func (s *Service) onApplicationStarted(_ *application.ApplicationEvent) {
 		MaximiseButtonState: application.ButtonDisabled,
 		DisableResize:       true,
 		URL:                 "/#/about",
+		Windows: application.WindowsWindow{
+			NonClientRegionSupport:     true,
+			WebView2CompositionHosting: true,
+		},
 	})
 
 	s.setupTray()

@@ -1,5 +1,5 @@
 import { BuildInfo, Service as MetaService } from "@bindings/meta";
-import { Window } from "@wailsio/runtime";
+import { System, Window } from "@wailsio/runtime";
 import { CopyrightIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import appicon from "@/assets/appicon.png";
 import { Separator } from "@/components/ui/separator";
 import { WindowControls } from "@/components/window-controls";
 import { logger } from "@/lib/logger";
+import { cn } from "@/lib/utils";
 
 const year = () => new Date().getFullYear();
 
@@ -25,7 +26,12 @@ export default function AboutPage() {
 
   return (
     <div className="flex h-screen w-full flex-col">
-      <div className="sticky flex h-10 w-full items-center gap-2 border-b px-1.5 py-2 wails-drag">
+      <div
+        className={cn(
+          "sticky flex h-10 w-full items-center gap-2 border-b px-1.5 py-2",
+          System.IsWindows() ? "wails-app-drag" : "wails-drag",
+        )}
+      >
         <img src={appicon} alt="App Icon" className="ml-1 size-4" />
         <span className="text-sm">About {buildInfo?.name}</span>
         <WindowControls onClose={() => void Window.Close()} />
