@@ -1,3 +1,28 @@
+## [0.12.1] - 2026-08-22
+
+### 🚀 Features
+
+- *(window)* Emit window maximized event [`c8c2164`](https://github.com/AtifChy/aiub-companion/commit/c8c21648ed0ecd04b798e731212ed6d95d8d00f4)
+- *(windows/desktop)* Add windows non-client region support [`d95e8c1`](https://github.com/AtifChy/aiub-companion/commit/d95e8c1b019bd7f4e8f18a4a5251c40ae6b3287d)
+- *(window)* Add windows native webview app drag support [`5041994`](https://github.com/AtifChy/aiub-companion/commit/5041994181d4709c34ae5e1fdc5da748b36fc640)
+
+### 🐛 Bug Fixes
+
+- *(window)* Update maximize state when moved while maximized [`deae916`](https://github.com/AtifChy/aiub-companion/commit/deae9164e0fd444c90ed246354735507ff88ccd1)
+
+### 🚜 Refactor
+
+- *(about)* Rename appInfo to buildInfo and add date formatter [`62e7dd5`](https://github.com/AtifChy/aiub-companion/commit/62e7dd52a8fef00e8d72b59577f46f19cc39dab9)
+- *(lint)* Fix linting issues [`6e47015`](https://github.com/AtifChy/aiub-companion/commit/6e470152ee0462242820de4cda3ad302211fd8cc)
+- *(window)* Update window maximize logic [`998bb72`](https://github.com/AtifChy/aiub-companion/commit/998bb729b40e2c281f3333af5f1bc6ceeb5aeafd)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Bump version to v0.12.1 [`1f748af`](https://github.com/AtifChy/aiub-companion/commit/1f748afb6aafb56404e2365e31ebf8e7aad86af4)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.12.0...v0.12.1
+
 ## [0.12.0] - 2026-08-21
 
 ### 🚀 Features
@@ -25,6 +50,7 @@
 ### 📚 Documentation
 
 - Update build instructions [`661d253`](https://github.com/AtifChy/aiub-companion/commit/661d25374f713451d76bc260da6cad42cd8a6ae7)
+- Update changelog [`b98ae6c`](https://github.com/AtifChy/aiub-companion/commit/b98ae6cada1e873a3f8fd63dc17870230e9cc9b6)
 
 ### 🧪 Testing
 
