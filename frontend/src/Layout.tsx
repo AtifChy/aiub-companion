@@ -16,6 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { WindowControls } from "@/components/window-controls";
 import { routes } from "@/lib/routes";
+import { cn } from "@/lib/utils";
 
 export default function Layout() {
   const navigate = useNavigate();
@@ -47,18 +48,19 @@ function Header() {
     matchPath({ path: route.path, end: true }, location.pathname),
   );
 
-  const [maximized, setMaximized] = useState(false);
-  useEffect(() => void Window.IsMaximised().then(setMaximized), []);
-
-  const toggleMaximize = async () => {
-    await Window.ToggleMaximise();
-    setMaximized(await Window.IsMaximised());
-  };
+  const [isMaximized, setIsMaximized] = useState(false);
+  useEffect(() => {
+    void Window.IsMaximised().then(setIsMaximized);
+    return Events.On("window:maximized", (e) => setIsMaximized(e.data));
+  }, []);
 
   return (
     <header
-      onDoubleClick={() => void toggleMaximize()}
-      className="sticky top-0 z-50 flex h-11 shrink-0 items-center gap-2 border-b p-2 transition-[width,height] ease-linear wails-drag"
+      onDoubleClick={() => void Window.ToggleMaximise()}
+      className={cn(
+        "wails-drag",
+        "sticky top-0 z-50 flex h-11 shrink-0 items-center gap-2 border-b p-2 transition-[width,height] ease-linear",
+      )}
     >
       <SidebarTrigger />
       <Separator
@@ -77,9 +79,9 @@ function Header() {
         </BreadcrumbList>
       </Breadcrumb>
       <WindowControls
-        maximized={maximized}
+        maximized={isMaximized}
         onMinimize={() => void Window.Minimise()}
-        onMaximize={() => void toggleMaximize()}
+        onMaximize={() => void Window.ToggleMaximise()}
         onClose={() => void Window.Close()}
       />
     </header>
