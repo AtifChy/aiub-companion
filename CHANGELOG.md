@@ -1,3 +1,24 @@
+## [0.12.2] - 2026-08-22
+
+### 🚀 Features
+
+- *(window/about)* Enable windows non-client region support [`870f1dd`](https://github.com/AtifChy/aiub-companion/commit/870f1dd687fa53f83f8342eb69e405230e6fec06)
+
+### 🐛 Bug Fixes
+
+- *(window)* Use local handle in onclose [`2a80b20`](https://github.com/AtifChy/aiub-companion/commit/2a80b20318268e0e2c08d3f140c29bdf5a614f52)
+
+### 🚜 Refactor
+
+- *(window)* Extract hide on close logic [`e5efe56`](https://github.com/AtifChy/aiub-companion/commit/e5efe56ea0420b2e915313b2243938666611da7c)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Bump version to v0.12.2 [`b9fb0b5`](https://github.com/AtifChy/aiub-companion/commit/b9fb0b58f5af013249bfe2f393bb4603167f6c5f)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.12.1...v0.12.2
+
 ## [0.12.1] - 2026-08-22
 
 ### 🚀 Features
@@ -15,6 +36,10 @@
 - *(about)* Rename appInfo to buildInfo and add date formatter [`62e7dd5`](https://github.com/AtifChy/aiub-companion/commit/62e7dd52a8fef00e8d72b59577f46f19cc39dab9)
 - *(lint)* Fix linting issues [`6e47015`](https://github.com/AtifChy/aiub-companion/commit/6e470152ee0462242820de4cda3ad302211fd8cc)
 - *(window)* Update window maximize logic [`998bb72`](https://github.com/AtifChy/aiub-companion/commit/998bb729b40e2c281f3333af5f1bc6ceeb5aeafd)
+
+### 📚 Documentation
+
+- Update changelog [`75da462`](https://github.com/AtifChy/aiub-companion/commit/75da4627d54d73ef476483573362a06668c62ba0)
 
 ### ⚙️ Miscellaneous Tasks
 
