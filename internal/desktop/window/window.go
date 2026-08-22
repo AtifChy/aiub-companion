@@ -6,6 +6,8 @@ import (
 	"sync"
 	"time"
 
+	"aiub-companion/internal/event"
+
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
 )
@@ -162,17 +164,21 @@ func (w *Window) setupStateTracking() {
 		return
 	}
 
-	w.handle.OnWindowEvent(events.Common.WindowMinimise, func(event *application.WindowEvent) {
+	w.handle.OnWindowEvent(events.Common.WindowMinimise, func(e *application.WindowEvent) {
 		w.flushSaveState()
 	})
-	w.handle.OnWindowEvent(events.Common.WindowMaximise, func(event *application.WindowEvent) {
+	w.handle.OnWindowEvent(events.Common.WindowMaximise, func(e *application.WindowEvent) {
+		w.app.Event.Emit(event.EventWindowMaximized, true)
+
 		w.mu.Lock()
 		w.state.Maximized = true
 		w.mu.Unlock()
 
 		w.flushSaveState()
 	})
-	w.handle.OnWindowEvent(events.Common.WindowUnMaximise, func(event *application.WindowEvent) {
+	w.handle.OnWindowEvent(events.Windows.WindowUnMaximise, func(e *application.WindowEvent) {
+		w.app.Event.Emit(event.EventWindowMaximized, false)
+
 		w.mu.Lock()
 		w.state.Maximized = false
 		w.mu.Unlock()
@@ -180,7 +186,7 @@ func (w *Window) setupStateTracking() {
 		w.flushSaveState()
 	})
 
-	w.handle.OnWindowEvent(events.Common.WindowDidResize, func(event *application.WindowEvent) {
+	w.handle.OnWindowEvent(events.Common.WindowDidResize, func(e *application.WindowEvent) {
 		w.mu.Lock()
 
 		if !w.state.Maximized {
@@ -192,7 +198,7 @@ func (w *Window) setupStateTracking() {
 			w.mu.Unlock()
 		}
 	})
-	w.handle.OnWindowEvent(events.Common.WindowDidMove, func(event *application.WindowEvent) {
+	w.handle.OnWindowEvent(events.Common.WindowDidMove, func(e *application.WindowEvent) {
 		w.mu.Lock()
 
 		if !w.state.Maximized {
@@ -235,4 +241,8 @@ func (w *Window) flushSaveState() {
 	if err := saveState(w.opts.Name, w.state); err != nil {
 		slog.Error("Failed to save window state", "error", err)
 	}
+}
+
+func init() {
+	application.RegisterEvent[bool](event.EventWindowMaximized)
 }

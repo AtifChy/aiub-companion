@@ -6,9 +6,10 @@ const (
 
 	EventNoticeSyncing = "notice:syncing"
 	EventNoticeSynced  = "notice:synced"
-
-	EventNoticeOpen = "notice:open"
+	EventNoticeOpen    = "notice:open"
 
 	EventMainWindowShow    = "main-window:show"
 	EventMainWindowClosing = "main-window:closing"
+
+	EventWindowMaximized = "window:maximized"
 )
