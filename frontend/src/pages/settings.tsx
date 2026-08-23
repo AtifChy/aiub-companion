@@ -13,6 +13,7 @@ import { SettingSelect } from "@/components/settings/settings-select";
 import { ThemePicker } from "@/components/settings/theme-picker";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { UpdateDialog } from "@/lib/routes";
 
 const colorItems = Object.values(Color)
   .filter(Boolean)
@@ -254,7 +255,13 @@ export default function SettingsPage() {
               </SettingRow>
 
               <SettingRow label="Check for Updates" description="Manually check for updates">
-                <Button variant="outline" disabled={check.isPending} onClick={() => check.mutate()}>
+                <Button
+                  variant="outline"
+                  disabled={check.isPending}
+                  onClick={() => check.mutate()}
+                  onMouseEnter={() => void UpdateDialog.preload()}
+                  onFocus={() => void UpdateDialog.preload()}
+                >
                   {check.isPending ? "Checking..." : "Check Now"}
                 </Button>
               </SettingRow>

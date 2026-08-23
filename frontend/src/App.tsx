@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Suspense } from "react";
 import { HashRouter, Navigate, Route, Routes } from "react-router";
 
 import { SettingsProvider, useSettings } from "@/components/providers/settings-provider";
@@ -7,9 +8,9 @@ import { UpdateProvider } from "@/components/providers/update-provider";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { UpdateDialog } from "@/components/update-dialog";
+import { useUpdateStore } from "@/hooks/use-update-store";
 import Layout from "@/Layout";
-import { AboutPage, routes } from "@/lib/routes";
+import { AboutPage, routes, UpdateDialog } from "@/lib/routes";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -51,6 +52,7 @@ function AppRouter() {
 
 function AppLayout() {
   const { config } = useSettings();
+  const release = useUpdateStore((state) => state.release);
   return (
     <SidebarProvider
       defaultOpen={config.launch.sidebar_open}
@@ -64,7 +66,11 @@ function AppLayout() {
       <TooltipProvider>
         <UpdateProvider>
           <Layout />
-          <UpdateDialog />
+          {release && (
+            <Suspense>
+              <UpdateDialog />
+            </Suspense>
+          )}
           <Toaster position="top-center" richColors />
         </UpdateProvider>
       </TooltipProvider>

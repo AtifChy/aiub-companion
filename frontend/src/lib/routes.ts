@@ -18,6 +18,10 @@ const HelpPage = lazyWithPreload(() => import("@/pages/help"));
 
 export const AboutPage = lazyWithPreload(() => import("@/pages/about"));
 
+export const UpdateDialog = lazyWithPreload(() =>
+  import("@/components/update-dialog").then((m) => ({ default: m.UpdateDialog })),
+);
+
 export interface RouteItem {
   label: string;
   path: string;
