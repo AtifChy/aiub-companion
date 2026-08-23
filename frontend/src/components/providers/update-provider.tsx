@@ -1,6 +1,6 @@
 import { Service as UpdaterService } from "@bindings/updater";
 import { useMutation } from "@tanstack/react-query";
-import { createContext, use, useEffect, useRef } from "react";
+import { createContext, use, useCallback, useEffect, useRef } from "react";
 import { toast } from "sonner";
 
 import { COUNTDOWN_SECONDS, initUpdateListeners, useUpdateStore } from "@/hooks/use-update-store";
@@ -8,9 +8,8 @@ import { logger } from "@/lib/logger";
 
 interface UpdateContextType {
   check: ReturnType<typeof useCheckMutation>;
-  download: ReturnType<typeof useDownloadMutation>;
-  install: ReturnType<typeof useInstallMutation>;
-  runInstall: () => void;
+  download: () => void;
+  install: () => void;
   cancelCountdown: () => void;
 }
 
@@ -53,8 +52,8 @@ function useInstallMutation() {
 
 export function UpdateProvider({ children }: { children: React.ReactNode }) {
   const check = useCheckMutation();
-  const download = useDownloadMutation();
-  const install = useInstallMutation();
+  const { mutate: download } = useDownloadMutation();
+  const { mutate: install } = useInstallMutation();
 
   const countdownTimer = useRef<ReturnType<typeof setInterval>>(null);
 
@@ -65,13 +64,13 @@ export function UpdateProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const runInstall = () => {
+  const runInstall = useCallback(() => {
     stopCountdown();
     useUpdateStore.setState({ phaseState: { phase: "installing" } });
-    install.mutate();
-  };
+    install();
+  }, [install]);
 
-  const startCountdown = () => {
+  const startCountdown = useCallback(() => {
     stopCountdown();
     useUpdateStore.setState({ phaseState: { phase: "ready", countdown: COUNTDOWN_SECONDS } });
 
@@ -87,15 +86,17 @@ export function UpdateProvider({ children }: { children: React.ReactNode }) {
           phaseState: { phase: "ready", countdown: current.countdown - 1 },
         });
     }, 1000);
-  };
+  }, [runInstall]);
 
   const cancelCountdown = () => {
     stopCountdown();
     useUpdateStore.setState({ phaseState: { phase: "idle" } });
   };
 
-  // oxlint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => initUpdateListeners({ onReady: startCountdown, onError: cancelCountdown }), []);
+  useEffect(
+    () => initUpdateListeners({ onReady: startCountdown, onError: cancelCountdown }),
+    [startCountdown],
+  );
 
   useEffect(
     () =>
@@ -127,7 +128,7 @@ export function UpdateProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("focus", checkPending);
   }, []);
 
-  const value = () => ({ check, download, install, runInstall, cancelCountdown });
+  const value = () => ({ check, download, install: runInstall, cancelCountdown });
 
   return <UpdateContext value={value()}>{children}</UpdateContext>;
 }

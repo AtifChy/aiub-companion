@@ -26,7 +26,7 @@ import { handleExternalLinkClick } from "@/lib/link-handler";
 import { cn, formatBytes, formatSpeed } from "@/lib/utils";
 
 export function UpdateDialog() {
-  const { download, runInstall, cancelCountdown } = useUpdate();
+  const { download, install, cancelCountdown } = useUpdate();
 
   const { release, dialogOpen, phaseState, closeDialog } = useUpdateStore(
     useShallow((s) => ({
@@ -45,7 +45,7 @@ export function UpdateDialog() {
 
   const handleDownload = () => {
     useUpdateStore.setState({ phaseState: { phase: "downloading", progress: null } });
-    download.mutate();
+    download();
   };
 
   const percent =
@@ -153,7 +153,7 @@ export function UpdateDialog() {
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction
-                onClick={runInstall}
+                onClick={install}
                 className="bg-emerald-600 text-background hover:bg-emerald-700"
               >
                 Install Now
