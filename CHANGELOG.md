@@ -1,3 +1,26 @@
+## [0.12.3] - 2026-08-23
+
+### 🚀 Features
+
+- *(updater)* Lazy load update dialog [`6d4f764`](https://github.com/AtifChy/aiub-companion/commit/6d4f764a59424403a8b929a95b93221bc73f70d4)
+
+### 💼 Other
+
+- Update tsconfig target and module [`ec483a1`](https://github.com/AtifChy/aiub-companion/commit/ec483a1a451af67e2b42b63441d6185222dd7537)
+- Switch to oxc-transform-react reactCompiler [`9b1ff0e`](https://github.com/AtifChy/aiub-companion/commit/9b1ff0ed9757a8a98e4b5e6ec3f9e924b6a3177d)
+
+### 🚜 Refactor
+
+- *(lint)* ReactCompiler doesn't support nullish-coalescing [`8c8cd31`](https://github.com/AtifChy/aiub-companion/commit/8c8cd31f83c6affc35d78d35bcc35173370e480d)
+- *(updater)* Update provider hook usage [`e513edc`](https://github.com/AtifChy/aiub-companion/commit/e513edc6f5768a8ec6e4aaf225550ea3ac8df29c)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Bump version to v0.12.3 [`786583a`](https://github.com/AtifChy/aiub-companion/commit/786583a80be8a239cfd27b9979751438b43f53e1)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.12.2...v0.12.3
+
 ## [0.12.2] - 2026-08-22
 
 ### 🚀 Features
@@ -11,6 +34,10 @@
 ### 🚜 Refactor
 
 - *(window)* Extract hide on close logic [`e5efe56`](https://github.com/AtifChy/aiub-companion/commit/e5efe56ea0420b2e915313b2243938666611da7c)
+
+### 📚 Documentation
+
+- Update changelog [`2524070`](https://github.com/AtifChy/aiub-companion/commit/2524070c0f81faddd7c15621497058f85bed18d9)
 
 ### ⚙️ Miscellaneous Tasks
 
