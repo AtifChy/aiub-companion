@@ -6,7 +6,7 @@ require (
 	github.com/hbollon/go-edlib v1.7.0
 	github.com/lmittmann/tint v1.2.0
 	github.com/microcosm-cc/bluemonday v1.0.27
-	github.com/wailsapp/wails/v3 v3.0.0-beta.11
+	github.com/wailsapp/wails/v3 v3.0.0-beta.12
 	github.com/xuri/excelize/v2 v2.11.0
 	golang.org/x/mod v0.40.0
 	golang.org/x/net v0.58.0
