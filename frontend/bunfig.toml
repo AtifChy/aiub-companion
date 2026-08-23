@@ -1,7 +1,7 @@
 [install]
 # Only install package versions published at least 3 days ago (in seconds)
 minimumReleaseAge = 259200
-minimumReleaseAgeExcludes = ["@wailsio/runtime"]
+minimumReleaseAgeExcludes = ["@wailsio/runtime", "@types/bun", "bun-types"]
 
 [run]
 # Use Bun to run scripts instead of Node.js

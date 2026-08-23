@@ -1,8 +1,7 @@
-import path from "path";
+import path from "node:path";
 
-import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
-import react, { reactCompilerPreset } from "@vitejs/plugin-react";
+import react from "@vitejs/plugin-react";
 import wails from "@wailsio/runtime/plugins/vite";
 import { defineConfig } from "vite";
 
@@ -13,12 +12,7 @@ export default defineConfig({
     port: Number(process.env["WAILS_VITE_PORT"]) || 9245,
     strictPort: true,
   },
-  plugins: [
-    react(),
-    babel({ presets: [reactCompilerPreset()] }),
-    tailwindcss(),
-    wails("./bindings"),
-  ],
+  plugins: [react({ compiler: true }), tailwindcss(), wails("./bindings")],
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),
@@ -31,24 +25,14 @@ export default defineConfig({
         codeSplitting: {
           groups: [
             {
-              name: "react",
-              test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|@tanstack[\\/]react-query)[\\/]/,
-              priority: 20,
-            },
-            {
-              name: "ui",
-              test: /[\\/]node_modules[\\/](@radix-ui|@base-ui|lucide-react|sonner|clsx|tailwind-merge|class-variance-authority|framer-motion)[\\/]/,
-              priority: 15,
-            },
-            {
               name: "wails",
               test: /[\\/]node_modules[\\/]@wailsio[\\/]/,
-              priority: 12,
+              priority: 10,
             },
             {
-              name: "vendor",
-              test: /[\\/]node_modules[\\/]/,
-              priority: 10,
+              name: "react-vendor",
+              test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/,
+              priority: 5,
             },
           ],
         },
