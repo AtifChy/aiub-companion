@@ -31,12 +31,8 @@ var monthMap = map[string]time.Month{
 }
 
 var (
-	reFullDate  = regexp.MustCompile(`(?i)^([a-z]+)\s+(\d{1,2}),?\s+(\d{4})$`)                        // Pattern: "July 13, 2023"
-	reMonthDay  = regexp.MustCompile(`(?i)^([a-z]+)\s+(\d{1,2})$`)                                    // Pattern: "July 13"
-	reDateRange = regexp.MustCompile(`(?i)(\d{1,2})(?:\s+([a-z]+))?\s*-\s*(\d{1,2})(?:\s+([a-z]+))?`) // Pattern: "7 - 13" or "28 - 4 Jul" or "28 Sep - 4 Oct"
-	reParen     = regexp.MustCompile(`\([^)]*\)`)                                                     // Pattern: "(Sat)"
-	reWeekNum   = regexp.MustCompile(`(\d+)`)                                                         // Pattern: "Week 1", "Week 2", etc.
-
+	reParen     = regexp.MustCompile(`\([^)]*\)`)              // Pattern: "(Sat)"
+	reWeekNum   = regexp.MustCompile(`(\d+)`)                  // Pattern: "Week 1", "Week 2", etc.
 	reParagraph = regexp.MustCompile(`<p[^>]*>([\s\S]*?)</p>`) // Pattern to match <p>...</p> blocks
 )
 
@@ -290,105 +286,97 @@ func (p *Parser) parseDayColumn(dayStr string, month time.Month, fallbackRange s
 }
 
 func (p *Parser) parseFullDate(text string) (time.Time, bool) {
-	match := reFullDate.FindStringSubmatch(text)
-	if len(match) < 4 {
+	parts := strings.SplitN(text, ",", 2)
+	if len(parts) != 2 {
 		return time.Time{}, false
 	}
-
-	month, ok := parseMonth(match[1])
-	if !ok {
-		return time.Time{}, false
-	}
-
-	day, err1 := strconv.Atoi(match[2])
-	year, err2 := strconv.Atoi(match[3])
-	if err1 != nil || err2 != nil {
-		return time.Time{}, false
-	}
-
-	return time.Date(year, month, day, 0, 0, 0, 0, tz.Dhaka), true
-}
-
-func (p *Parser) parseMonthDay(text string) (time.Time, bool) {
-	match := reMonthDay.FindStringSubmatch(text)
-	if len(match) < 3 {
-		return time.Time{}, false
-	}
-
-	month, ok := parseMonth(match[1])
-	if !ok {
-		return time.Time{}, false
-	}
-
-	day, err := strconv.Atoi(match[2])
+	year, err := strconv.Atoi(strings.TrimSpace(parts[1]))
 	if err != nil {
 		return time.Time{}, false
 	}
+	token, ok := parseDayMonthToken(parts[0])
+	if !ok || !token.hasMonth {
+		return time.Time{}, false
+	}
+	return time.Date(year, token.month, token.day, 0, 0, 0, 0, tz.Dhaka), true
+}
 
-	return time.Date(p.year, month, day, 0, 0, 0, 0, tz.Dhaka), true
+func (p *Parser) parseMonthDay(text string) (time.Time, bool) {
+	token, ok := parseDayMonthToken(text)
+	if !ok || !token.hasMonth {
+		return time.Time{}, false
+	}
+	return time.Date(p.year, token.month, token.day, 0, 0, 0, 0, tz.Dhaka), true
 }
 
 func (p *Parser) parseDateRange(text string, month time.Month) (DateParseResult, bool) {
-	// Normalize dashes
-	replacer := strings.NewReplacer("–", "-", "—", "-", "−", "-")
-	text = replacer.Replace(text)
+	text = normalizeDashes(text)
 
-	match := reDateRange.FindStringSubmatch(text)
-	if len(match) < 5 {
+	parts := strings.SplitN(text, "-", 2)
+	if len(parts) != 2 {
 		return DateParseResult{}, false
 	}
 
-	startDay, err1 := strconv.Atoi(match[1])
-	endDay, err2 := strconv.Atoi(match[3])
-	if err1 != nil || err2 != nil {
+	start, ok := parseDayMonthToken(parts[0])
+	if !ok {
 		return DateParseResult{}, false
 	}
-
-	// Determine the start month
-	startMonth := month
-	if match[2] != "" {
-		if m, ok := parseMonth(match[2]); ok {
-			startMonth = m
-		}
+	if !start.hasMonth {
+		start.month = month
 	}
 
-	// Determine the end month
-	endMonth := startMonth
-	if match[4] != "" {
-		if m, ok := parseMonth(match[4]); ok {
-			endMonth = m
+	end, ok := parseDayMonthToken(parts[1])
+	if !ok {
+		return DateParseResult{}, false
+	}
+	switch {
+	case end.hasMonth:
+	case end.day < start.day:
+		end.month = start.month + 1
+		if end.month > time.December {
+			end.month = time.January
 		}
+	default:
+		end.month = start.month
 	}
 
-	startYear := p.year
-	startDate := time.Date(startYear, startMonth, startDay, 0, 0, 0, 0, tz.Dhaka)
-
-	var endDate time.Time
-	if endMonth != startMonth {
-		// Cross-month range
-		endYear := startYear
-		if endMonth < startMonth {
-			endYear++ // Next year
-		}
-		endDate = time.Date(endYear, endMonth, endDay, 0, 0, 0, 0, tz.Dhaka)
-	} else if endDay < startDay {
-		// Cross-month without explicit month
-		nextMonth := startMonth + 1
-		nextYear := startYear
-		if nextMonth > time.December {
-			nextMonth = time.January
-			nextYear++
-		}
-		endDate = time.Date(nextYear, nextMonth, endDay, 0, 0, 0, 0, tz.Dhaka)
-	} else {
-		endDate = time.Date(startYear, endMonth, endDay, 0, 0, 0, 0, tz.Dhaka)
+	startDate := time.Date(p.year, start.month, start.day, 0, 0, 0, 0, tz.Dhaka)
+	endYear := p.year
+	if end.month < start.month || (end.month == start.month && end.day < start.day) {
+		endYear++ // If the end date is earlier in the year, assume it's in the next year
 	}
+	endDate := time.Date(endYear, end.month, end.day, 0, 0, 0, 0, tz.Dhaka)
 
 	return DateParseResult{
 		IsRange:   true,
 		StartDate: startDate,
 		EndDate:   endDate,
 	}, true
+}
+
+func normalizeDashes(text string) string {
+	return strings.NewReplacer("–", "-", "—", "-", "−", "-").Replace(text)
+}
+
+type dayMonthToken struct {
+	day      int
+	month    time.Month
+	hasMonth bool
+}
+
+func parseDayMonthToken(token string) (dayMonthToken, bool) {
+	var result dayMonthToken
+	for field := range strings.FieldsSeq(token) {
+		if d, err := strconv.Atoi(field); err == nil {
+			result.day = d
+			continue
+		}
+		if m, ok := parseMonth(field); ok {
+			result.month = m
+			result.hasMonth = true
+		}
+	}
+	return result, result.day > 0
 }
 
 func (p *Parser) parseIndividualDates(text string, month time.Month) []time.Time {
@@ -420,11 +408,9 @@ func parseMonth(text string) (time.Month, bool) {
 	if len(text) < 3 {
 		return 0, false
 	}
-
 	if month, ok := monthMap[text[:3]]; ok {
 		return month, true
 	}
-
 	return 0, false
 }
 
