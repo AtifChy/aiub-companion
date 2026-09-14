@@ -107,9 +107,10 @@ func TestAcademicCalendar_GetCurrentWeek(t *testing.T) {
 	now := time.Now()
 
 	tests := []struct {
-		name     string
-		weeks    []Week
-		expected int
+		name           string
+		weeks          []Week
+		expectedWeek   int
+		expectedStatus CalendarStatus
 	}{
 		{
 			name: "current week found",
@@ -117,27 +118,51 @@ func TestAcademicCalendar_GetCurrentWeek(t *testing.T) {
 				{Number: 3, Start: now.Add(-14 * 24 * time.Hour), End: now.Add(-7 * 24 * time.Hour)},
 				{Number: 4, Start: now.Add(-1 * time.Hour), End: now.Add(7 * 24 * time.Hour)},
 			},
-			expected: 4,
+			expectedWeek:   4,
+			expectedStatus: CalendarActive,
 		},
 		{
-			name:     "no weeks",
-			weeks:    []Week{},
-			expected: 0,
+			name:           "no weeks",
+			weeks:          []Week{},
+			expectedWeek:   0,
+			expectedStatus: CalendarFinished,
 		},
 		{
 			name: "no current week",
 			weeks: []Week{
 				{Number: 1, Start: now.Add(-21 * 24 * time.Hour), End: now.Add(-14 * 24 * time.Hour)},
 			},
-			expected: 0,
+			expectedWeek:   0,
+			expectedStatus: CalendarFinished,
+		},
+		{
+			name: "not started yet",
+			weeks: []Week{
+				{Number: 1, Start: now.Add(7 * 24 * time.Hour), End: now.Add(14 * 24 * time.Hour)},
+			},
+			expectedWeek:   0,
+			expectedStatus: CalendarNotStarted,
+		},
+		{
+			name: "missing week in between",
+			weeks: []Week{
+				{Number: 1, Start: now.Add(-21 * 24 * time.Hour), End: now.Add(-14 * 24 * time.Hour)},
+				{Number: 3, Start: now.Add(1 * 24 * time.Hour), End: now.Add(7 * 24 * time.Hour)},
+			},
+			expectedWeek:   2,
+			expectedStatus: CalendarActive,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cal := &AcademicCalendar{Weeks: tt.weeks}
-			if got := cal.GetCurrentWeek(); got != tt.expected {
-				t.Errorf("GetCurrentWeek() = %d, want %d", got, tt.expected)
+			gotWeek, gotStatus := cal.GetCurrentWeek()
+			if gotWeek != tt.expectedWeek {
+				t.Errorf("GetCurrentWeek() = %d, want %d", gotWeek, tt.expectedWeek)
+			}
+			if gotStatus != tt.expectedStatus {
+				t.Errorf("GetCurrentWeek() status = %v, want %v", gotStatus, tt.expectedStatus)
 			}
 		})
 	}
