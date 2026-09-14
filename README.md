@@ -10,7 +10,7 @@ A desktop app for AIUB students that pulls in university notices, lets you manag
 
 Built with Go + Wails v3 on the backend and React 19 + Tailwind CSS v4 on the frontend.
 
-![img](assets/aiub-companion.png)
+![aiub-companion](assets/aiub-companion.png)
 
 ## Features
 
