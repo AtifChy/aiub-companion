@@ -1,3 +1,37 @@
+## [0.13.0] - 2026-09-14
+
+### 🚀 Features
+
+- *(calendar)* Add calendar status to current week [`bd61644`](https://github.com/AtifChy/aiub-companion/commit/bd616440d6476a075d9a98e85242281260c9bcfd)
+
+### 🐛 Bug Fixes
+
+- *(ui)* Update focus-visible styles for checkbox and switch [`3c2005a`](https://github.com/AtifChy/aiub-companion/commit/3c2005acc9182893978eb4849803acbd4f99556f)
+
+### 💼 Other
+
+- Update build files to follow latest wails changes [`b04e3ad`](https://github.com/AtifChy/aiub-companion/commit/b04e3ad4aaeeda762fda0b51a2e335e1b7ad8a2c)
+- *(frontend)* Add react types [`16892ee`](https://github.com/AtifChy/aiub-companion/commit/16892ee4c11c117150ec4fa12ba7e32a4a3f6a0f)
+
+### 🚜 Refactor
+
+- *(calendar)* Simplify date parsing logic [`e11b785`](https://github.com/AtifChy/aiub-companion/commit/e11b7858e0b1abdbb18ead4f2e6b3bb174d51e44)
+
+### 📚 Documentation
+
+- Add project screenshot to readme [`39ae68a`](https://github.com/AtifChy/aiub-companion/commit/39ae68adfee9bf79428cc71fac6cd4cbd2dcb351)
+
+### 🧪 Testing
+
+- *(calendar)* Update `GetCurrentWeek` test cases [`8db1ed2`](https://github.com/AtifChy/aiub-companion/commit/8db1ed2c873534ad74446a380360e16557cbd685)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Bump version to v0.13.0 [`8c141b4`](https://github.com/AtifChy/aiub-companion/commit/8c141b433fd30361ebedd90ea08e037c88d6b501)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.12.3...v0.13.0
+
 ## [0.12.3] - 2026-08-23
 
 ### 🚀 Features
@@ -13,6 +47,10 @@
 
 - *(lint)* ReactCompiler doesn't support nullish-coalescing [`8c8cd31`](https://github.com/AtifChy/aiub-companion/commit/8c8cd31f83c6affc35d78d35bcc35173370e480d)
 - *(updater)* Update provider hook usage [`e513edc`](https://github.com/AtifChy/aiub-companion/commit/e513edc6f5768a8ec6e4aaf225550ea3ac8df29c)
+
+### 📚 Documentation
+
+- Update changelog [`4ecc197`](https://github.com/AtifChy/aiub-companion/commit/4ecc197a7d1057d245a95f4eb1a5044fcfdbbcc7)
 
 ### ⚙️ Miscellaneous Tasks
 
