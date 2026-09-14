@@ -3,7 +3,7 @@
     "target": "ESNext",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "module": "Preserve",
-    "types": ["bun"],
+    "types": ["bun", "react"],
     "skipLibCheck": true,
     "useDefineForClassFields": true,
 
