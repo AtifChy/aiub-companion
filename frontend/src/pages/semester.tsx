@@ -1,4 +1,9 @@
-import { Service as CalendarService, CalendarType, type AcademicEvent } from "@bindings/calendar";
+import {
+  Service as CalendarService,
+  CalendarStatus,
+  CalendarType,
+  type AcademicEvent,
+} from "@bindings/calendar";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BookOpenIcon,
@@ -76,7 +81,7 @@ export default function SemesterPage() {
 
   const { data, isLoading } = calendarQuery;
   const calendar = data?.calendar ?? null;
-  const currentWeek = data?.currentWeek ?? 0;
+  const [currentWeek, calendarStatus] = data?.currentWeek ?? [0, CalendarStatus.CalendarNotStarted];
   const currentOrNextExam = data?.currentOrNextExam ?? null;
   const upcomingEvents = data?.upcomingEvents ?? [];
 
@@ -156,10 +161,17 @@ export default function SemesterPage() {
               <CalendarDaysIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">Week {currentWeek}</div>
+              <div className="text-2xl font-bold">
+                {calendarStatus === CalendarStatus.CalendarNotStarted
+                  ? "—"
+                  : calendarStatus === CalendarStatus.CalendarFinished
+                    ? "Finished"
+                    : `Week ${String(currentWeek)}`}
+              </div>
               {calendar?.totalWeeks && (
                 <p className="text-xs text-muted-foreground">
-                  of {calendar.totalWeeks} total weeks
+                  {calendarStatus === CalendarStatus.CalendarActive && "of"}
+                  {calendar.totalWeeks} total weeks
                 </p>
               )}
             </CardContent>

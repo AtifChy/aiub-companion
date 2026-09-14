@@ -73,24 +73,42 @@ type AcademicCalendar struct {
 	Year        int             `json:"year"`
 }
 
-func (c *AcademicCalendar) GetCurrentWeek() int {
+type CalendarStatus int
+
+const (
+	CalendarNotStarted CalendarStatus = iota
+	CalendarActive
+	CalendarFinished
+)
+
+func (c *AcademicCalendar) GetCurrentWeek() (int, CalendarStatus) {
+	if len(c.Weeks) == 0 {
+		return 0, CalendarFinished
+	}
 	now := timeNow()
-	for _, w := range c.Weeks {
+	for i, w := range c.Weeks {
 		if !isBeforeDay(now, w.Start) && !isAfterDay(now, w.End) {
-			return w.Number
+			return w.Number, CalendarActive
+		}
+		// Check if the current date is between the end of this week and the start of the next week
+		if i+1 < len(c.Weeks) {
+			next := c.Weeks[i+1]
+			if isAfterDay(now, w.End) && isBeforeDay(now, next.Start) {
+				return w.Number + 1, CalendarActive
+			}
 		}
 	}
 	if len(c.Weeks) > 0 && isBeforeDay(now, c.Weeks[0].Start) {
-		return 1
+		return 0, CalendarNotStarted
 	}
-	if len(c.Weeks) > 0 && isAfterDay(now, c.Weeks[len(c.Weeks)-1].End) {
-		return c.TotalWeeks
-	}
-	return 0
+	return 0, CalendarFinished
 }
 
 func (c *AcademicCalendar) GetProgressPercentage() float64 {
-	currentWeek := c.GetCurrentWeek()
+	currentWeek, status := c.GetCurrentWeek()
+	if status == CalendarFinished {
+		return 100
+	}
 	if currentWeek == 0 || c.TotalWeeks == 0 {
 		return 0
 	}

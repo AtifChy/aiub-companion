@@ -164,12 +164,13 @@ func (s *Service) fetchAndParse(ctx context.Context, calType CalendarType) (*Aca
 
 // Public methods to expose calendar data
 
-func (s *Service) GetCurrentWeek(ctx context.Context, calType CalendarType) (int, error) {
+func (s *Service) GetCurrentWeek(ctx context.Context, calType CalendarType) (int, CalendarStatus, error) {
 	calendar, err := s.GetAcademicCalendar(ctx, calType)
 	if err != nil {
-		return 0, err
+		return 0, CalendarFinished, err
 	}
-	return calendar.GetCurrentWeek(), nil
+	week, status := calendar.GetCurrentWeek()
+	return week, status, nil
 }
 
 func (s *Service) GetUpcomingEvents(ctx context.Context, calType CalendarType, limit int) ([]AcademicEvent, error) {
