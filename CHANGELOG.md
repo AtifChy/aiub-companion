@@ -1,3 +1,21 @@
+## [0.13.1] - 2026-09-20
+
+### 🐛 Bug Fixes
+
+- *(calendar)* `registration` category parsed as exam [`2b67c89`](https://github.com/AtifChy/aiub-companion/commit/2b67c8968a57aecdaf4b7fceee0c1a183e36d2be)
+
+### 📚 Documentation
+
+- Update license copyright year and owner [`ab4f2ba`](https://github.com/AtifChy/aiub-companion/commit/ab4f2ba521d976e27432a318145754df89d05ea1)
+- Update product image [`7429526`](https://github.com/AtifChy/aiub-companion/commit/7429526de7fa01f61dfb0aba041626a671120172)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Bump version to v0.13.1 [`def6b9e`](https://github.com/AtifChy/aiub-companion/commit/def6b9e856122bca521ae6e52913c7969dadf52a)
+
+
+> **Full Changelog**: https://github.com/AtifChy/aiub-companion/compare/v0.13.0...v0.13.1
+
 ## [0.13.0] - 2026-09-14
 
 ### 🚀 Features
@@ -20,6 +38,7 @@
 ### 📚 Documentation
 
 - Add project screenshot to readme [`39ae68a`](https://github.com/AtifChy/aiub-companion/commit/39ae68adfee9bf79428cc71fac6cd4cbd2dcb351)
+- Update changelog [`4bd9b0b`](https://github.com/AtifChy/aiub-companion/commit/4bd9b0b3c371815b5dba12d3653f562cd20744c8)
 
 ### 🧪 Testing
 
