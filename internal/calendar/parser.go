@@ -481,8 +481,8 @@ var categoryRules = []categoryRule{
 	{EventDeadline, []string{"deadline", "last date"}},
 	{EventAcademic, []string{"result", "grade"}},
 	{EventLab, []string{"lab", "laboratory"}},
-	{EventExam, []string{"exam", "midterm", "final"}},
 	{EventRegistration, []string{"registration"}},
+	{EventExam, []string{"exam", "midterm", "final"}},
 	{EventBreak, []string{"break", "holiday"}},
 }
 
